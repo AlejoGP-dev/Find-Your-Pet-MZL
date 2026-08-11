@@ -66,25 +66,24 @@ export default async function Inicio({ searchParams }: { searchParams: Params })
             </Link>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-6 text-sm">
-            <div>
-              <span className="block text-2xl font-extrabold text-perdida">
-                {totales.perdidas}
-              </span>
-              <span className="text-stone-600">buscando su casa</span>
-            </div>
-            <div>
-              <span className="block text-2xl font-extrabold text-encontrada">
-                {totales.encontradas}
-              </span>
-              <span className="text-stone-600">encontradas, buscando dueño</span>
-            </div>
-            <div>
-              <span className="block text-2xl font-extrabold text-marca">
-                {totales.reunidas}
-              </span>
-              <span className="text-stone-600">ya volvieron a casa 🎉</span>
-            </div>
+          <div className="mt-8 grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3">
+            {[
+              { n: totales.perdidas, texto: "buscando su casa", color: "text-perdida" },
+              { n: totales.encontradas, texto: "buscando dueño", color: "text-encontrada" },
+              { n: totales.reunidas, texto: "ya en casa 🎉", color: "text-marca" },
+            ].map((dato) => (
+              <div
+                key={dato.texto}
+                className="rounded-xl bg-white/70 px-2 py-3 text-center ring-1 ring-stone-200/70 sm:px-4"
+              >
+                <span className={`block text-2xl font-extrabold sm:text-3xl ${dato.color}`}>
+                  {dato.n}
+                </span>
+                <span className="mt-0.5 block text-xs leading-tight text-stone-600 sm:text-sm">
+                  {dato.texto}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </section>

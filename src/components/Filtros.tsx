@@ -42,30 +42,32 @@ export default function Filtros() {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex flex-wrap rounded-xl border border-stone-300 bg-white p-1">
-          {PESTANAS.map((p) => (
-            <button
-              key={p.clave}
-              type="button"
-              onClick={() => actualizar({ tipo: p.tipo, estado: p.estado })}
-              className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
-                pestanaActual === p.clave
-                  ? p.clave === "reunidas"
-                    ? "bg-encontrada text-white"
-                    : "bg-marca text-white"
-                  : "text-stone-600 hover:bg-stone-100"
-              }`}
-            >
-              {p.etiqueta}
-            </button>
-          ))}
-        </div>
+      {/* Pestañas: 2x2 en móvil, una fila en escritorio */}
+      <div className="grid grid-cols-2 gap-1 rounded-xl border border-stone-300 bg-white p-1 sm:inline-grid sm:grid-cols-4">
+        {PESTANAS.map((p) => (
+          <button
+            key={p.clave}
+            type="button"
+            onClick={() => actualizar({ tipo: p.tipo, estado: p.estado })}
+            className={`rounded-lg px-3 py-2.5 text-sm font-bold transition sm:px-4 ${
+              pestanaActual === p.clave
+                ? p.clave === "reunidas"
+                  ? "bg-encontrada text-white"
+                  : "bg-marca text-white"
+                : "text-stone-600 hover:bg-stone-100"
+            }`}
+          >
+            {p.etiqueta}
+          </button>
+        ))}
+      </div>
 
+      {/* Selectores: dos columnas en móvil */}
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
         <select
           value={especieActual}
           onChange={(e) => actualizar({ especie: e.target.value })}
-          className="rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca"
+          className="w-full min-w-0 rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca sm:w-auto"
           aria-label="Filtrar por tipo de mascota"
         >
           <option value="">Perros y gatos</option>
@@ -79,7 +81,7 @@ export default function Filtros() {
         <select
           value={barrioActual}
           onChange={(e) => actualizar({ barrio: e.target.value })}
-          className="rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca"
+          className="w-full min-w-0 rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca sm:w-auto"
           aria-label="Filtrar por barrio"
         >
           <option value="">Todos los barrios</option>
@@ -101,7 +103,7 @@ export default function Filtros() {
               setBusqueda("");
               actualizar({ tipo: "", especie: "", barrio: "", q: "", estado: "" });
             }}
-            className="text-sm font-semibold text-stone-500 underline underline-offset-2 hover:text-stone-700"
+            className="col-span-2 text-sm font-semibold text-stone-500 underline underline-offset-2 hover:text-stone-700"
           >
             Limpiar filtros
           </button>
