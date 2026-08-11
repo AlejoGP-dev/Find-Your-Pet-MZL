@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --color-crema: #faf6f0;
+  --color-tinta: #1c1917;
+  --color-marca: #0f6f6c;
+  --color-marca-oscuro: #0a4f4d;
+  --color-marca-suave: #e3f2f1;
+  --color-perdida: #c2410c;
+  --color-perdida-suave: #ffedd5;
+  --color-encontrada: #047857;
+  --color-encontrada-suave: #d1fae5;
+  --font-sans: var(--fuente-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-crema);
+  color: var(--color-tinta);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .campo {
+    @apply w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-base text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-marca focus:ring-2 focus:ring-marca/25;
+  }
+  .etiqueta {
+    @apply mb-1.5 block text-sm font-semibold text-stone-700;
+  }
+  .boton-primario {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-marca px-5 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-marca-oscuro focus:outline-none focus:ring-2 focus:ring-marca/40 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .boton-secundario {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-5 py-3 text-base font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50;
+  }
+}
