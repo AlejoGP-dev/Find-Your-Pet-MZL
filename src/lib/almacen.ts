@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import type { NuevoReporte, Reporte } from "./tipos";
+import type { Avistamiento, NuevoAvistamiento, NuevoReporte, Reporte } from "./tipos";
 
 const URL_SUPABASE = process.env.SUPABASE_URL;
 const LLAVE_SERVICIO = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -23,11 +23,15 @@ function supabase(): SupabaseClient {
 /* ------------------------------------------------------------------ */
 type FilaDemo = Reporte & { token_gestion: string };
 
-const globalDemo = globalThis as unknown as { __demoReportes?: FilaDemo[] };
+const globalDemo = globalThis as unknown as {
+  __demoReportes?: FilaDemo[];
+  __demoAvistamientos?: Avistamiento[];
+};
 if (!globalDemo.__demoReportes) globalDemo.__demoReportes = [];
+if (!globalDemo.__demoAvistamientos) globalDemo.__demoAvistamientos = [];
 
 const CAMPOS_PUBLICOS =
-  "id,tipo,nombre,especie,raza,color,tamano,sexo,foto_url,barrio,referencia,fecha,descripcion,contacto_nombre,contacto_whatsapp,estado,created_at";
+  "id,tipo,nombre,especie,raza,color,tamano,sexo,foto_url,barrio,referencia,fecha,descripcion,contacto_nombre,contacto_whatsapp,estado,avistamientos,created_at";
 
 export type FiltrosReporte = {
   tipo?: string | null;
@@ -107,6 +111,7 @@ export async function crearReporte(
       ...datos,
       id: crypto.randomUUID(),
       estado: "activo",
+      avistamientos: 0,
       created_at: new Date().toISOString(),
       token_gestion: token,
     };
@@ -195,4 +200,91 @@ export async function contarPorEstado(): Promise<{
 
 function consultaBase() {
   return supabase().from("reportes").select("id", { count: "exact", head: true });
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Avistamientos: pistas que deja la comunidad sobre una mascota       */
+/* ------------------------------------------------------------------ */
+
+export async function listarAvistamientos(reporteId: string): Promise<Avistamiento[]> {
+  if (!HAY_SUPABASE) {
+    return globalDemo
+      .__demoAvistamientos!.filter((a) => a.reporte_id === reporteId)
+      .sort((a, b) => b.created_at.localeCompare(a.created_at));
+  }
+  const { data, error } = await supabase()
+    .from("avistamientos")
+    .select("id,reporte_id,lugar,fecha,comentario,nombre,whatsapp,created_at")
+    .eq("reporte_id", reporteId)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as unknown as Avistamiento[];
+}
+
+export async function crearAvistamiento(
+  datos: NuevoAvistamiento,
+): Promise<Avistamiento> {
+  if (!HAY_SUPABASE) {
+    const fila: Avistamiento = {
+      ...datos,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+    };
+    globalDemo.__demoAvistamientos!.unshift(fila);
+    const reporte = globalDemo.__demoReportes!.find((r) => r.id === datos.reporte_id);
+    if (reporte) reporte.avistamientos += 1;
+    return fila;
+  }
+  const { data, error } = await supabase()
+    .from("avistamientos")
+    .insert(datos)
+    .select("id,reporte_id,lugar,fecha,comentario,nombre,whatsapp,created_at")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as unknown as Avistamiento;
+}
+
+/** Solo quien publicó el reporte (con su código) puede borrar una pista. */
+export async function eliminarAvistamiento(
+  avistamientoId: string,
+  token: string,
+): Promise<boolean> {
+  const codigo = token.trim().toUpperCase();
+
+  if (!HAY_SUPABASE) {
+    const indice = globalDemo.__demoAvistamientos!.findIndex(
+      (a) => a.id === avistamientoId,
+    );
+    if (indice === -1) return false;
+    const aviso = globalDemo.__demoAvistamientos![indice];
+    const reporte = globalDemo.__demoReportes!.find((r) => r.id === aviso.reporte_id);
+    if (!reporte || reporte.token_gestion !== codigo) return false;
+    globalDemo.__demoAvistamientos!.splice(indice, 1);
+    reporte.avistamientos = Math.max(reporte.avistamientos - 1, 0);
+    return true;
+  }
+
+  const { data: aviso } = await supabase()
+    .from("avistamientos")
+    .select("id,reporte_id")
+    .eq("id", avistamientoId)
+    .maybeSingle();
+  if (!aviso) return false;
+
+  const { data: reporte } = await supabase()
+    .from("reportes")
+    .select("id")
+    .eq("id", (aviso as { reporte_id: string }).reporte_id)
+    .eq("token_gestion", codigo)
+    .maybeSingle();
+  if (!reporte) return false;
+
+  const { error } = await supabase()
+    .from("avistamientos")
+    .delete()
+    .eq("id", avistamientoId);
+  if (error) throw new Error(error.message);
+  return true;
 }

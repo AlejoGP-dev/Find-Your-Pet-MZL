@@ -21,10 +21,27 @@ export type Reporte = {
   contacto_nombre: string;
   contacto_whatsapp: string;
   estado: EstadoReporte;
+  avistamientos: number;
   created_at: string;
 };
 
-export type NuevoReporte = Omit<Reporte, "id" | "estado" | "created_at">;
+export type Avistamiento = {
+  id: string;
+  reporte_id: string;
+  lugar: string;
+  fecha: string;
+  comentario: string | null;
+  nombre: string | null;
+  whatsapp: string | null;
+  created_at: string;
+};
+
+export type NuevoAvistamiento = Omit<Avistamiento, "id" | "created_at">;
+
+export type NuevoReporte = Omit<
+  Reporte,
+  "id" | "estado" | "avistamientos" | "created_at"
+>;
 
 export type GrupoUbicacion = { ciudad: string; barrios: string[] };
 
@@ -159,4 +176,17 @@ export function enlaceWhatsapp(reporte: Reporte, urlPublica: string): string {
       : `Hola ${reporte.contacto_nombre}, vi en Find Your Pet MZL la mascota que encontraste y creo que puede ser la mía.`;
   const texto = `${saludo}\n\n${urlPublica}`;
   return `https://wa.me/${normalizarWhatsapp(reporte.contacto_whatsapp)}?text=${encodeURIComponent(texto)}`;
+}
+
+/** "hace 3 horas", "hace 2 días"… para la lista de avistamientos. */
+export function haceCuanto(iso: string): string {
+  const minutos = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (minutos < 1) return "hace un momento";
+  if (minutos < 60) return `hace ${minutos} min`;
+  const horas = Math.floor(minutos / 60);
+  if (horas < 24) return `hace ${horas} ${horas === 1 ? "hora" : "horas"}`;
+  const dias = Math.floor(horas / 24);
+  if (dias < 30) return `hace ${dias} ${dias === 1 ? "día" : "días"}`;
+  const meses = Math.floor(dias / 30);
+  return `hace ${meses} ${meses === 1 ? "mes" : "meses"}`;
 }

@@ -52,8 +52,13 @@ export default function TarjetaReporte({ reporte }: { reporte: Reporte }) {
           </div>
         )}
         {reporte.estado === "activo" && (
-          <div className="absolute left-3 top-3">
+          <div className="absolute inset-x-2 top-2 flex flex-wrap items-start gap-1">
             <InsigniaTipo tipo={reporte.tipo} />
+            {reporte.avistamientos > 0 && (
+              <span className="rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-marca-oscuro shadow-sm">
+                👀 {reporte.avistamientos}
+              </span>
+            )}
           </div>
         )}
         {reporte.estado === "resuelto" && (

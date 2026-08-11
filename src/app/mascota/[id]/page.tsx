@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import AccionesReporte from "@/components/AccionesReporte";
+import Avistamientos from "@/components/Avistamientos";
 import { InsigniaTipo } from "@/components/TarjetaReporte";
-import { obtenerReporte } from "@/lib/almacen";
+import { listarAvistamientos, obtenerReporte } from "@/lib/almacen";
 import {
   ESPECIES,
   SEXOS,
@@ -52,6 +53,7 @@ export default async function PaginaMascota({ params }: Props) {
 
   const especie = ESPECIES.find((e) => e.valor === reporte.especie);
   const url = await urlActual(id);
+  const avistamientos = await listarAvistamientos(id).catch(() => []);
   const esPerdida = reporte.tipo === "perdida";
 
   const datos: { rotulo: string; valor: string | null }[] = [
@@ -159,6 +161,15 @@ export default async function PaginaMascota({ params }: Props) {
             dinero por adelantado y prefiere encontrarte en un lugar público.
           </p>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <Avistamientos
+          reporteId={reporte.id}
+          tipo={reporte.tipo}
+          resuelto={reporte.estado === "resuelto"}
+          iniciales={avistamientos}
+        />
       </div>
     </div>
   );
