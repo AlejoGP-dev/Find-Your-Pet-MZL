@@ -79,6 +79,18 @@ export default function RootLayout({
                 119
               </a>
             </p>
+
+            <p className="mt-6 border-t border-stone-200 pt-5 text-center text-stone-500">
+              Un granito de arena realizado por{" "}
+              <a
+                href="https://www.instagram.com/ialejog"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-marca underline underline-offset-2 hover:text-marca-oscuro"
+              >
+                Alejandro Grajales
+              </a>
+            </p>
           </div>
         </footer>
       </body>
