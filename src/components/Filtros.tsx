@@ -42,72 +42,75 @@ export default function Filtros() {
 
   return (
     <div className="space-y-3">
-      {/* Pestañas: 2x2 en móvil, una fila en escritorio */}
-      <div className="grid grid-cols-2 gap-1 rounded-xl border border-stone-300 bg-white p-1 sm:inline-grid sm:grid-cols-4">
-        {PESTANAS.map((p) => (
-          <button
-            key={p.clave}
-            type="button"
-            onClick={() => actualizar({ tipo: p.tipo, estado: p.estado })}
-            className={`rounded-lg px-3 py-2.5 text-sm font-bold transition sm:px-4 ${
-              pestanaActual === p.clave
-                ? p.clave === "reunidas"
-                  ? "bg-encontrada text-white"
-                  : "bg-marca text-white"
-                : "text-stone-600 hover:bg-stone-100"
-            }`}
-          >
-            {p.etiqueta}
-          </button>
-        ))}
-      </div>
-
-      {/* Selectores: dos columnas en móvil */}
-      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
-        <select
-          value={especieActual}
-          onChange={(e) => actualizar({ especie: e.target.value })}
-          className="w-full min-w-0 rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca sm:w-auto"
-          aria-label="Filtrar por tipo de mascota"
-        >
-          <option value="">Perros y gatos</option>
-          {ESPECIES.map((e) => (
-            <option key={e.valor} value={e.valor}>
-              {e.emoji} {e.etiqueta}
-            </option>
+      {/* Fila de filtros: apilada en móvil, todo en una línea en escritorio */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        {/* Pestañas: 2x2 en móvil */}
+        <div className="grid grid-cols-2 gap-1 rounded-xl border border-stone-300 bg-white p-1 sm:flex sm:shrink-0">
+          {PESTANAS.map((p) => (
+            <button
+              key={p.clave}
+              type="button"
+              onClick={() => actualizar({ tipo: p.tipo, estado: p.estado })}
+              className={`whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-bold transition ${
+                pestanaActual === p.clave
+                  ? p.clave === "reunidas"
+                    ? "bg-encontrada text-white"
+                    : "bg-marca text-white"
+                  : "text-stone-600 hover:bg-stone-100"
+              }`}
+            >
+              {p.etiqueta}
+            </button>
           ))}
-        </select>
+        </div>
 
-        <select
-          value={barrioActual}
-          onChange={(e) => actualizar({ barrio: e.target.value })}
-          className="w-full min-w-0 rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca sm:w-auto"
-          aria-label="Filtrar por barrio"
-        >
-          <option value="">Todos los barrios</option>
-          {UBICACIONES.map((grupo) => (
-            <optgroup key={grupo.ciudad} label={grupo.ciudad}>
-              {grupo.barrios.map((b) => (
-                <option key={b} value={b}>
-                  {b.replace(" (Villamaría)", "")}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-
-        {hayFiltros && (
-          <button
-            type="button"
-            onClick={() => {
-              setBusqueda("");
-              actualizar({ tipo: "", especie: "", barrio: "", q: "", estado: "" });
-            }}
-            className="col-span-2 text-sm font-semibold text-stone-500 underline underline-offset-2 hover:text-stone-700"
+        {/* Selectores: dos columnas en móvil, en la misma fila en escritorio */}
+        <div className="grid grid-cols-2 gap-2 sm:contents">
+          <select
+            value={especieActual}
+            onChange={(e) => actualizar({ especie: e.target.value })}
+            className="w-full min-w-0 rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca sm:w-auto"
+            aria-label="Filtrar por tipo de mascota"
           >
-            Limpiar filtros
-          </button>
-        )}
+            <option value="">Perros y gatos</option>
+            {ESPECIES.map((e) => (
+              <option key={e.valor} value={e.valor}>
+                {e.emoji} {e.etiqueta}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={barrioActual}
+            onChange={(e) => actualizar({ barrio: e.target.value })}
+            className="w-full min-w-0 rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca sm:w-auto"
+            aria-label="Filtrar por barrio"
+          >
+            <option value="">Todos los barrios</option>
+            {UBICACIONES.map((grupo) => (
+              <optgroup key={grupo.ciudad} label={grupo.ciudad}>
+                {grupo.barrios.map((b) => (
+                  <option key={b} value={b}>
+                    {b.replace(" (Villamaría)", "")}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+
+          {hayFiltros && (
+            <button
+              type="button"
+              onClick={() => {
+                setBusqueda("");
+                actualizar({ tipo: "", especie: "", barrio: "", q: "", estado: "" });
+              }}
+              className="col-span-2 whitespace-nowrap text-sm font-semibold text-stone-500 underline underline-offset-2 hover:text-stone-700"
+            >
+              Limpiar filtros
+            </button>
+          )}
+        </div>
       </div>
 
       <form
