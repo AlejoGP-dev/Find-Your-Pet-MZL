@@ -26,39 +26,76 @@ export type Reporte = {
 
 export type NuevoReporte = Omit<Reporte, "id" | "estado" | "created_at">;
 
-export const BARRIOS_MANIZALES = [
-  "Centro",
-  "Chipre",
-  "Palogrande",
-  "La Enea",
-  "Milán",
-  "Villapilar",
-  "El Cable",
-  "Los Rosales",
-  "Fátima",
-  "La Sultana",
-  "San Jorge",
-  "Estrella",
-  "Villa del Río",
-  "La Camelia",
-  "Belén",
-  "Alta Suiza",
-  "Laureles",
-  "Malhabar",
-  "Versalles",
-  "Bosques del Norte",
-  "La Carola",
-  "Marmato",
-  "San José",
-  "El Nevado",
-  "Campohermoso",
-  "Aranjuez",
-  "Solferino",
-  "Minitas",
-  "Las Américas",
-  "Corregimiento / vereda",
-  "Otro",
-] as const;
+export type GrupoUbicacion = { ciudad: string; barrios: string[] };
+
+/**
+ * Ubicaciones agrupadas por municipio. El valor que se guarda en la base de
+ * datos es el nombre del barrio; los de Villamaría llevan el sufijo de ciudad
+ * para no confundirlos con los de Manizales.
+ */
+export const UBICACIONES: GrupoUbicacion[] = [
+  {
+    ciudad: "Manizales",
+    barrios: [
+      "Centro",
+      "Chipre",
+      "Palogrande",
+      "La Enea",
+      "Milán",
+      "Villapilar",
+      "El Cable",
+      "Los Rosales",
+      "Fátima",
+      "La Sultana",
+      "San Jorge",
+      "Estrella",
+      "Villa del Río",
+      "La Camelia",
+      "Belén",
+      "Alta Suiza",
+      "Laureles",
+      "Malhabar",
+      "Versalles",
+      "Bosques del Norte",
+      "La Carola",
+      "Marmato",
+      "San José",
+      "El Nevado",
+      "Campohermoso",
+      "Aranjuez",
+      "Solferino",
+      "Minitas",
+      "Las Américas",
+      "Corregimiento o vereda de Manizales",
+    ],
+  },
+  {
+    ciudad: "Villamaría",
+    barrios: [
+      "Centro (Villamaría)",
+      "La Pradera (Villamaría)",
+      "La Floresta (Villamaría)",
+      "Villa Nueva (Villamaría)",
+      "Nuevo Horizonte (Villamaría)",
+      "Bellavista (Villamaría)",
+      "Gallinazo (Villamaría)",
+      "Llanitos (Villamaría)",
+      "Miraflores (Villamaría)",
+      "Partidas (Villamaría)",
+      "Rioclaro (Villamaría)",
+      "Nueva Primavera (Villamaría)",
+      "Los Cuervos (Villamaría)",
+      "Agrícola La Paz (Villamaría)",
+      "Termales (Villamaría)",
+      "Corregimiento o vereda de Villamaría",
+    ],
+  },
+];
+
+/** Opción que habilita el campo de texto libre. */
+export const OTRO_BARRIO = "__otro__";
+
+export const BARRIOS_MANIZALES = UBICACIONES.flatMap((g) => g.barrios);
 
 export const ESPECIES: { valor: Especie; etiqueta: string; emoji: string }[] = [
   { valor: "perro", etiqueta: "Perro", emoji: "🐶" },

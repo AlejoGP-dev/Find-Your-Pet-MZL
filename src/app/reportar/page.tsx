@@ -6,7 +6,7 @@ import FormularioReporte from "@/components/FormularioReporte";
 export const metadata: Metadata = {
   title: "Publicar reporte — Find Your Pet MZL",
   description:
-    "Reporta una mascota perdida o encontrada en Manizales. Toma menos de un minuto.",
+    "Reporta una mascota perdida o encontrada en Manizales o Villamaría. Toma menos de un minuto.",
 };
 
 export default function PaginaReportar() {

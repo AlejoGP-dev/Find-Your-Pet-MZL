@@ -11,13 +11,13 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Find Your Pet MZL — Mascotas perdidas y encontradas en Manizales",
+  title: "Find Your Pet MZL — Mascotas perdidas y encontradas en Manizales y Villamaría",
   description:
-    "Plataforma comunitaria para reportar mascotas perdidas y encontradas en Manizales después del sismo. Publica en un minuto y contacta por WhatsApp.",
+    "Plataforma comunitaria para reportar mascotas perdidas y encontradas en Manizales y Villamaría después del sismo. Publica en un minuto y contacta por WhatsApp.",
   openGraph: {
     title: "Find Your Pet MZL",
     description:
-      "Reporta mascotas perdidas o encontradas en Manizales. Rápido, gratis y sin registro.",
+      "Reporta mascotas perdidas o encontradas en Manizales y Villamaría. Rápido, gratis y sin registro.",
     locale: "es_CO",
     type: "website",
   },
@@ -43,7 +43,7 @@ export default function RootLayout({
                 <span className="block text-base font-extrabold tracking-tight text-marca-oscuro sm:text-lg">
                   Find Your Pet MZL
                 </span>
-                <span className="block text-xs text-stone-500">Manizales, Caldas</span>
+                <span className="block text-xs text-stone-500">Manizales y Villamaría</span>
               </span>
             </Link>
             <Link
@@ -64,7 +64,8 @@ export default function RootLayout({
               Find Your Pet MZL — iniciativa ciudadana sin ánimo de lucro.
             </p>
             <p className="mt-2 max-w-2xl">
-              Hecha para ayudar a reunir a las familias de Manizales con sus mascotas.
+              Hecha para ayudar a reunir a las familias de Manizales y Villamaría con sus
+              mascotas.
               Verifica siempre la información antes de entregar un animal y prefiere
               encuentros en lugares públicos y acompañado.
             </p>

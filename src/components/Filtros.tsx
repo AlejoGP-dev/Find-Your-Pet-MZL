@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
-import { BARRIOS_MANIZALES, ESPECIES } from "@/lib/tipos";
+import { ESPECIES, UBICACIONES } from "@/lib/tipos";
 
 const PESTANAS = [
   { valor: "", etiqueta: "Todas" },
@@ -75,10 +75,14 @@ export default function Filtros() {
           aria-label="Filtrar por barrio"
         >
           <option value="">Todos los barrios</option>
-          {BARRIOS_MANIZALES.map((b) => (
-            <option key={b} value={b}>
-              {b}
-            </option>
+          {UBICACIONES.map((grupo) => (
+            <optgroup key={grupo.ciudad} label={grupo.ciudad}>
+              {grupo.barrios.map((b) => (
+                <option key={b} value={b}>
+                  {b.replace(" (Villamaría)", "")}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
 

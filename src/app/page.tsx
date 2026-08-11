@@ -39,14 +39,14 @@ export default async function Inicio({ searchParams }: { searchParams: Params })
       <section className="border-b border-stone-200 bg-linear-to-b from-marca-suave to-crema">
         <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14">
           <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-marca-oscuro shadow-sm">
-            Iniciativa ciudadana · Manizales
+            Iniciativa ciudadana · Manizales y Villamaría
           </p>
           <h1 className="max-w-2xl text-3xl font-extrabold leading-tight text-stone-900 sm:text-4xl">
-            Ayudemos a que cada mascota de Manizales vuelva a casa.
+            Ayudemos a que cada mascota vuelva a casa.
           </h1>
           <p className="mt-4 max-w-2xl text-base text-stone-600 sm:text-lg">
-            Después del sismo muchas mascotas salieron corriendo y hoy están lejos de su
-            familia. Publica tu reporte en menos de un minuto: sin registro, gratis y con
+            Después del sismo muchas mascotas de Manizales y Villamaría salieron corriendo
+            y hoy están lejos de su familia. Publica tu reporte en menos de un minuto: sin registro, gratis y con
             contacto directo por WhatsApp.
           </p>
 
