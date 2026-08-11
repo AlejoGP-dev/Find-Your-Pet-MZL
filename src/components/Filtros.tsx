@@ -5,9 +5,10 @@ import { useState, useTransition } from "react";
 import { ESPECIES, UBICACIONES } from "@/lib/tipos";
 
 const PESTANAS = [
-  { valor: "", etiqueta: "Todas" },
-  { valor: "perdida", etiqueta: "Perdidas" },
-  { valor: "encontrada", etiqueta: "Encontradas" },
+  { clave: "todas", etiqueta: "Todas", tipo: "", estado: "" },
+  { clave: "perdida", etiqueta: "Perdidas", tipo: "perdida", estado: "" },
+  { clave: "encontrada", etiqueta: "Encontradas", tipo: "encontrada", estado: "" },
+  { clave: "reunidas", etiqueta: "🎉 Ya aparecieron", tipo: "", estado: "resuelto" },
 ];
 
 export default function Filtros() {
@@ -30,22 +31,29 @@ export default function Filtros() {
   const tipoActual = params.get("tipo") ?? "";
   const especieActual = params.get("especie") ?? "";
   const barrioActual = params.get("barrio") ?? "";
+  const estadoActual = params.get("estado") ?? "";
+
+  const pestanaActual =
+    estadoActual === "resuelto" ? "reunidas" : tipoActual || "todas";
+
   const hayFiltros = Boolean(
-    tipoActual || especieActual || barrioActual || params.get("q"),
+    tipoActual || especieActual || barrioActual || estadoActual || params.get("q"),
   );
 
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex rounded-xl border border-stone-300 bg-white p-1">
+        <div className="flex flex-wrap rounded-xl border border-stone-300 bg-white p-1">
           {PESTANAS.map((p) => (
             <button
-              key={p.valor}
+              key={p.clave}
               type="button"
-              onClick={() => actualizar({ tipo: p.valor })}
+              onClick={() => actualizar({ tipo: p.tipo, estado: p.estado })}
               className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
-                tipoActual === p.valor
-                  ? "bg-marca text-white"
+                pestanaActual === p.clave
+                  ? p.clave === "reunidas"
+                    ? "bg-encontrada text-white"
+                    : "bg-marca text-white"
                   : "text-stone-600 hover:bg-stone-100"
               }`}
             >
@@ -91,7 +99,7 @@ export default function Filtros() {
             type="button"
             onClick={() => {
               setBusqueda("");
-              actualizar({ tipo: "", especie: "", barrio: "", q: "" });
+              actualizar({ tipo: "", especie: "", barrio: "", q: "", estado: "" });
             }}
             className="text-sm font-semibold text-stone-500 underline underline-offset-2 hover:text-stone-700"
           >

@@ -79,7 +79,10 @@ export default async function PaginaMascota({ params }: Props) {
 
       {reporte.estado === "resuelto" && (
         <div className="mb-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
-          🎉 Esta mascota ya está de vuelta con su familia.
+          🎉 Esta mascota ya está de vuelta con su familia.{" "}
+          <Link href="/?estado=resuelto#reportes" className="underline">
+            Ver otros reencuentros
+          </Link>
         </div>
       )}
 
@@ -145,7 +148,11 @@ export default async function PaginaMascota({ params }: Props) {
             </div>
           )}
 
-          <AccionesReporte id={reporte.id} />
+          <AccionesReporte
+            id={reporte.id}
+            tipo={reporte.tipo}
+            resuelto={reporte.estado === "resuelto"}
+          />
 
           <p className="rounded-xl bg-amber-50 p-3 text-xs text-amber-900">
             Por seguridad: pide señas o fotos que solo el dueño pueda conocer, no envíes

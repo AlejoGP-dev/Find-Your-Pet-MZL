@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import Filtros from "@/components/Filtros";
 import TarjetaReporte from "@/components/TarjetaReporte";
-import { HAY_SUPABASE, listarReportes } from "@/lib/almacen";
+import { HAY_SUPABASE, contarPorEstado, listarReportes } from "@/lib/almacen";
 import type { Reporte } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
@@ -17,22 +17,26 @@ function uno(valor: string | string[] | undefined): string | null {
 export default async function Inicio({ searchParams }: { searchParams: Params }) {
   const p = await searchParams;
 
+  const estado = uno(p.estado) === "resuelto" ? "resuelto" : "activo";
+  const viendoReunidas = estado === "resuelto";
+
   let reportes: Reporte[] = [];
+  let totales = { perdidas: 0, encontradas: 0, reunidas: 0 };
   let errorCarga: string | null = null;
   try {
-    reportes = await listarReportes({
-      tipo: uno(p.tipo),
-      especie: uno(p.especie),
-      barrio: uno(p.barrio),
-      q: uno(p.q),
-      estado: "activo",
-    });
+    [reportes, totales] = await Promise.all([
+      listarReportes({
+        tipo: uno(p.tipo),
+        especie: uno(p.especie),
+        barrio: uno(p.barrio),
+        q: uno(p.q),
+        estado,
+      }),
+      contarPorEstado(),
+    ]);
   } catch (error) {
     errorCarga = error instanceof Error ? error.message : "Error desconocido";
   }
-
-  const perdidas = reportes.filter((r) => r.tipo === "perdida").length;
-  const encontradas = reportes.filter((r) => r.tipo === "encontrada").length;
 
   return (
     <>
@@ -62,16 +66,24 @@ export default async function Inicio({ searchParams }: { searchParams: Params })
             </Link>
           </div>
 
-          <div className="mt-8 flex gap-6 text-sm">
+          <div className="mt-8 flex flex-wrap gap-6 text-sm">
             <div>
-              <span className="block text-2xl font-extrabold text-perdida">{perdidas}</span>
+              <span className="block text-2xl font-extrabold text-perdida">
+                {totales.perdidas}
+              </span>
               <span className="text-stone-600">buscando su casa</span>
             </div>
             <div>
               <span className="block text-2xl font-extrabold text-encontrada">
-                {encontradas}
+                {totales.encontradas}
               </span>
               <span className="text-stone-600">encontradas, buscando dueño</span>
+            </div>
+            <div>
+              <span className="block text-2xl font-extrabold text-marca">
+                {totales.reunidas}
+              </span>
+              <span className="text-stone-600">ya volvieron a casa 🎉</span>
             </div>
           </div>
         </div>
@@ -92,6 +104,12 @@ export default async function Inicio({ searchParams }: { searchParams: Params })
           <Filtros />
         </Suspense>
 
+        {viendoReunidas && reportes.length > 0 && (
+          <p className="mt-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
+            Estas mascotas ya están de vuelta con su familia. 🎉
+          </p>
+        )}
+
         {errorCarga ? (
           <div className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800">
             <p className="font-bold">No pudimos cargar los reportes.</p>
@@ -99,16 +117,22 @@ export default async function Inicio({ searchParams }: { searchParams: Params })
           </div>
         ) : reportes.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center">
-            <p className="text-4xl">🐾</p>
+            <p className="text-4xl">{viendoReunidas ? "🎉" : "🐾"}</p>
             <p className="mt-3 text-lg font-bold text-stone-800">
-              No hay reportes que coincidan.
+              {viendoReunidas
+                ? "Todavía no hay reencuentros publicados."
+                : "No hay reportes que coincidan."}
             </p>
             <p className="mt-1 text-stone-600">
-              Prueba quitando filtros o sé el primero en publicar.
+              {viendoReunidas
+                ? "Cuando alguien marque que su mascota apareció, la vas a ver acá."
+                : "Prueba quitando filtros o sé el primero en publicar."}
             </p>
-            <Link href="/reportar" className="boton-primario mt-5">
-              Publicar un reporte
-            </Link>
+            {!viendoReunidas && (
+              <Link href="/reportar" className="boton-primario mt-5">
+                Publicar un reporte
+              </Link>
+            )}
           </div>
         ) : (
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">

@@ -164,12 +164,35 @@ export async function subirFoto(
   return data.publicUrl;
 }
 
-export async function contarReportes(): Promise<{ perdidas: number; encontradas: number; reunidas: number }> {
-  const activos = await listarReportes({ estado: "activo" });
-  const resueltos = await listarReportes({ estado: "resuelto" });
-  return {
-    perdidas: activos.filter((r) => r.tipo === "perdida").length,
-    encontradas: activos.filter((r) => r.tipo === "encontrada").length,
-    reunidas: resueltos.length,
+export async function contarPorEstado(): Promise<{
+  perdidas: number;
+  encontradas: number;
+  reunidas: number;
+}> {
+  if (!HAY_SUPABASE) {
+    const filas = globalDemo.__demoReportes!;
+    return {
+      perdidas: filas.filter((r) => r.estado === "activo" && r.tipo === "perdida").length,
+      encontradas: filas.filter((r) => r.estado === "activo" && r.tipo === "encontrada")
+        .length,
+      reunidas: filas.filter((r) => r.estado === "resuelto").length,
+    };
+  }
+
+  const contar = async (filtro: (c: ReturnType<typeof consultaBase>) => typeof c) => {
+    const { count } = await filtro(consultaBase());
+    return count ?? 0;
   };
+
+  const [perdidas, encontradas, reunidas] = await Promise.all([
+    contar((c) => c.eq("estado", "activo").eq("tipo", "perdida")),
+    contar((c) => c.eq("estado", "activo").eq("tipo", "encontrada")),
+    contar((c) => c.eq("estado", "resuelto")),
+  ]);
+
+  return { perdidas, encontradas, reunidas };
+}
+
+function consultaBase() {
+  return supabase().from("reportes").select("id", { count: "exact", head: true });
 }

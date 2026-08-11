@@ -51,9 +51,11 @@ export default function TarjetaReporte({ reporte }: { reporte: Reporte }) {
             {especie?.emoji ?? "🐾"}
           </div>
         )}
-        <div className="absolute left-3 top-3">
-          <InsigniaTipo tipo={reporte.tipo} />
-        </div>
+        {reporte.estado === "activo" && (
+          <div className="absolute left-3 top-3">
+            <InsigniaTipo tipo={reporte.tipo} />
+          </div>
+        )}
         {reporte.estado === "resuelto" && (
           <div className="absolute inset-0 grid place-items-center bg-encontrada/80">
             <span className="rounded-full bg-white px-4 py-2 text-sm font-extrabold text-encontrada">
