@@ -109,6 +109,78 @@ function SugerenciasTrasPublicar({ id, tipo }: { id: string; tipo: TipoReporte }
   );
 }
 
+type ReporteExistente = {
+  id: string;
+  nombre: string | null;
+  tipo: TipoReporte;
+  barrio: string;
+  fecha: string;
+  foto_url: string | null;
+};
+
+/**
+ * Cuando el número ya tiene reportes activos, en vez de publicar de una le
+ * preguntamos: casi siempre la persona quiere actualizar el que ya tenía y
+ * termina creando un duplicado sin darse cuenta.
+ */
+function AvisoYaTienesReporte({
+  reportes,
+  onContinuar,
+  onCancelar,
+}: {
+  reportes: ReporteExistente[];
+  onContinuar: () => void;
+  onCancelar: () => void;
+}) {
+  return (
+    <div className="rounded-2xl border-2 border-amber-400 bg-amber-50 p-5">
+      <h3 className="text-lg font-extrabold text-stone-900">
+        ⚠️ Con este número ya hay {reportes.length === 1 ? "un reporte activo" : `${reportes.length} reportes activos`}
+      </h3>
+      <p className="mt-1 text-sm text-stone-700">
+        Si es la misma mascota, no publiques otro: abre el reporte que ya tienes.
+        Ahí puedes marcarla como encontrada cuando aparezca.
+      </p>
+
+      <ul className="mt-3 space-y-2">
+        {reportes.map((r) => (
+          <li key={r.id}>
+            <Link
+              href={`/mascota/${r.id}`}
+              className="flex items-center gap-3 rounded-xl bg-white p-3 ring-1 ring-stone-200 transition hover:ring-marca"
+            >
+              <span className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-stone-100">
+                {r.foto_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={r.foto_url} alt="" className="h-full w-full object-cover" />
+                )}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-bold text-stone-900">
+                  {r.nombre || "Sin nombre"}
+                </span>
+                <span className="block truncate text-xs text-stone-600">
+                  {r.tipo === "perdida" ? "Se perdió" : "La encontraron"} · 📍 {r.barrio}
+                </span>
+              </span>
+              <span className="shrink-0 text-sm font-bold text-marca">Ver →</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <button type="button" onClick={onContinuar} className="boton-primario flex-1 py-2.5">
+          Es otra mascota, publicar igual
+        </button>
+        <button type="button" onClick={onCancelar} className="boton-secundario py-2.5">
+          Volver al formulario
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Titulo({ numero, texto }: { numero: number; texto: string }) {
   return (
     <h2 className="mb-4 flex items-center gap-2.5">
@@ -137,6 +209,9 @@ export default function FormularioReporte() {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [exito, setExito] = useState<{ id: string; token: string } | null>(null);
+  const [existentes, setExistentes] = useState<ReporteExistente[] | null>(null);
+  const [revisando, setRevisando] = useState(false);
+  const datosPendientes = useRef<FormData | null>(null);
 
   const hoy = new Date().toISOString().slice(0, 10);
 
@@ -161,13 +236,39 @@ export default function FormularioReporte() {
   async function enviar(evento: React.FormEvent<HTMLFormElement>) {
     evento.preventDefault();
     setError(null);
+
+    const datos = new FormData(evento.currentTarget);
+    datos.delete("foto");
+    if (archivoFoto) datos.append("foto", archivoFoto);
+
+    // Antes de publicar: ¿este número ya tiene reportes activos?
+    setRevisando(true);
+    try {
+      const numero = String(datos.get("contacto_whatsapp") ?? "");
+      const r = await fetch(
+        `/api/reportes/existentes?whatsapp=${encodeURIComponent(numero)}`,
+      );
+      const cuerpo = await r.json();
+      if (Array.isArray(cuerpo.reportes) && cuerpo.reportes.length > 0) {
+        datosPendientes.current = datos;
+        setExistentes(cuerpo.reportes as ReporteExistente[]);
+        setRevisando(false);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+    } catch {
+      /* si la revisión falla, seguimos: publicar es más importante */
+    }
+    setRevisando(false);
+
+    await publicar(datos);
+  }
+
+  async function publicar(datos: FormData) {
+    setError(null);
     setEnviando(true);
 
     try {
-      const datos = new FormData(evento.currentTarget);
-      datos.delete("foto");
-      if (archivoFoto) datos.append("foto", archivoFoto);
-
       const respuesta = await fetch("/api/reportes", { method: "POST", body: datos });
       const cuerpo = await respuesta.json();
       if (!respuesta.ok) throw new Error(cuerpo.error || "No pudimos guardar el reporte.");
@@ -180,6 +281,8 @@ export default function FormularioReporte() {
         /* si el navegador bloquea el almacenamiento no pasa nada */
       }
 
+      setExistentes(null);
+      datosPendientes.current = null;
       setExito({ id: cuerpo.id, token: cuerpo.token });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
@@ -256,6 +359,24 @@ export default function FormularioReporte() {
         className="hidden"
         aria-hidden="true"
       />
+
+      {existentes && (
+        <AvisoYaTienesReporte
+          reportes={existentes}
+          onContinuar={() => {
+            const datos = datosPendientes.current;
+            setExistentes(null);
+            if (datos) {
+              datos.set("confirmado", "1");
+              publicar(datos);
+            }
+          }}
+          onCancelar={() => {
+            setExistentes(null);
+            datosPendientes.current = null;
+          }}
+        />
+      )}
 
       <section className="rounded-2xl border border-stone-200 bg-white p-5">
         <Titulo numero={1} texto="¿Qué pasó?" />
@@ -552,8 +673,12 @@ export default function FormularioReporte() {
       )}
 
       <div className="sticky bottom-0 z-10 -mx-4 border-t border-stone-200 bg-crema/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
-        <button type="submit" disabled={enviando} className="boton-primario w-full py-4 shadow-lg">
-          {enviando ? "Publicando…" : "Publicar reporte"}
+        <button
+          type="submit"
+          disabled={enviando || revisando}
+          className="boton-primario w-full py-4 shadow-lg"
+        >
+          {revisando ? "Revisando…" : enviando ? "Publicando…" : "Publicar reporte"}
         </button>
         <p className="mt-2 text-center text-xs text-stone-500 sm:hidden">
           Al publicar aceptas que tu nombre y WhatsApp queden visibles.

@@ -101,6 +101,31 @@ export async function obtenerReporte(id: string): Promise<Reporte | null> {
   return (data as unknown as Reporte) ?? null;
 }
 
+/** Reportes activos publicados con ese mismo número de WhatsApp. */
+export async function reportesActivosDe(whatsapp: string): Promise<Reporte[]> {
+  const digitos = whatsapp.replace(/\D/g, "").slice(-10);
+  if (digitos.length < 10) return [];
+
+  const coincide = (r: { contacto_whatsapp: string }) =>
+    r.contacto_whatsapp.replace(/\D/g, "").slice(-10) === digitos;
+
+  if (!HAY_SUPABASE) {
+    return globalDemo
+      .__demoReportes!.filter((r) => r.estado === "activo" && coincide(r))
+      .map(({ token_gestion: _t, ...resto }) => resto as Reporte);
+  }
+
+  const { data, error } = await supabase()
+    .from("reportes")
+    .select(CAMPOS_PUBLICOS)
+    .eq("estado", "activo")
+    .ilike("contacto_whatsapp", `%${digitos.slice(-7)}%`)
+    .order("created_at", { ascending: false })
+    .limit(20);
+  if (error) return [];
+  return ((data ?? []) as unknown as Reporte[]).filter(coincide);
+}
+
 /** ¿El mismo número publicó algo casi idéntico hace un momento? */
 export async function hayReporteReciente(
   whatsapp: string,

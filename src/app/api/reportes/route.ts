@@ -72,8 +72,11 @@ export async function POST(request: NextRequest) {
     if (contacto_whatsapp.replace(/\D/g, "").length < 10)
       return NextResponse.json({ error: "El número de WhatsApp no parece válido." }, { status: 400 });
 
-    // Evita que un doble clic o un reenvío cree el mismo reporte dos veces.
-    if (await hayReporteReciente(contacto_whatsapp, especie)) {
+    // Evita que un doble clic cree el mismo reporte dos veces. Si la persona
+    // ya vio el aviso de "con este número ya hay reportes activos" y confirmó
+    // que es otra mascota, la dejamos publicar.
+    const confirmado = texto(form, "confirmado") === "1";
+    if (!confirmado && (await hayReporteReciente(contacto_whatsapp, especie))) {
       return NextResponse.json(
         {
           error:
