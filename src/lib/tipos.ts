@@ -71,6 +71,7 @@ export const UBICACIONES: GrupoUbicacion[] = [
       "La Camelia",
       "Belén",
       "Alta Suiza",
+      "Alta Castilla",
       "Laureles",
       "Malhabar",
       "Versalles",
@@ -179,6 +180,11 @@ export function enlaceWhatsapp(reporte: Reporte, urlPublica: string): string {
   return `https://wa.me/${normalizarWhatsapp(reporte.contacto_whatsapp)}?text=${encodeURIComponent(texto)}`;
 }
 
+/** Días completos transcurridos desde una fecha ISO. */
+export function diasDesde(iso: string): number {
+  return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+}
+
 /** "hace 3 horas", "hace 2 días"… para la lista de avistamientos. */
 export function haceCuanto(iso: string): string {
   const minutos = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
@@ -190,4 +196,48 @@ export function haceCuanto(iso: string): string {
   if (dias < 30) return `hace ${dias} ${dias === 1 ? "día" : "días"}`;
   const meses = Math.floor(dias / 30);
   return `hace ${meses} ${meses === 1 ? "mes" : "meses"}`;
+}
+
+/** Variantes que la gente escribe a mano y su forma unificada. */
+const ALIAS_BARRIO: Record<string, string> = {
+  "villamaria": "Villamaría",
+  "villa maria": "Villamaría",
+  "villamaria caldas": "Villamaría",
+  "parque de villa maria": "Villamaría",
+  "villa maria floresta 2": "La Floresta (Villamaría)",
+  "la floresta villamaria": "La Floresta (Villamaría)",
+  "n/a": "Sin especificar",
+  "na": "Sin especificar",
+  "-": "Sin especificar",
+};
+
+function sinTildes(texto: string): string {
+  return texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Unifica cómo se guarda el barrio: si coincide con uno de la lista (sin
+ * importar tildes ni mayúsculas) usa el nombre oficial; si no, lo deja como
+ * lo escribió la persona pero con la primera letra en mayúscula.
+ */
+export function canonicalizarBarrio(texto: string): string {
+  const limpio = texto.replace(/\s+/g, " ").trim();
+  if (!limpio) return limpio;
+
+  const clave = sinTildes(limpio);
+  if (ALIAS_BARRIO[clave]) return ALIAS_BARRIO[clave];
+
+  for (const grupo of UBICACIONES) {
+    for (const barrio of grupo.barrios) {
+      if (sinTildes(barrio) === clave) return barrio;
+      if (sinTildes(barrio.replace(" (Villamaría)", "")) === clave) return barrio;
+    }
+  }
+
+  return limpio.charAt(0).toUpperCase() + limpio.slice(1);
 }

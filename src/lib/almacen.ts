@@ -101,6 +101,37 @@ export async function obtenerReporte(id: string): Promise<Reporte | null> {
   return (data as unknown as Reporte) ?? null;
 }
 
+/** ¿El mismo número publicó algo casi idéntico hace un momento? */
+export async function hayReporteReciente(
+  whatsapp: string,
+  especie: string,
+): Promise<boolean> {
+  const desde = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+  const digitos = whatsapp.replace(/\D/g, "").slice(-10);
+  if (digitos.length < 10) return false;
+
+  if (!HAY_SUPABASE) {
+    return globalDemo.__demoReportes!.some(
+      (r) =>
+        r.especie === especie &&
+        r.contacto_whatsapp.replace(/\D/g, "").slice(-10) === digitos &&
+        r.created_at > desde,
+    );
+  }
+  const { data } = await supabase()
+    .from("reportes")
+    .select("id,contacto_whatsapp")
+    .eq("especie", especie)
+    .gte("created_at", desde)
+    .limit(50);
+  return (data ?? []).some(
+    (r) =>
+      (r as { contacto_whatsapp: string }).contacto_whatsapp
+        .replace(/\D/g, "")
+        .slice(-10) === digitos,
+  );
+}
+
 export async function crearReporte(
   datos: NuevoReporte,
 ): Promise<{ id: string; token: string }> {

@@ -5,6 +5,7 @@ import {
   TAMANOS,
   etiquetaDe,
   formatearFecha,
+  haceCuanto,
   type Reporte,
 } from "@/lib/tipos";
 
@@ -80,7 +81,14 @@ export default function TarjetaReporte({ reporte }: { reporte: Reporte }) {
         <p className="mt-auto flex items-center gap-1.5 pt-2 text-sm font-semibold text-marca">
           📍 {reporte.barrio}
         </p>
-        <p className="text-xs text-stone-500">{formatearFecha(reporte.fecha)}</p>
+        <p className="text-xs text-stone-500">
+          {formatearFecha(reporte.fecha)}
+          {reporte.estado === "activo" && (
+            <span className="block text-stone-400">
+              publicado {haceCuanto(reporte.created_at)}
+            </span>
+          )}
+        </p>
       </div>
     </Link>
   );

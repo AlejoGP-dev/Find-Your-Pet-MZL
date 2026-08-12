@@ -40,6 +40,75 @@ async function comprimirImagen(archivo: File): Promise<File> {
   }
 }
 
+type Sugerencia = {
+  reporte: { id: string; nombre: string | null; barrio: string; foto_url: string | null };
+  puntaje: number;
+  razones: string[];
+};
+
+/** Tras publicar, avisa si ya hay algo parecido del otro lado del listado. */
+function SugerenciasTrasPublicar({ id, tipo }: { id: string; tipo: TipoReporte }) {
+  const [lista, setLista] = useState<Sugerencia[]>([]);
+
+  useEffect(() => {
+    let vivo = true;
+    fetch(`/api/reportes/${id}/coincidencias`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (vivo && Array.isArray(d.coincidencias)) setLista(d.coincidencias);
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, [id]);
+
+  if (lista.length === 0) return null;
+
+  return (
+    <div className="mx-auto mt-6 max-w-md rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-left">
+      <p className="font-extrabold text-stone-900">
+        🔎 Encontramos {lista.length}{" "}
+        {lista.length === 1 ? "reporte parecido" : "reportes parecidos"}
+      </p>
+      <p className="mt-1 text-sm text-stone-700">
+        {tipo === "perdida"
+          ? "Alguien reportó mascotas encontradas que se parecen a la tuya. Míralas antes de irte."
+          : "Hay familias buscando mascotas parecidas a la que encontraste."}
+      </p>
+      <ul className="mt-3 space-y-2">
+        {lista.map((c) => (
+          <li key={c.reporte.id}>
+            <Link
+              href={`/mascota/${c.reporte.id}`}
+              className="flex items-center gap-3 rounded-lg bg-white p-2 transition hover:ring-2 hover:ring-marca/30"
+            >
+              <span className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-stone-100">
+                {c.reporte.foto_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={c.reporte.foto_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                )}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-bold text-stone-900">
+                  {c.reporte.nombre || "Sin nombre"} · {c.puntaje}%
+                </span>
+                <span className="block truncate text-xs text-stone-600">
+                  📍 {c.reporte.barrio} · {c.razones.join(" · ")}
+                </span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function Titulo({ numero, texto }: { numero: number; texto: string }) {
   return (
     <h2 className="mb-4 flex items-center gap-2.5">
@@ -139,6 +208,16 @@ export default function FormularioReporte() {
             aparezca. Tómale una foto a esta pantalla.
           </p>
         </div>
+
+        <a
+          href={`/api/reportes/${exito.id}/afiche`}
+          download
+          className="boton-secundario mx-auto mt-4 w-full max-w-md"
+        >
+          🖼️ Descargar afiche para compartir
+        </a>
+
+        <SugerenciasTrasPublicar id={exito.id} tipo={tipo} />
 
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
           <Link href={`/mascota/${exito.id}`} className="boton-primario">

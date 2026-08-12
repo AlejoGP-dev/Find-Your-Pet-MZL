@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { crearReporte, listarReportes, subirFoto } from "@/lib/almacen";
-import type { NuevoReporte } from "@/lib/tipos";
+import {
+  crearReporte,
+  hayReporteReciente,
+  listarReportes,
+  subirFoto,
+} from "@/lib/almacen";
+import { canonicalizarBarrio, type NuevoReporte } from "@/lib/tipos";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,7 +59,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Selecciona el tipo de mascota." }, { status: 400 });
     }
 
-    const barrio = texto(form, "barrio");
+    const barrio = canonicalizarBarrio(texto(form, "barrio"));
     const fecha = texto(form, "fecha");
     const contacto_nombre = texto(form, "contacto_nombre");
     const contacto_whatsapp = texto(form, "contacto_whatsapp");
@@ -66,6 +71,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Falta tu nombre." }, { status: 400 });
     if (contacto_whatsapp.replace(/\D/g, "").length < 10)
       return NextResponse.json({ error: "El número de WhatsApp no parece válido." }, { status: 400 });
+
+    // Evita que un doble clic o un reenvío cree el mismo reporte dos veces.
+    if (await hayReporteReciente(contacto_whatsapp, especie)) {
+      return NextResponse.json(
+        {
+          error:
+            "Ya publicaste un reporte parecido hace unos minutos. Revisa el listado antes de publicar otro.",
+        },
+        { status: 409 },
+      );
+    }
 
     let foto_url: string | null = null;
     const foto = form.get("foto");

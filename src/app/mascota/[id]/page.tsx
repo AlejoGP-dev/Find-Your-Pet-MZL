@@ -4,15 +4,19 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import AccionesReporte from "@/components/AccionesReporte";
 import Avistamientos from "@/components/Avistamientos";
+import Coincidencias from "@/components/Coincidencias";
 import { InsigniaTipo } from "@/components/TarjetaReporte";
-import { listarAvistamientos, obtenerReporte } from "@/lib/almacen";
+import { listarAvistamientos, listarReportes, obtenerReporte } from "@/lib/almacen";
+import { buscarCoincidencias } from "@/lib/coincidencias";
 import {
   ESPECIES,
   SEXOS,
   TAMANOS,
   enlaceWhatsapp,
   etiquetaDe,
+  diasDesde,
   formatearFecha,
+  haceCuanto,
 } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
@@ -54,6 +58,19 @@ export default async function PaginaMascota({ params }: Props) {
   const especie = ESPECIES.find((e) => e.valor === reporte.especie);
   const url = await urlActual(id);
   const avistamientos = await listarAvistamientos(id).catch(() => []);
+
+  // Cruce automático con el otro lado del listado.
+  const candidatos =
+    reporte.estado === "activo"
+      ? await listarReportes({
+          tipo: reporte.tipo === "perdida" ? "encontrada" : "perdida",
+          especie: reporte.especie,
+          estado: "activo",
+        }).catch(() => [])
+      : [];
+  const coincidencias = buscarCoincidencias(reporte, candidatos);
+
+  const diasPublicado = diasDesde(reporte.created_at);
   const esPerdida = reporte.tipo === "perdida";
 
   const datos: { rotulo: string; valor: string | null }[] = [
@@ -88,6 +105,16 @@ export default async function PaginaMascota({ params }: Props) {
         </div>
       )}
 
+      {reporte.estado === "activo" && diasPublicado >= 30 && (
+        <div className="mb-5 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong className="font-bold">
+            Este reporte lleva {diasPublicado} días publicado.
+          </strong>{" "}
+          Si la mascota ya apareció, márcala con tu código para que salga del
+          listado y las búsquedas queden al día.
+        </div>
+      )}
+
       <div className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
         <div className="self-start overflow-hidden rounded-2xl border border-stone-200 bg-white">
           {reporte.foto_url ? (
@@ -111,6 +138,9 @@ export default async function PaginaMascota({ params }: Props) {
               {reporte.nombre || `${especie?.etiqueta ?? "Mascota"} sin nombre`}
             </h1>
             <p className="mt-1 font-semibold text-marca">📍 {reporte.barrio}</p>
+            <p className="mt-1 text-sm text-stone-500">
+              Publicado {haceCuanto(reporte.created_at)}
+            </p>
           </div>
 
           {reporte.descripcion && (
@@ -150,6 +180,14 @@ export default async function PaginaMascota({ params }: Props) {
             </div>
           )}
 
+          <a
+            href={`/api/reportes/${reporte.id}/afiche`}
+            className="boton-secundario w-full"
+            download
+          >
+            🖼️ Descargar afiche para compartir
+          </a>
+
           <AccionesReporte
             id={reporte.id}
             tipo={reporte.tipo}
@@ -162,6 +200,12 @@ export default async function PaginaMascota({ params }: Props) {
           </p>
         </div>
       </div>
+
+      {coincidencias.length > 0 && (
+        <div className="mt-6">
+          <Coincidencias lista={coincidencias} tipo={reporte.tipo} />
+        </div>
+      )}
 
       <div className="mt-6">
         <Avistamientos
