@@ -45,16 +45,18 @@ export type Coincidencia = {
  * No es magia: cruza especie, zona, fechas, color, sexo y tamaño. La decisión
  * final siempre es de las personas, por eso mostramos también las razones.
  */
-export function compararReportes(a: Reporte, b: Reporte): Coincidencia | null {
-  const perdida = a.tipo === "perdida" ? a : b;
-  const encontrada = a.tipo === "perdida" ? b : a;
+export function compararReportes(
+  sujeto: Reporte,
+  candidato: Reporte,
+): Coincidencia | null {
+  const perdida = sujeto.tipo === "perdida" ? sujeto : candidato;
+  const encontrada = sujeto.tipo === "perdida" ? candidato : sujeto;
 
   // Solo tiene sentido cruzar una perdida con una encontrada.
   if (perdida.tipo !== "perdida" || encontrada.tipo !== "encontrada") return null;
   // Distinta especie: no se parecen y punto.
   if (perdida.especie !== encontrada.especie) return null;
 
-  const otra = a.tipo === "perdida" ? b : a;
   let puntaje = 25;
   const razones: string[] = [];
 
@@ -115,7 +117,7 @@ export function compararReportes(a: Reporte, b: Reporte): Coincidencia | null {
 
   if (puntaje < 60) return null;
 
-  return { reporte: otra, puntaje: Math.min(puntaje, 100), razones };
+  return { reporte: candidato, puntaje: Math.min(puntaje, 100), razones };
 }
 
 /** Devuelve las mejores coincidencias para un reporte, de mayor a menor parecido. */
