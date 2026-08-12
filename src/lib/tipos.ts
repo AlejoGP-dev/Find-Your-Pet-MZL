@@ -57,6 +57,7 @@ export const UBICACIONES: GrupoUbicacion[] = [
       "Centro",
       "Chipre",
       "Palogrande",
+      "Palermo",
       "La Enea",
       "Milán",
       "Villapilar",
