@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import Contador from "@/components/Contador";
 import Filtros from "@/components/Filtros";
 import TarjetaReporte from "@/components/TarjetaReporte";
 import { HAY_SUPABASE, contarPorEstado, listarReportes } from "@/lib/almacen";
@@ -38,13 +39,22 @@ export default async function Inicio({ searchParams }: { searchParams: Params })
     errorCarga = error instanceof Error ? error.message : "Error desconocido";
   }
 
+  const totalReportes = totales.perdidas + totales.encontradas + totales.reunidas;
+
   return (
     <>
       <section className="border-b border-stone-200 bg-linear-to-b from-marca-suave to-crema">
         <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-marca-oscuro shadow-sm">
-            Iniciativa ciudadana · Manizales y Villamaría
-          </p>
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <p className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-marca-oscuro shadow-sm">
+              Iniciativa ciudadana · Manizales y Villamaría
+            </p>
+            {totalReportes > 0 && (
+              <p className="text-xs font-semibold text-stone-500">
+                {totalReportes} reportes publicados
+              </p>
+            )}
+          </div>
           <h1 className="max-w-2xl text-3xl font-extrabold leading-tight text-stone-900 sm:text-4xl">
             Ayudemos a que cada mascota vuelva a casa.
           </h1>
@@ -76,9 +86,10 @@ export default async function Inicio({ searchParams }: { searchParams: Params })
                 key={dato.texto}
                 className="rounded-xl bg-white/70 px-2 py-3 text-center ring-1 ring-stone-200/70 sm:px-4"
               >
-                <span className={`block text-2xl font-extrabold sm:text-3xl ${dato.color}`}>
-                  {dato.n}
-                </span>
+                <Contador
+                  hasta={dato.n}
+                  className={`block text-2xl font-extrabold tabular-nums sm:text-3xl ${dato.color}`}
+                />
                 <span className="mt-0.5 block text-xs leading-tight text-stone-600 sm:text-sm">
                   {dato.texto}
                 </span>
