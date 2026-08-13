@@ -1,0 +1,16 @@
+Logos de las fundaciones.
+
+Guarda aquí la imagen de cada organización (cuadrada, mínimo 200x200, jpg o png)
+y luego pon la ruta en src/lib/organizaciones.ts, en el campo "logo". Ejemplo:
+
+  {
+    nombre: "Fundación Huellitas",
+    logo: "/fundaciones/huellitas.jpg",
+    ...
+  }
+
+Si una organización no tiene logo, la página muestra sus iniciales sobre un
+color. No hace falta hacer nada más.
+
+Pídele el logo a cada fundación por mensaje directo: casi siempre lo tienen en
+buena calidad y les gusta que se los pidan.

@@ -70,6 +70,14 @@ export default function RootLayout({
               encuentros en lugares públicos y acompañado.
             </p>
             <p className="mt-3">
+              <Link
+                href="/ayudar"
+                className="font-bold text-marca underline underline-offset-2"
+              >
+                💚 Fundaciones y albergues que necesitan ayuda
+              </Link>
+            </p>
+            <p className="mt-3">
               Emergencias con animales:{" "}
               <a className="font-semibold text-marca underline" href="tel:123">
                 123

@@ -142,6 +142,26 @@ export default async function Inicio({ searchParams }: { searchParams: Params })
         )}
       </section>
 
+      <section className="mx-auto w-full max-w-5xl px-4 pb-6">
+        <Link
+          href="/ayudar"
+          className="flex flex-col gap-3 rounded-2xl border-2 border-marca/30 bg-marca-suave p-6 transition hover:border-marca sm:flex-row sm:items-center sm:justify-between"
+        >
+          <span>
+            <span className="block text-xl font-extrabold text-marca-oscuro">
+              💚 Las fundaciones también necesitan ayuda
+            </span>
+            <span className="mt-1 block text-stone-700">
+              Alimento, arena, antipulgas, desparasitante. Mira quiénes están
+              cuidando animales en Manizales y Villamaría, y qué les hace falta.
+            </span>
+          </span>
+          <span className="shrink-0 rounded-xl bg-marca px-5 py-3 text-center font-bold text-white">
+            Ver cómo ayudar
+          </span>
+        </Link>
+      </section>
+
       <section className="mx-auto w-full max-w-5xl px-4 pb-14">
         <div className="rounded-2xl border border-stone-200 bg-white p-6">
           <h2 className="text-xl font-extrabold text-stone-900">
