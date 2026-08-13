@@ -40,18 +40,33 @@ export default function RootLayout({
                 <Isotipo className="h-7 w-7" fondo="#0f6f6c" />
               </span>
               <span className="leading-tight">
-                <span className="block text-base font-extrabold tracking-tight text-marca-oscuro sm:text-lg">
+                <span className="block text-sm font-extrabold tracking-tight text-marca-oscuro min-[400px]:text-base sm:text-lg">
                   Find Your Pet MZL
                 </span>
-                <span className="block text-xs text-stone-500">Manizales y Villamaría</span>
+                <span className="hidden text-xs text-stone-500 min-[400px]:block">
+                  Manizales y Villamaría
+                </span>
               </span>
             </Link>
-            <Link
-              href="/reportar"
-              className="rounded-xl bg-marca px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-marca-oscuro"
-            >
-              Publicar reporte
-            </Link>
+
+            <nav className="flex shrink-0 items-center gap-1 sm:gap-3">
+              {/* Enlace secundario: se ve, pero no compite con el botón principal */}
+              <Link
+                href="/ayudar"
+                className="rounded-lg px-2 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-marca-oscuro sm:px-3"
+              >
+                <span aria-hidden="true">💚</span>
+                <span className="ml-1 hidden min-[375px]:inline">Ayudar</span>
+                <span className="sr-only">Fundaciones que necesitan ayuda</span>
+              </Link>
+
+              <Link
+                href="/reportar"
+                className="whitespace-nowrap rounded-xl bg-marca px-3.5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-marca-oscuro sm:px-4"
+              >
+                Publicar<span className="hidden sm:inline"> reporte</span>
+              </Link>
+            </nav>
           </div>
         </header>
 
