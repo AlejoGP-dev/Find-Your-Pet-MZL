@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
@@ -118,12 +119,19 @@ export default async function PaginaMascota({ params }: Props) {
       <div className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
         <div className="self-start overflow-hidden rounded-2xl border border-stone-200 bg-white">
           {reporte.foto_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={reporte.foto_url}
-              alt={reporte.nombre ? `Foto de ${reporte.nombre}` : "Foto de la mascota"}
-              className="max-h-[28rem] w-full object-cover"
-            />
+            // object-contain: muchas fotos son afiches verticales y recortarlos
+            // esconde el número de contacto.
+            <div className="relative aspect-square w-full bg-stone-100 sm:aspect-4/3">
+              <Image
+                src={reporte.foto_url}
+                alt={reporte.nombre ? `Foto de ${reporte.nombre}` : "Foto de la mascota"}
+                fill
+                sizes="(min-width: 768px) 560px, 100vw"
+                quality={75}
+                priority
+                className="object-contain"
+              />
+            </div>
           ) : (
             <div className="grid aspect-4/3 w-full place-items-center bg-stone-100 text-7xl opacity-40">
               {especie?.emoji ?? "🐾"}

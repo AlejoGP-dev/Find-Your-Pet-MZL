@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -83,13 +84,15 @@ function SugerenciasTrasPublicar({ id, tipo }: { id: string; tipo: TipoReporte }
               href={`/mascota/${c.reporte.id}`}
               className="flex items-center gap-3 rounded-lg bg-white p-2 transition hover:ring-2 hover:ring-marca/30"
             >
-              <span className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-stone-100">
+              <span className="relative block h-12 w-12 shrink-0 overflow-hidden rounded-md bg-stone-100">
                 {c.reporte.foto_url && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={c.reporte.foto_url}
                     alt=""
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="48px"
+                    quality={55}
+                    className="object-cover"
                   />
                 )}
               </span>
@@ -149,10 +152,16 @@ function AvisoYaTienesReporte({
               href={`/mascota/${r.id}`}
               className="flex items-center gap-3 rounded-xl bg-white p-3 ring-1 ring-stone-200 transition hover:ring-marca"
             >
-              <span className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-stone-100">
+              <span className="relative block h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-stone-100">
                 {r.foto_url && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={r.foto_url} alt="" className="h-full w-full object-cover" />
+                  <Image
+                    src={r.foto_url}
+                    alt=""
+                    fill
+                    sizes="48px"
+                    quality={55}
+                    className="object-cover"
+                  />
                 )}
               </span>
               <span className="min-w-0 flex-1">

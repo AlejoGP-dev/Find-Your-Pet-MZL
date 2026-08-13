@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ESPECIES,
@@ -40,12 +41,14 @@ export default function TarjetaReporte({ reporte }: { reporte: Reporte }) {
     >
       <div className="relative aspect-4/3 w-full overflow-hidden bg-stone-100">
         {reporte.foto_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={reporte.foto_url}
             alt={reporte.nombre ? `Foto de ${reporte.nombre}` : "Foto de la mascota"}
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-            loading="lazy"
+            fill
+            // 2 columnas en móvil, 3 en tablet, 4 en desktop
+            sizes="(min-width: 1024px) 240px, (min-width: 640px) 240px, 46vw"
+            quality={65}
+            className="object-cover transition duration-300 group-hover:scale-[1.03]"
           />
         ) : (
           <div className="grid h-full w-full place-items-center text-5xl opacity-40">

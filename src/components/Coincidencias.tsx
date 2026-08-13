@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Coincidencia } from "@/lib/coincidencias";
 import { ESPECIES, formatearFecha, type TipoReporte } from "@/lib/tipos";
@@ -42,14 +43,15 @@ export default function Coincidencias({
               href={`/mascota/${reporte.id}`}
               className="flex gap-3 rounded-xl border border-stone-200 bg-white p-3 transition hover:border-marca hover:shadow-sm"
             >
-              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-stone-100">
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-stone-100">
                 {reporte.foto_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={reporte.foto_url}
                     alt={reporte.nombre ?? "Mascota"}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
+                    fill
+                    sizes="80px"
+                    quality={60}
+                    className="object-cover"
                   />
                 ) : (
                   <span className="grid h-full w-full place-items-center text-3xl opacity-40">
