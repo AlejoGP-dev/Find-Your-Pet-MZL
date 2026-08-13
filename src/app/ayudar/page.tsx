@@ -17,6 +17,7 @@ const ICONOS: Record<string, string> = {
   instagram: "📸",
   tiktok: "🎵",
   whatsapp: "💬",
+  facebook: "👥",
 };
 
 export default function PaginaAyudar() {
@@ -82,6 +83,11 @@ export default function PaginaAyudar() {
                 </h2>
                 {org.zona && (
                   <p className="mt-0.5 text-sm font-semibold text-marca">📍 {org.zona}</p>
+                )}
+                {org.etiqueta && (
+                  <span className="mt-1.5 inline-block rounded-full bg-encontrada-suave px-2.5 py-1 text-xs font-bold text-encontrada">
+                    🏠 {org.etiqueta}
+                  </span>
                 )}
               </div>
             </div>

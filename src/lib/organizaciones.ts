@@ -10,6 +10,8 @@ export type Organizacion = {
    * de perfil desde Instagram: sus URLs se vencen y quedarían rotas.
    */
   logo?: string;
+  /** Distintivo corto, p. ej. "Ofrece hogar de paso". Va como etiqueta en la tarjeta. */
+  etiqueta?: string;
   enlaces: Enlace[];
 };
 
@@ -85,6 +87,31 @@ export const ORGANIZACIONES: Organizacion[] = [
         etiqueta: "@fundacion.huellitas",
         url: "https://www.tiktok.com/@fundacion.huellitas",
         icono: "tiktok",
+      },
+    ],
+  },
+  {
+    nombre: "Peter Can Manizales",
+    logo: "/fundaciones/peter-can.jpg",
+    etiqueta: "Ofrece hogar de paso",
+    descripcion:
+      "Centro de adiestramiento y crianza canina que abrió sus instalaciones como hogar de paso para perros afectados por el sismo. Contacto: Jairo Alexander Marulanda Ríos.",
+    zona: "Manizales",
+    enlaces: [
+      {
+        etiqueta: "300 403 3237",
+        url: "https://wa.me/573004033237",
+        icono: "whatsapp",
+      },
+      {
+        etiqueta: "323 345 8424",
+        url: "https://wa.me/573233458424",
+        icono: "whatsapp",
+      },
+      {
+        etiqueta: "Perfil de Facebook",
+        url: "https://www.facebook.com/groups/310649269592232/user/100021816300026/",
+        icono: "facebook",
       },
     ],
   },
