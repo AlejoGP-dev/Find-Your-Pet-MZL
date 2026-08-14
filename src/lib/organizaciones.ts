@@ -130,6 +130,26 @@ export const ORGANIZACIONES: Organizacion[] = [
   },
 ];
 
+/**
+ * Grupos de Facebook donde la comunidad difunde mascotas perdidas y
+ * encontradas. No son nuestros ni los administramos: los enlazamos porque
+ * entre más ojos vean un reporte, más rápido aparece la mascota.
+ */
+export const GRUPOS_DIFUSION: { nombre: string; url: string; miembros?: string }[] = [
+  {
+    nombre: "MASCOTAS PERDIDAS EN MANIZALES",
+    url: "https://www.facebook.com/groups/adopcionesymascotasperdidaseje/",
+  },
+  {
+    nombre: "Mascotas Perdidas Manizales",
+    url: "https://www.facebook.com/groups/310649269592232/",
+  },
+  {
+    nombre: "Mascotas Perdidas en Manizales",
+    url: "https://www.facebook.com/groups/mascotasperdidasenmanizales/",
+  },
+];
+
 /** Lo que más les hace falta en el día a día. */
 export const NECESIDADES = [
   { emoji: "🍖", texto: "Alimento (perro y gato)" },

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  GRUPOS_DIFUSION,
   NECESIDADES,
   ORGANIZACIONES,
   colorDe,
@@ -109,6 +110,50 @@ export default function PaginaAyudar() {
             </div>
           </article>
         ))}
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
+        <h2 className="text-lg font-extrabold text-stone-900">
+          📣 Grupos donde también puedes difundir
+        </h2>
+        <p className="mt-1 text-stone-600">
+          Comunidades de Facebook con miles de personas atentas a mascotas
+          perdidas y encontradas. Publica tu reporte acá y compártelo también
+          allá: entre más gente lo vea, más rápido aparece.
+        </p>
+
+        <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+          {GRUPOS_DIFUSION.map((g) => (
+            <li key={g.url}>
+              <a
+                href={g.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-full items-center gap-3 rounded-xl border border-stone-300 p-3.5 transition hover:border-marca hover:bg-marca-suave"
+              >
+                <span
+                  aria-hidden="true"
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#1877F2]/10 text-xl"
+                >
+                  👥
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-bold leading-snug text-stone-800">
+                    {g.nombre}
+                  </span>
+                  <span className="block text-xs text-stone-500">
+                    Grupo de Facebook
+                  </span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-3 text-xs text-stone-500">
+          Estos grupos son de la comunidad, no los administra Find Your Pet MZL.
+          Cada uno tiene sus propias reglas para publicar.
+        </p>
       </section>
 
       <p className="mt-6 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">
