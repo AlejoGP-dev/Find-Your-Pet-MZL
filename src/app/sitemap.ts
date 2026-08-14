@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { GUIAS } from "@/lib/consejos";
 import { CIUDADES } from "@/lib/tipos";
 
 /** Dominio público. Se puede cambiar sin tocar código con NEXT_PUBLIC_SITIO. */
@@ -15,6 +16,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITIO}/`, changeFrequency: "hourly", priority: 1 },
     { url: `${SITIO}/reportar`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITIO}/ayudar`, changeFrequency: "weekly", priority: 0.6 },
+    ...GUIAS.map((g) => ({
+      url: `${SITIO}/consejos/${g.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     ...CIUDADES.map((c) => ({
       url: `${SITIO}/${c.slug}`,
       changeFrequency: "hourly" as const,

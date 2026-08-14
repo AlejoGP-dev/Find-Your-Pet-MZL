@@ -235,30 +235,39 @@ export default async function Portada({
       <section className="mx-auto w-full max-w-5xl px-4 pb-14">
         <div className="rounded-2xl border border-stone-200 bg-white p-6">
           <h2 className="text-xl font-extrabold text-stone-900">
-            Consejos para la búsqueda
+            No sabes por dónde empezar a buscar
           </h2>
-          <ul className="mt-4 grid gap-3 text-sm text-stone-700 sm:grid-cols-2">
-            <li className="rounded-xl bg-stone-50 p-4">
-              <strong className="block text-stone-900">Busca de noche</strong>
-              Las mascotas asustadas se esconden de día y se mueven cuando hay silencio.
-              Llámala con su nombre y lleva su comida favorita.
-            </li>
-            <li className="rounded-xl bg-stone-50 p-4">
-              <strong className="block text-stone-900">Deja su olor</strong>
-              Poner su cama, una cobija o su arenera afuera de la casa ayuda a que
-              encuentre el camino de regreso.
-            </li>
-            <li className="rounded-xl bg-stone-50 p-4">
-              <strong className="block text-stone-900">Comparte el enlace</strong>
-              Cada reporte tiene su propia página. Compártela en los grupos de WhatsApp de
-              tu barrio y en redes.
-            </li>
-            <li className="rounded-xl bg-stone-50 p-4">
-              <strong className="block text-stone-900">Cuidado con las estafas</strong>
-              Nunca envíes dinero por adelantado. Pide fotos o señas que solo el dueño
-              real pueda conocer.
-            </li>
-          </ul>
+          <p className="mt-2 text-stone-600">
+            Buscar un gato no se parece en nada a buscar un perro, y la mayoría de
+            la gente hace justo lo que hace huir al animal. Armamos dos guías con
+            lo que sí funciona.
+          </p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <Link
+              href="/consejos/perdida"
+              className="rounded-xl border-2 border-perdida/30 bg-perdida-suave p-5 transition hover:border-perdida"
+            >
+              <span className="block text-lg font-extrabold text-perdida">
+                😿 Se me perdió
+              </span>
+              <span className="mt-1 block text-sm text-stone-700">
+                Dónde buscar según sea perro o gato, qué NO hacer y cómo evitar
+                estafas.
+              </span>
+            </Link>
+            <Link
+              href="/consejos/encontrada"
+              className="rounded-xl border-2 border-encontrada/30 bg-encontrada-suave p-5 transition hover:border-encontrada"
+            >
+              <span className="block text-lg font-extrabold text-encontrada">
+                🐕 Me encontré una
+              </span>
+              <span className="mt-1 block text-sm text-stone-700">
+                Cómo acercarte sin espantarla, qué darle de comer y cómo
+                verificar a la familia.
+              </span>
+            </Link>
+          </div>
         </div>
       </section>
     </>

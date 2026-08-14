@@ -193,6 +193,15 @@ export default async function PaginaMascota({ params }: Props) {
             </div>
           )}
 
+          <Link
+            href={`/consejos/${reporte.tipo}`}
+            className="block rounded-2xl border border-stone-200 bg-white p-4 text-center font-bold text-marca transition hover:border-marca hover:bg-marca-suave"
+          >
+            {esPerdida
+              ? "🔎 Guía: cómo buscar una mascota perdida"
+              : "🤲 Guía: qué hacer si te encontraste una mascota"}
+          </Link>
+
           <a
             href={`/api/reportes/${reporte.id}/afiche`}
             className="boton-secundario w-full"

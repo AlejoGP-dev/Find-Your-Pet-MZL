@@ -84,6 +84,20 @@ export default function RootLayout({
               Verifica siempre la información antes de entregar un animal y prefiere
               encuentros en lugares públicos y acompañado.
             </p>
+            <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+              <Link
+                href="/consejos/perdida"
+                className="font-bold text-marca underline underline-offset-2"
+              >
+                🔎 Cómo buscar una mascota perdida
+              </Link>
+              <Link
+                href="/consejos/encontrada"
+                className="font-bold text-marca underline underline-offset-2"
+              >
+                🤲 Me encontré una mascota
+              </Link>
+            </p>
             <p className="mt-3">
               <Link
                 href="/ayudar"
