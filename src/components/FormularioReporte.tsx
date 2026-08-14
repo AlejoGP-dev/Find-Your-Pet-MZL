@@ -13,31 +13,98 @@ import {
   type TipoReporte,
 } from "@/lib/tipos";
 
-/** Reduce la foto en el navegador para que suba rápido incluso con mala señal. */
-async function comprimirImagen(archivo: File): Promise<File> {
-  if (!archivo.type.startsWith("image/")) return archivo;
+/**
+ * Vercel rechaza cualquier envío de más de 4,5 MB antes de que llegue al
+ * servidor, y el navegador solo alcanza a decir "Failed to fetch". Por eso la
+ * foto TIENE que salir pequeña de acá: apuntamos a 1,5 MB.
+ */
+const OBJETIVO_FOTO = 1.5 * 1024 * 1024;
+const TOPE_FOTO = 3.5 * 1024 * 1024;
+
+/**
+ * Decodifica la imagen. createImageBitmap es lo más rápido, pero falla en
+ * Android viejos y con fotos HEIC del iPhone; ahí caemos a un <img>, que sí
+ * las entiende porque lo decodifica el sistema operativo.
+ */
+async function decodificar(
+  archivo: File,
+): Promise<{ fuente: CanvasImageSource; ancho: number; alto: number; limpiar: () => void }> {
   try {
     const bitmap = await createImageBitmap(archivo);
-    const maxLado = 1400;
-    const escala = Math.min(1, maxLado / Math.max(bitmap.width, bitmap.height));
-    const ancho = Math.round(bitmap.width * escala);
-    const alto = Math.round(bitmap.height * escala);
-
-    const lienzo = document.createElement("canvas");
-    lienzo.width = ancho;
-    lienzo.height = alto;
-    const ctx = lienzo.getContext("2d");
-    if (!ctx) return archivo;
-    ctx.drawImage(bitmap, 0, 0, ancho, alto);
-    bitmap.close?.();
-
-    const blob = await new Promise<Blob | null>((resolve) =>
-      lienzo.toBlob(resolve, "image/jpeg", 0.82),
-    );
-    if (!blob || blob.size >= archivo.size) return archivo;
-    return new File([blob], "mascota.jpg", { type: "image/jpeg" });
+    return {
+      fuente: bitmap,
+      ancho: bitmap.width,
+      alto: bitmap.height,
+      limpiar: () => bitmap.close?.(),
+    };
   } catch {
-    return archivo;
+    const url = URL.createObjectURL(archivo);
+    try {
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const el = new window.Image();
+        el.onload = () => resolve(el);
+        el.onerror = () => reject(new Error("no se pudo leer la imagen"));
+        el.src = url;
+      });
+      return {
+        fuente: img,
+        ancho: img.naturalWidth,
+        alto: img.naturalHeight,
+        limpiar: () => URL.revokeObjectURL(url),
+      };
+    } catch (e) {
+      URL.revokeObjectURL(url);
+      throw e;
+    }
+  }
+}
+
+/**
+ * Reduce la foto en el navegador para que suba rápido incluso con mala señal.
+ * Baja tamaño y calidad por pasos hasta quedar bajo el objetivo.
+ */
+async function comprimirImagen(archivo: File): Promise<File> {
+  const { fuente, ancho: anchoOriginal, alto: altoOriginal, limpiar } =
+    await decodificar(archivo);
+
+  try {
+    let mejor: File | null = null;
+
+    for (const [maxLado, calidad] of [
+      [1400, 0.82],
+      [1200, 0.75],
+      [1000, 0.7],
+      [800, 0.65],
+    ] as const) {
+      const escala = Math.min(1, maxLado / Math.max(anchoOriginal, altoOriginal));
+      const ancho = Math.max(1, Math.round(anchoOriginal * escala));
+      const alto = Math.max(1, Math.round(altoOriginal * escala));
+
+      const lienzo = document.createElement("canvas");
+      lienzo.width = ancho;
+      lienzo.height = alto;
+      const ctx = lienzo.getContext("2d");
+      if (!ctx) break;
+      ctx.drawImage(fuente, 0, 0, ancho, alto);
+
+      const blob = await new Promise<Blob | null>((resolve) =>
+        lienzo.toBlob(resolve, "image/jpeg", calidad),
+      );
+      if (!blob) break;
+
+      mejor = new File([blob], "mascota.jpg", { type: "image/jpeg" });
+      if (blob.size <= OBJETIVO_FOTO) break;
+    }
+
+    // Si por lo que sea no logramos comprimir, devolvemos el original solo
+    // cuando sea lo bastante liviano para que el envío no reviente.
+    if (!mejor) {
+      if (archivo.size > TOPE_FOTO) throw new Error("foto muy pesada");
+      return archivo;
+    }
+    return mejor.size < archivo.size ? mejor : archivo;
+  } finally {
+    limpiar();
   }
 }
 
@@ -220,6 +287,7 @@ export default function FormularioReporte() {
   const [exito, setExito] = useState<{ id: string; token: string } | null>(null);
   const [existentes, setExistentes] = useState<ReporteExistente[] | null>(null);
   const [revisando, setRevisando] = useState(false);
+  const [preparandoFoto, setPreparandoFoto] = useState(false);
   const datosPendientes = useRef<FormData | null>(null);
 
   const hoy = new Date().toISOString().slice(0, 10);
@@ -237,9 +305,22 @@ export default function FormularioReporte() {
       setPrevisualizacion(null);
       return;
     }
-    const comprimida = await comprimirImagen(original);
-    setArchivoFoto(comprimida);
-    setPrevisualizacion(URL.createObjectURL(comprimida));
+    setError(null);
+    setPreparandoFoto(true);
+    try {
+      const comprimida = await comprimirImagen(original);
+      setArchivoFoto(comprimida);
+      setPrevisualizacion(URL.createObjectURL(comprimida));
+    } catch {
+      setArchivoFoto(null);
+      setPrevisualizacion(null);
+      evento.target.value = "";
+      setError(
+        "No pudimos preparar esa foto. Intenta con otra, o tómale una captura de pantalla y sube esa.",
+      );
+    } finally {
+      setPreparandoFoto(false);
+    }
   }
 
   async function enviar(evento: React.FormEvent<HTMLFormElement>) {
@@ -278,9 +359,31 @@ export default function FormularioReporte() {
     setEnviando(true);
 
     try {
-      const respuesta = await fetch("/api/reportes", { method: "POST", body: datos });
-      const cuerpo = await respuesta.json();
-      if (!respuesta.ok) throw new Error(cuerpo.error || "No pudimos guardar el reporte.");
+      const foto = datos.get("foto");
+      if (foto instanceof File && foto.size > TOPE_FOTO) {
+        throw new Error(
+          "La foto quedó muy pesada para subirla. Intenta con otra foto o con una captura de pantalla.",
+        );
+      }
+
+      let respuesta: Response;
+      try {
+        respuesta = await fetch("/api/reportes", { method: "POST", body: datos });
+      } catch {
+        // fetch solo falla así cuando la petición no llegó: sin señal, sin
+        // datos, o el archivo se cortó a mitad de camino.
+        throw new Error(
+          "No pudimos conectar con el servidor. Revisa tu conexión y toca «Publicar reporte» otra vez — no se perdió nada de lo que escribiste.",
+        );
+      }
+
+      const cuerpo = await respuesta.json().catch(() => ({}) as { error?: string });
+      if (!respuesta.ok) {
+        if (respuesta.status === 413) {
+          throw new Error("La foto pesa demasiado. Intenta con otra más liviana.");
+        }
+        throw new Error(cuerpo.error || "No pudimos guardar el reporte. Intenta de nuevo.");
+      }
 
       try {
         const guardados = JSON.parse(localStorage.getItem("fyp-mis-reportes") || "[]");
@@ -442,12 +545,16 @@ export default function FormularioReporte() {
               />
             ) : (
               <span className="grid h-20 w-20 place-items-center rounded-lg bg-stone-100 text-3xl">
-                📷
+                {preparandoFoto ? "⏳" : "📷"}
               </span>
             )}
             <span className="text-sm text-stone-600">
               <span className="block font-bold text-stone-800">
-                {previsualizacion ? "Cambiar foto" : "Toca para subir una foto"}
+                {preparandoFoto
+                  ? "Preparando la foto…"
+                  : previsualizacion
+                    ? "Cambiar foto"
+                    : "Toca para subir una foto"}
               </span>
               Desde la galería o la cámara. La reducimos automáticamente.
             </span>
@@ -684,10 +791,16 @@ export default function FormularioReporte() {
       <div className="sticky bottom-0 z-10 -mx-4 border-t border-stone-200 bg-crema/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
         <button
           type="submit"
-          disabled={enviando || revisando}
+          disabled={enviando || revisando || preparandoFoto}
           className="boton-primario w-full py-4 shadow-lg"
         >
-          {revisando ? "Revisando…" : enviando ? "Publicando…" : "Publicar reporte"}
+          {preparandoFoto
+            ? "Preparando la foto…"
+            : revisando
+              ? "Revisando…"
+              : enviando
+                ? "Publicando…"
+                : "Publicar reporte"}
         </button>
         <p className="mt-2 text-center text-xs text-stone-500 sm:hidden">
           Al publicar aceptas que tu nombre y WhatsApp queden visibles.

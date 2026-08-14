@@ -29,7 +29,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
-const MAX_FOTO = 6 * 1024 * 1024;
+// Vercel corta cualquier petición de más de 4,5 MB antes de que llegue acá,
+// así que el tope propio va por debajo para poder responder con un mensaje claro.
+const MAX_FOTO = 4 * 1024 * 1024;
 
 function texto(form: FormData, campo: string): string {
   return String(form.get(campo) ?? "").trim();
