@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Nunito } from "next/font/google";
 import Isotipo from "@/components/Isotipo";
+import MenuMovil from "@/components/MenuMovil";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -49,15 +50,22 @@ export default function RootLayout({
               </span>
             </Link>
 
-            <nav className="flex shrink-0 items-center gap-1 sm:gap-3">
-              {/* Enlace secundario: se ve, pero no compite con el botón principal */}
+            <nav className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              {/* En escritorio los enlaces van sueltos; en móvil se recogen en
+                  la hamburguesa. El botón de publicar nunca se esconde: es la
+                  acción principal. */}
+              <Link
+                href="/consejos"
+                className="hidden rounded-lg px-3 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-marca-oscuro sm:inline-block"
+              >
+                <span aria-hidden="true">🔎</span> Consejos
+              </Link>
+
               <Link
                 href="/ayudar"
-                className="rounded-lg px-2 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-marca-oscuro sm:px-3"
+                className="hidden rounded-lg px-3 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-marca-oscuro sm:inline-block"
               >
-                <span aria-hidden="true">💚</span>
-                <span className="ml-1 hidden min-[375px]:inline">Ayudar</span>
-                <span className="sr-only">Fundaciones que necesitan ayuda</span>
+                <span aria-hidden="true">💚</span> Ayudar
               </Link>
 
               <Link
@@ -66,6 +74,8 @@ export default function RootLayout({
               >
                 Publicar<span className="hidden sm:inline"> reporte</span>
               </Link>
+
+              <MenuMovil />
             </nav>
           </div>
         </header>
