@@ -59,8 +59,10 @@ export default async function Portada({
   return (
     <>
       <section className="border-b border-stone-200 bg-linear-to-b from-marca-suave to-crema">
-        <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
+        {/* En escritorio el hero va centrado; en móvil se queda alineado a la
+            izquierda, que se lee mejor en columna angosta. */}
+        <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14 md:text-center">
+          <div className="mb-3 flex flex-wrap items-center gap-2 md:justify-center">
             <p className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-marca-oscuro shadow-sm">
               Iniciativa ciudadana · {zona}
             </p>
@@ -70,18 +72,18 @@ export default async function Portada({
               </p>
             )}
           </div>
-          <h1 className="max-w-2xl text-3xl font-extrabold leading-tight text-stone-900 sm:text-4xl">
+          <h1 className="max-w-2xl text-3xl font-extrabold leading-tight text-stone-900 sm:text-4xl md:mx-auto">
             {ciudad
               ? `Mascotas perdidas y encontradas en ${ciudad.nombre}.`
               : "Ayudemos a que cada mascota vuelva a casa."}
           </h1>
-          <p className="mt-4 max-w-2xl text-base text-stone-600 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base text-stone-600 sm:text-lg md:mx-auto">
             Después del sismo del 10 de agosto muchas mascotas salieron corriendo y hoy
             están lejos de su familia. Publica tu reporte en menos de un minuto: sin
             registro, gratis y con contacto directo por WhatsApp.
           </p>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row md:justify-center">
             <Link
               href={`/reportar?tipo=perdida${ciudad ? `&ciudad=${ciudad.slug}` : ""}`}
               className="boton-primario"
@@ -96,7 +98,7 @@ export default async function Portada({
             </Link>
           </div>
 
-          <div className="mt-8 grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3">
+          <div className="mt-8 grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3 md:mx-auto">
             {[
               { n: totales.perdidas, texto: "buscando su casa", color: "text-perdida" },
               { n: totales.encontradas, texto: "buscando dueño", color: "text-encontrada" },
