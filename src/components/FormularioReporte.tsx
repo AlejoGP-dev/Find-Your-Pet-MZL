@@ -70,12 +70,30 @@ async function comprimirImagen(archivo: File): Promise<File> {
   try {
     let mejor: File | null = null;
 
-    for (const [maxLado, calidad] of [
-      [1400, 0.82],
-      [1200, 0.75],
-      [1000, 0.7],
-      [800, 0.65],
-    ] as const) {
+    // Con datos lentos apuntamos mucho más abajo: vale más un reporte
+    // publicado con foto regular que uno que nunca sube.
+    const red = (
+      navigator as Navigator & {
+        connection?: { effectiveType?: string; saveData?: boolean };
+      }
+    ).connection;
+    const lenta =
+      red?.saveData === true ||
+      ["slow-2g", "2g", "3g"].includes(red?.effectiveType ?? "");
+    const objetivo = lenta ? 400 * 1024 : OBJETIVO_FOTO;
+
+    for (const [maxLado, calidad] of (lenta
+      ? ([
+          [1000, 0.7],
+          [800, 0.62],
+          [640, 0.55],
+        ] as const)
+      : ([
+          [1400, 0.82],
+          [1200, 0.75],
+          [1000, 0.7],
+          [800, 0.65],
+        ] as const))) {
       const escala = Math.min(1, maxLado / Math.max(anchoOriginal, altoOriginal));
       const ancho = Math.max(1, Math.round(anchoOriginal * escala));
       const alto = Math.max(1, Math.round(altoOriginal * escala));
@@ -93,7 +111,7 @@ async function comprimirImagen(archivo: File): Promise<File> {
       if (!blob) break;
 
       mejor = new File([blob], "mascota.jpg", { type: "image/jpeg" });
-      if (blob.size <= OBJETIVO_FOTO) break;
+      if (blob.size <= objetivo) break;
     }
 
     // Si por lo que sea no logramos comprimir, devolvemos el original solo
@@ -288,6 +306,11 @@ export default function FormularioReporte() {
   const [existentes, setExistentes] = useState<ReporteExistente[] | null>(null);
   const [revisando, setRevisando] = useState(false);
   const [preparandoFoto, setPreparandoFoto] = useState(false);
+  /** Número de reintento en curso (0 = no estamos reintentando). */
+  const [intentando, setIntentando] = useState(0);
+  /** Tras fallar con foto, ofrecemos publicar sin ella: pesa mil veces menos. */
+  const [puedeReintentarSinFoto, setPuedeReintentarSinFoto] = useState(false);
+  const ultimosDatos = useRef<FormData | null>(null);
   const datosPendientes = useRef<FormData | null>(null);
 
   const hoy = new Date().toISOString().slice(0, 10);
@@ -354,8 +377,19 @@ export default function FormularioReporte() {
     await publicar(datos);
   }
 
+  /** Reenvía lo mismo pero sin la foto, para que pase con señal mala. */
+  async function publicarSinFoto() {
+    const datos = ultimosDatos.current;
+    if (!datos) return;
+    datos.delete("foto");
+    setPuedeReintentarSinFoto(false);
+    await publicar(datos);
+  }
+
   async function publicar(datos: FormData) {
     setError(null);
+    setPuedeReintentarSinFoto(false);
+    ultimosDatos.current = datos;
     setEnviando(true);
 
     try {
@@ -366,16 +400,39 @@ export default function FormularioReporte() {
         );
       }
 
-      let respuesta: Response;
-      try {
-        respuesta = await fetch("/api/reportes", { method: "POST", body: datos });
-      } catch {
-        // fetch solo falla así cuando la petición no llegó: sin señal, sin
-        // datos, o el archivo se cortó a mitad de camino.
-        throw new Error(
-          "No pudimos conectar con el servidor. Revisa tu conexión y toca «Publicar reporte» otra vez — no se perdió nada de lo que escribiste.",
-        );
+      // En datos móviles la subida se corta con frecuencia. Reintentamos solo
+      // cuando la petición ni siquiera llegó: si el servidor respondió algo,
+      // reintentar podría crear el reporte dos veces.
+      let respuesta: Response | null = null;
+      const intentos = 3;
+      for (let intento = 1; intento <= intentos; intento++) {
+        const cortar = new AbortController();
+        const reloj = setTimeout(() => cortar.abort(), 45000);
+        try {
+          respuesta = await fetch("/api/reportes", {
+            method: "POST",
+            body: datos,
+            signal: cortar.signal,
+          });
+          break;
+        } catch {
+          if (intento === intentos) {
+            setPuedeReintentarSinFoto(
+              datos.get("foto") instanceof File &&
+                (datos.get("foto") as File).size > 0,
+            );
+            throw new Error(
+              "No pudimos enviar el reporte: la conexión se cortó. Busca mejor señal o wifi y toca «Publicar reporte» otra vez — no se perdió nada de lo que escribiste.",
+            );
+          }
+          setIntentando(intento + 1);
+          await new Promise((r) => setTimeout(r, intento * 1500));
+        } finally {
+          clearTimeout(reloj);
+        }
       }
+      setIntentando(0);
+      if (!respuesta) throw new Error("No pudimos enviar el reporte.");
 
       const cuerpo = await respuesta.json().catch(() => ({}) as { error?: string });
       if (!respuesta.ok) {
@@ -399,8 +456,10 @@ export default function FormularioReporte() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ocurrió un error inesperado.");
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
     } finally {
       setEnviando(false);
+      setIntentando(0);
     }
   }
 
@@ -783,8 +842,27 @@ export default function FormularioReporte() {
       </section>
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800"
+        >
           {error}
+          {puedeReintentarSinFoto && (
+            <>
+              <p className="mt-2 font-normal">
+                Si la señal sigue mala, publica ya sin la foto: es mejor que el
+                reporte esté arriba. Después puedes publicarlo de nuevo con foto.
+              </p>
+              <button
+                type="button"
+                onClick={publicarSinFoto}
+                disabled={enviando}
+                className="mt-3 w-full rounded-xl border-2 border-red-300 bg-white px-4 py-3 font-bold text-red-800 transition hover:bg-red-100 disabled:opacity-60"
+              >
+                Publicar sin la foto
+              </button>
+            </>
+          )}
         </div>
       )}
 
@@ -798,9 +876,11 @@ export default function FormularioReporte() {
             ? "Preparando la foto…"
             : revisando
               ? "Revisando…"
-              : enviando
-                ? "Publicando…"
-                : "Publicar reporte"}
+              : intentando > 0
+                ? `Reintentando (${intentando} de 3)…`
+                : enviando
+                  ? "Publicando…"
+                  : "Publicar reporte"}
         </button>
         <p className="mt-2 text-center text-xs text-stone-500 sm:hidden">
           Al publicar aceptas que tu nombre y WhatsApp queden visibles.
