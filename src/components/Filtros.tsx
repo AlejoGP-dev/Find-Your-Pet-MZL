@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
-import { ESPECIES, UBICACIONES } from "@/lib/tipos";
+import { CIUDADES, ESPECIES, type Ciudad } from "@/lib/tipos";
 
 const PESTANAS = [
   { clave: "todas", etiqueta: "Todas", tipo: "", estado: "" },
@@ -11,7 +11,15 @@ const PESTANAS = [
   { clave: "reunidas", etiqueta: "🎉 Ya aparecieron", tipo: "", estado: "resuelto" },
 ];
 
-export default function Filtros() {
+export default function Filtros({
+  ciudad = null,
+  base = "/",
+}: {
+  /** Ciudad activa: si viene, el selector de barrios es solo de esa ciudad. */
+  ciudad?: Ciudad | null;
+  /** Ruta sobre la que se arman los filtros ("/" o "/pereira"). */
+  base?: string;
+}) {
   const router = useRouter();
   const params = useSearchParams();
   const [pendiente, iniciar] = useTransition();
@@ -24,20 +32,26 @@ export default function Filtros() {
       else nuevos.delete(clave);
     }
     iniciar(() => {
-      router.push(`/?${nuevos.toString()}#reportes`, { scroll: false });
+      router.push(`${base}?${nuevos.toString()}#reportes`, { scroll: false });
     });
   }
 
   const tipoActual = params.get("tipo") ?? "";
   const especieActual = params.get("especie") ?? "";
   const barrioActual = params.get("barrio") ?? "";
+  const ciudadActual = params.get("ciudad") ?? "";
   const estadoActual = params.get("estado") ?? "";
 
   const pestanaActual =
     estadoActual === "resuelto" ? "reunidas" : tipoActual || "todas";
 
   const hayFiltros = Boolean(
-    tipoActual || especieActual || barrioActual || estadoActual || params.get("q"),
+    tipoActual ||
+      especieActual ||
+      barrioActual ||
+      ciudadActual ||
+      estadoActual ||
+      params.get("q"),
   );
 
   return (
@@ -80,30 +94,49 @@ export default function Filtros() {
             ))}
           </select>
 
-          <select
-            value={barrioActual}
-            onChange={(e) => actualizar({ barrio: e.target.value })}
-            className="w-full min-w-0 rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca sm:w-auto"
-            aria-label="Filtrar por barrio"
-          >
-            <option value="">Todos los barrios</option>
-            {UBICACIONES.map((grupo) => (
-              <optgroup key={grupo.ciudad} label={grupo.ciudad}>
-                {grupo.barrios.map((b) => (
-                  <option key={b} value={b}>
-                    {b.replace(" (Villamaría)", "")}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
+          {ciudad ? (
+            <select
+              value={barrioActual}
+              onChange={(e) => actualizar({ barrio: e.target.value })}
+              className="w-full min-w-0 rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca sm:w-auto"
+              aria-label="Filtrar por barrio"
+            >
+              <option value="">Todos los barrios</option>
+              {ciudad.barrios.map((b) => (
+                <option key={b} value={b}>
+                  {b}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <select
+              value={ciudadActual}
+              onChange={(e) => actualizar({ ciudad: e.target.value, barrio: "" })}
+              className="w-full min-w-0 rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-stone-700 outline-none focus:border-marca sm:w-auto"
+              aria-label="Filtrar por ciudad"
+            >
+              <option value="">Todas las ciudades</option>
+              {CIUDADES.map((c) => (
+                <option key={c.slug} value={c.nombre}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
+          )}
 
           {hayFiltros && (
             <button
               type="button"
               onClick={() => {
                 setBusqueda("");
-                actualizar({ tipo: "", especie: "", barrio: "", q: "", estado: "" });
+                actualizar({
+                  tipo: "",
+                  especie: "",
+                  barrio: "",
+                  ciudad: "",
+                  q: "",
+                  estado: "",
+                });
               }}
               className="col-span-2 whitespace-nowrap text-sm font-semibold text-stone-500 underline underline-offset-2 hover:text-stone-700"
             >
@@ -124,7 +157,11 @@ export default function Filtros() {
           type="search"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="Buscar por nombre, raza, color o barrio…"
+          placeholder={
+            ciudad
+              ? "Buscar por nombre, raza, color o barrio…"
+              : "Buscar por nombre, raza, color o ciudad…"
+          }
           className="campo py-2.5"
           aria-label="Buscar mascotas"
         />

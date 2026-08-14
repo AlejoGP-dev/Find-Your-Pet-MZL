@@ -11,13 +11,13 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Find Your Pet MZL — Mascotas perdidas y encontradas en Manizales y Villamaría",
+  title: "Find Your Pet CO — Mascotas perdidas y encontradas en Colombia",
   description:
-    "Plataforma comunitaria para reportar mascotas perdidas y encontradas en Manizales y Villamaría después del sismo. Publica en un minuto y contacta por WhatsApp.",
+    "Plataforma comunitaria para reportar mascotas perdidas y encontradas en Colombia después del sismo del 10 de agosto. Publica en un minuto y contacta por WhatsApp.",
   openGraph: {
-    title: "Find Your Pet MZL",
+    title: "Find Your Pet CO",
     description:
-      "Reporta mascotas perdidas o encontradas en Manizales y Villamaría. Rápido, gratis y sin registro.",
+      "Reporta mascotas perdidas o encontradas en Colombia. Rápido, gratis y sin registro.",
     locale: "es_CO",
     type: "website",
   },
@@ -41,10 +41,10 @@ export default function RootLayout({
               </span>
               <span className="leading-tight">
                 <span className="block text-sm font-extrabold tracking-tight text-marca-oscuro min-[400px]:text-base sm:text-lg">
-                  Find Your Pet MZL
+                  Find Your Pet CO
                 </span>
                 <span className="hidden text-xs text-stone-500 min-[400px]:block">
-                  Manizales y Villamaría
+                  Mascotas perdidas en Colombia
                 </span>
               </span>
             </Link>
@@ -76,10 +76,10 @@ export default function RootLayout({
           <div className="mx-auto w-full max-w-5xl px-4 py-8 text-sm text-stone-500">
             <p className="flex items-center gap-2 font-semibold text-stone-700">
               <Isotipo className="h-5 w-5 text-marca" fondo="#faf6f0" />
-              Find Your Pet MZL — iniciativa ciudadana sin ánimo de lucro.
+              Find Your Pet CO — iniciativa ciudadana sin ánimo de lucro.
             </p>
             <p className="mt-2 max-w-2xl">
-              Hecha para ayudar a reunir a las familias de Manizales y Villamaría con sus
+              Hecha para ayudar a reunir a las familias de Colombia con sus
               mascotas.
               Verifica siempre la información antes de entregar un animal y prefiere
               encuentros en lugares públicos y acompañado.

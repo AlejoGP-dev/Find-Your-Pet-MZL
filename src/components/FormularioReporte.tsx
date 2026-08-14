@@ -6,10 +6,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   ESPECIES,
+  CIUDADES,
+  OTRA_CIUDAD,
   OTRO_BARRIO,
+  ciudadPorNombre,
+  ciudadPorSlug,
   SEXOS,
   TAMANOS,
-  UBICACIONES,
   type TipoReporte,
 } from "@/lib/tipos";
 
@@ -296,8 +299,17 @@ export default function FormularioReporte() {
     tipoInicial === "encontrada" ? "encontrada" : "perdida",
   );
   const [especie, setEspecie] = useState("perro");
+  // Si llega desde /pereira, la ciudad viene preseleccionada en la URL.
+  const [ciudad, setCiudad] = useState(
+    () => ciudadPorSlug(params.get("ciudad") ?? "")?.nombre ?? "",
+  );
+  const [otraCiudad, setOtraCiudad] = useState("");
   const [barrio, setBarrio] = useState("");
   const [otroBarrio, setOtroBarrio] = useState("");
+
+  // Barrios de la ciudad elegida. Vacío = ciudad fuera del catálogo.
+  const barriosDeCiudad =
+    ciudad && ciudad !== OTRA_CIUDAD ? (ciudadPorNombre(ciudad)?.barrios ?? []) : [];
   const [previsualizacion, setPrevisualizacion] = useState<string | null>(null);
   const [archivoFoto, setArchivoFoto] = useState<File | null>(null);
   const [enviando, setEnviando] = useState(false);
@@ -733,44 +745,105 @@ export default function FormularioReporte() {
         <Titulo numero={3} texto="¿Dónde y cuándo?" />
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="etiqueta" htmlFor="barrio">
-              Barrio o zona *
+            <label className="etiqueta" htmlFor="ciudad">
+              Ciudad *
             </label>
             <select
-              id="barrio"
+              id="ciudad"
               className="campo"
               required
-              value={barrio}
-              onChange={(e) => setBarrio(e.target.value)}
+              value={ciudad}
+              onChange={(e) => {
+                setCiudad(e.target.value);
+                // Los barrios dependen de la ciudad: al cambiarla, se reinicia.
+                setBarrio("");
+                setOtroBarrio("");
+              }}
             >
               <option value="" disabled>
                 Selecciona…
               </option>
-              {UBICACIONES.map((grupo) => (
-                <optgroup key={grupo.ciudad} label={grupo.ciudad}>
-                  {grupo.barrios.map((b) => (
-                    <option key={b} value={b}>
-                      {b.replace(" (Villamaría)", "")}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-              <option value={OTRO_BARRIO}>Mi barrio no está en la lista…</option>
+              <optgroup label="Más afectadas por el sismo">
+                {CIUDADES.filter((c) => c.afectada).map((c) => (
+                  <option key={c.slug} value={c.nombre}>
+                    {c.nombre} ({c.departamento})
+                  </option>
+                ))}
+              </optgroup>
+              <option value={OTRA_CIUDAD}>Mi ciudad no está en la lista…</option>
             </select>
             <input
               type="hidden"
-              name="barrio"
-              value={barrio === OTRO_BARRIO ? otroBarrio.trim() : barrio}
+              name="ciudad"
+              value={ciudad === OTRA_CIUDAD ? otraCiudad.trim() : ciudad}
             />
-            {barrio === OTRO_BARRIO && (
+            {ciudad === OTRA_CIUDAD && (
               <input
                 className="campo mt-2"
-                value={otroBarrio}
-                onChange={(e) => setOtroBarrio(e.target.value)}
-                placeholder="Escribe el barrio y el municipio. Ej: El Bosque, Villamaría"
+                value={otraCiudad}
+                onChange={(e) => setOtraCiudad(e.target.value)}
+                placeholder="Escribe tu ciudad. Ej: Buenaventura"
                 maxLength={60}
                 required
                 autoFocus
+              />
+            )}
+          </div>
+
+          <div>
+            <label className="etiqueta" htmlFor="barrio">
+              Barrio o zona *
+            </label>
+            {barriosDeCiudad.length > 0 ? (
+              <>
+                <select
+                  id="barrio"
+                  className="campo"
+                  required
+                  value={barrio}
+                  onChange={(e) => setBarrio(e.target.value)}
+                >
+                  <option value="" disabled>
+                    Selecciona…
+                  </option>
+                  {barriosDeCiudad.map((b) => (
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
+                  ))}
+                  <option value={OTRO_BARRIO}>Mi barrio no está en la lista…</option>
+                </select>
+                <input
+                  type="hidden"
+                  name="barrio"
+                  value={barrio === OTRO_BARRIO ? otroBarrio.trim() : barrio}
+                />
+                {barrio === OTRO_BARRIO && (
+                  <input
+                    className="campo mt-2"
+                    value={otroBarrio}
+                    onChange={(e) => setOtroBarrio(e.target.value)}
+                    placeholder="Escribe el barrio. Ej: El Bosque"
+                    maxLength={60}
+                    required
+                    autoFocus
+                  />
+                )}
+              </>
+            ) : (
+              // Ciudad fuera del catálogo: no tenemos barrios, se escribe.
+              <input
+                id="barrio"
+                name="barrio"
+                className="campo"
+                value={otroBarrio}
+                onChange={(e) => setOtroBarrio(e.target.value)}
+                placeholder={
+                  ciudad ? "Escribe el barrio. Ej: El Bosque" : "Primero elige la ciudad"
+                }
+                maxLength={60}
+                required
+                disabled={!ciudad}
               />
             )}
           </div>

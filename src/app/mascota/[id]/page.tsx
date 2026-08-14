@@ -27,16 +27,16 @@ type Props = { params: Promise<{ id: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const reporte = await obtenerReporte(id).catch(() => null);
-  if (!reporte) return { title: "Reporte no encontrado — Find Your Pet MZL" };
+  if (!reporte) return { title: "Reporte no encontrado — Find Your Pet CO" };
 
   const nombre = reporte.nombre || "Mascota";
   const accion = reporte.tipo === "perdida" ? "Se perdió" : "Encontrada";
-  const titulo = `${accion}: ${nombre} en ${reporte.barrio} — Find Your Pet MZL`;
+  const titulo = `${accion}: ${nombre} en ${reporte.barrio}, ${reporte.ciudad} — Find Your Pet CO`;
   return {
     title: titulo,
     description:
       reporte.descripcion ||
-      `${accion} en ${reporte.barrio}, Manizales, el ${formatearFecha(reporte.fecha)}.`,
+      `${accion} en ${reporte.barrio}, ${reporte.ciudad}, el ${formatearFecha(reporte.fecha)}.`,
     openGraph: {
       title: titulo,
       images: reporte.foto_url ? [reporte.foto_url] : undefined,
@@ -66,6 +66,7 @@ export default async function PaginaMascota({ params }: Props) {
       ? await listarReportes({
           tipo: reporte.tipo === "perdida" ? "encontrada" : "perdida",
           especie: reporte.especie,
+          ciudad: reporte.ciudad,
           estado: "activo",
         }).catch(() => [])
       : [];
@@ -80,6 +81,7 @@ export default async function PaginaMascota({ params }: Props) {
     { rotulo: "Color", valor: reporte.color },
     { rotulo: "Tamaño", valor: etiquetaDe(TAMANOS, reporte.tamano) },
     { rotulo: "Sexo", valor: etiquetaDe(SEXOS, reporte.sexo) },
+    { rotulo: "Ciudad", valor: reporte.ciudad },
     { rotulo: "Barrio o zona", valor: reporte.barrio },
     { rotulo: "Punto de referencia", valor: reporte.referencia },
     {
@@ -145,7 +147,10 @@ export default async function PaginaMascota({ params }: Props) {
             <h1 className="mt-3 text-3xl font-extrabold leading-tight text-stone-900">
               {reporte.nombre || `${especie?.etiqueta ?? "Mascota"} sin nombre`}
             </h1>
-            <p className="mt-1 font-semibold text-marca">📍 {reporte.barrio}</p>
+            <p className="mt-1 font-semibold text-marca">
+              📍 {reporte.barrio}
+              {reporte.ciudad ? `, ${reporte.ciudad}` : ""}
+            </p>
             <p className="mt-1 text-sm text-stone-500">
               Publicado {haceCuanto(reporte.created_at)}
             </p>

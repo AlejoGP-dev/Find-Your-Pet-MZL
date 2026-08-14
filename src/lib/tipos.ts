@@ -14,6 +14,7 @@ export type Reporte = {
   tamano: Tamano | null;
   sexo: Sexo | null;
   foto_url: string | null;
+  ciudad: string;
   barrio: string;
   referencia: string | null;
   fecha: string;
@@ -43,78 +44,154 @@ export type NuevoReporte = Omit<
   "id" | "estado" | "avistamientos" | "created_at"
 >;
 
-export type GrupoUbicacion = { ciudad: string; barrios: string[] };
+export type Ciudad = {
+  /** Va en la URL: /pereira, /cali… */
+  slug: string;
+  nombre: string;
+  departamento: string;
+  /** Si es true, aparece destacada por el sismo del 10 de agosto. */
+  afectada?: boolean;
+  barrios: string[];
+};
 
 /**
- * Ubicaciones agrupadas por municipio. El valor que se guarda en la base de
- * datos es el nombre del barrio; los de Villamaría llevan el sufijo de ciudad
- * para no confundirlos con los de Manizales.
+ * Ciudades con lista de barrios propia. Quien viva en otra parte del país
+ * puede escribir su ciudad y su barrio a mano — por eso existe OTRA_CIUDAD.
+ *
+ * Los barrios de las ciudades nuevas son un primer listado con los sectores
+ * más conocidos; la gente de cada ciudad va completando con el campo libre.
  */
-export const UBICACIONES: GrupoUbicacion[] = [
+export const CIUDADES: Ciudad[] = [
   {
-    ciudad: "Manizales",
+    slug: "manizales",
+    nombre: "Manizales",
+    departamento: "Caldas",
+    afectada: true,
     barrios: [
-      "Centro",
-      "Chipre",
-      "Palogrande",
-      "Palermo",
-      "La Enea",
-      "Milán",
-      "Villapilar",
-      "El Cable",
-      "Los Rosales",
-      "Fátima",
-      "La Sultana",
-      "San Jorge",
-      "Estrella",
-      "Villa del Río",
-      "La Camelia",
-      "Belén",
-      "Alta Suiza",
-      "Alta Castilla",
-      "Laureles",
-      "Malhabar",
-      "Versalles",
-      "Bosques del Norte",
-      "La Carola",
-      "Marmato",
-      "San José",
-      "El Nevado",
-      "Campohermoso",
-      "Aranjuez",
-      "Solferino",
-      "Minitas",
-      "Las Américas",
-      "Corregimiento o vereda de Manizales",
+      "Centro", "Chipre", "Palogrande", "Palermo", "La Enea", "Milán",
+      "Villapilar", "El Cable", "Los Rosales", "Fátima", "La Sultana",
+      "San Jorge", "Estrella", "Villa del Río", "La Camelia", "Belén",
+      "Alta Suiza", "Alta Castilla", "Laureles", "Malhabar", "Versalles",
+      "Bosques del Norte", "La Carola", "Marmato", "San José", "El Nevado",
+      "Campohermoso", "Aranjuez", "Solferino", "Minitas", "Las Américas",
+      "Corregimiento o vereda",
     ],
   },
   {
-    ciudad: "Villamaría",
+    slug: "villamaria",
+    nombre: "Villamaría",
+    departamento: "Caldas",
+    afectada: true,
     barrios: [
-      "Centro (Villamaría)",
-      "La Pradera (Villamaría)",
-      "La Floresta (Villamaría)",
-      "Villa Nueva (Villamaría)",
-      "Nuevo Horizonte (Villamaría)",
-      "Bellavista (Villamaría)",
-      "Gallinazo (Villamaría)",
-      "Llanitos (Villamaría)",
-      "Miraflores (Villamaría)",
-      "Partidas (Villamaría)",
-      "Rioclaro (Villamaría)",
-      "Nueva Primavera (Villamaría)",
-      "Los Cuervos (Villamaría)",
-      "Agrícola La Paz (Villamaría)",
-      "Termales (Villamaría)",
-      "Corregimiento o vereda de Villamaría",
+      "Centro", "La Pradera", "La Floresta", "Villa Nueva", "Nuevo Horizonte",
+      "Bellavista", "Gallinazo", "Llanitos", "Miraflores", "Partidas",
+      "Rioclaro", "Nueva Primavera", "Los Cuervos", "Agrícola La Paz",
+      "Termales", "Corregimiento o vereda",
+    ],
+  },
+  {
+    slug: "pereira",
+    nombre: "Pereira",
+    departamento: "Risaralda",
+    afectada: true,
+    barrios: [
+      "Centro", "Cuba", "Villa Santana", "El Jardín", "Los Álamos",
+      "San Nicolás", "Boston", "El Poblado", "Providencia", "Corales",
+      "Pinares", "Kennedy", "Belmonte", "La Villa", "Gamma",
+      "Perla del Otún", "Samaria", "El Rocío", "El Dorado", "San Joaquín",
+      "Villavicencio", "Maraya", "Álamos", "Ciudad Boquía", "Naranjito",
+      "Corregimiento o vereda",
+    ],
+  },
+  {
+    slug: "dosquebradas",
+    nombre: "Dosquebradas",
+    departamento: "Risaralda",
+    afectada: true,
+    barrios: [
+      "Centro", "La Badea", "Los Naranjos", "Santa Mónica", "La Pradera",
+      "Frailes", "El Japón", "La Romelia", "Camilo Torres", "Bosques de la Acuarela",
+      "Villa Colombia", "El Balso", "Playa Rica", "Guadalupe",
+      "Corregimiento o vereda",
+    ],
+  },
+  {
+    slug: "cali",
+    nombre: "Cali",
+    departamento: "Valle del Cauca",
+    afectada: true,
+    barrios: [
+      "Centro", "San Nicolás", "Granada", "San Fernando", "El Peñón",
+      "Ciudad Jardín", "Pance", "Santa Mónica", "Versalles", "Chipichape",
+      "La Flora", "Menga", "Siloé", "Terrón Colorado", "Meléndez",
+      "Valle del Lili", "Alfonso López", "El Poblado", "Marroquín",
+      "El Vallado", "Junín", "Alameda", "El Obrero", "Bretaña", "La Base",
+      "Los Cristales", "Salomia", "Floralia", "Decepaz", "Aguablanca",
+      "Corregimiento o vereda",
+    ],
+  },
+  {
+    slug: "quibdo",
+    nombre: "Quibdó",
+    departamento: "Chocó",
+    afectada: true,
+    barrios: [
+      "Centro", "Yesquita", "Yesca Grande", "Roma", "Kennedy", "Cristo Rey",
+      "Niño Jesús", "Obrero", "César Conto", "La Aurora", "Huapango",
+      "Reposo", "Buenos Aires", "Los Álamos", "San Vicente", "Medrano",
+      "Alameda Reyes", "Julio Figueroa Villa", "La Victoria", "El Silencio",
+      "Tomás Pérez", "Pandeyuca", "Simón Bolívar", "El Jardín", "Miraflores",
+      "Corregimiento o vereda",
+    ],
+  },
+  {
+    slug: "armenia",
+    nombre: "Armenia",
+    departamento: "Quindío",
+    afectada: true,
+    barrios: [
+      "Centro", "La Patria", "Los Quindos", "Granada", "Laureles",
+      "El Bosque", "La Adiela", "Ciudad Dorada", "Nueva Libertad",
+      "El Paraíso", "Las Colinas", "Puerto Espejo", "Génesis",
+      "Rincón Santo", "La Cecilia", "Uribe", "Villa Liliana", "Zuldemayda",
+      "La Fachada", "Berlín", "La Isabela", "Yulima", "Mercedes del Norte",
+      "Corregimiento o vereda",
+    ],
+  },
+  {
+    slug: "popayan",
+    nombre: "Popayán",
+    departamento: "Cauca",
+    afectada: true,
+    barrios: [
+      "Centro Histórico", "La Esmeralda", "Bello Horizonte", "El Recuerdo",
+      "Modelo", "Alfonso López", "José María Obando", "La Paz", "Los Sauces",
+      "Yambitará", "Campanario", "Pandiguando", "Tomás Cipriano", "Berlín",
+      "Chirimía", "Villa del Norte", "Lomas de Granada", "Bosques de Pomona",
+      "El Placer", "La Ladera", "San Camilo", "Loma de la Virgen",
+      "Corregimiento o vereda",
     ],
   },
 ];
 
-/** Opción que habilita el campo de texto libre. */
+/** Opción que habilita el campo de texto libre para el barrio. */
 export const OTRO_BARRIO = "__otro__";
+/** Opción que habilita el campo de texto libre para la ciudad. */
+export const OTRA_CIUDAD = "__otra__";
 
-export const BARRIOS_MANIZALES = UBICACIONES.flatMap((g) => g.barrios);
+/** Nombre que guardamos cuando la ciudad no está en el catálogo. */
+export const CIUDAD_GENERICA = "Otra ciudad";
+
+export const SLUGS_CIUDADES = CIUDADES.map((c) => c.slug);
+
+export function ciudadPorSlug(slug: string): Ciudad | null {
+  return CIUDADES.find((c) => c.slug === slug) ?? null;
+}
+
+export function ciudadPorNombre(nombre: string): Ciudad | null {
+  const clave = sinTildes(nombre);
+  return CIUDADES.find((c) => sinTildes(c.nombre) === clave) ?? null;
+}
 
 export const ESPECIES: { valor: Especie; etiqueta: string; emoji: string }[] = [
   { valor: "perro", etiqueta: "Perro", emoji: "🐶" },
@@ -174,8 +251,8 @@ export function normalizarWhatsapp(numero: string): string {
 export function enlaceWhatsapp(reporte: Reporte, urlPublica: string): string {
   const saludo =
     reporte.tipo === "perdida"
-      ? `Hola ${reporte.contacto_nombre}, vi el reporte de ${reporte.nombre || "tu mascota"} en Find Your Pet MZL y creo que tengo información.`
-      : `Hola ${reporte.contacto_nombre}, vi en Find Your Pet MZL la mascota que encontraste y creo que puede ser la mía.`;
+      ? `Hola ${reporte.contacto_nombre}, vi el reporte de ${reporte.nombre || "tu mascota"} en Find Your Pet CO y creo que tengo información.`
+      : `Hola ${reporte.contacto_nombre}, vi en Find Your Pet CO la mascota que encontraste y creo que puede ser la mía.`;
   const texto = `${saludo}\n\n${urlPublica}`;
   return `https://wa.me/${normalizarWhatsapp(reporte.contacto_whatsapp)}?text=${encodeURIComponent(texto)}`;
 }
@@ -199,16 +276,25 @@ export function haceCuanto(iso: string): string {
 }
 
 /** Variantes que la gente escribe a mano y su forma unificada. */
-const ALIAS_BARRIO: Record<string, string> = {
+const ALIAS_CIUDAD: Record<string, string> = {
   "villamaria": "Villamaría",
   "villa maria": "Villamaría",
   "villamaria caldas": "Villamaría",
-  "parque de villa maria": "Villamaría",
-  "villa maria floresta 2": "La Floresta (Villamaría)",
-  "la floresta villamaria": "La Floresta (Villamaría)",
+  "manizales caldas": "Manizales",
+  "quibdo choco": "Quibdó",
+  "santiago de cali": "Cali",
+  "cali valle": "Cali",
+  "pereira risaralda": "Pereira",
+  "armenia quindio": "Armenia",
+  "popayan cauca": "Popayán",
+  "dos quebradas": "Dosquebradas",
+};
+
+const ALIAS_BARRIO: Record<string, string> = {
   "n/a": "Sin especificar",
   "na": "Sin especificar",
   "-": "Sin especificar",
+  "no se": "Sin especificar",
 };
 
 function sinTildes(texto: string): string {
@@ -220,22 +306,42 @@ function sinTildes(texto: string): string {
     .trim();
 }
 
+/** Deja la ciudad con el nombre oficial del catálogo cuando la reconoce. */
+export function canonicalizarCiudad(texto: string): string {
+  const limpio = texto.replace(/\s+/g, " ").trim();
+  if (!limpio) return "";
+
+  const clave = sinTildes(limpio);
+  if (ALIAS_CIUDAD[clave]) return ALIAS_CIUDAD[clave];
+
+  const porSlug = CIUDADES.find((c) => c.slug === clave);
+  if (porSlug) return porSlug.nombre;
+
+  const porNombre = ciudadPorNombre(limpio);
+  if (porNombre) return porNombre.nombre;
+
+  return limpio.charAt(0).toUpperCase() + limpio.slice(1);
+}
+
 /**
- * Unifica cómo se guarda el barrio: si coincide con uno de la lista (sin
+ * Unifica cómo se guarda el barrio: si coincide con uno de la ciudad (sin
  * importar tildes ni mayúsculas) usa el nombre oficial; si no, lo deja como
  * lo escribió la persona pero con la primera letra en mayúscula.
  */
-export function canonicalizarBarrio(texto: string): string {
+export function canonicalizarBarrio(texto: string, ciudad?: string): string {
   const limpio = texto.replace(/\s+/g, " ").trim();
   if (!limpio) return limpio;
 
   const clave = sinTildes(limpio);
   if (ALIAS_BARRIO[clave]) return ALIAS_BARRIO[clave];
 
-  for (const grupo of UBICACIONES) {
-    for (const barrio of grupo.barrios) {
+  const candidatas = ciudad
+    ? [ciudadPorNombre(ciudad)].filter(Boolean as unknown as (c: Ciudad | null) => c is Ciudad)
+    : CIUDADES;
+
+  for (const c of candidatas) {
+    for (const barrio of c.barrios) {
       if (sinTildes(barrio) === clave) return barrio;
-      if (sinTildes(barrio.replace(" (Villamaría)", "")) === clave) return barrio;
     }
   }
 

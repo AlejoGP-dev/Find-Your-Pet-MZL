@@ -51,8 +51,8 @@ export async function GET(
 
   const titulo = esPerdida ? "¡SE PERDIÓ!" : "¿LO CONOCES?";
   const subtitulo = esPerdida
-    ? `EN EL BARRIO ${reporte.barrio.replace(" (Villamaría)", "").toUpperCase()}`
-    : `ENCONTRADA EN ${reporte.barrio.replace(" (Villamaría)", "").toUpperCase()}`;
+    ? `EN ${reporte.barrio.toUpperCase()}, ${reporte.ciudad.toUpperCase()}`
+    : `ENCONTRADA EN ${reporte.barrio.toUpperCase()}, ${reporte.ciudad.toUpperCase()}`;
 
   const datos = [
     reporte.raza,
@@ -181,7 +181,7 @@ export async function GET(
               marginTop: 14,
             }}
           >
-            🐾 find-your-pet-mzl.vercel.app · Mascotas perdidas en Manizales y Villamaría
+            🐾 find-your-pet-mzl.vercel.app · Mascotas perdidas y encontradas en Colombia
           </div>
         </div>
       </div>

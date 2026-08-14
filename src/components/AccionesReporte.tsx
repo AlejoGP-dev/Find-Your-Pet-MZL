@@ -46,7 +46,7 @@ export default function AccionesReporte({
   async function compartir() {
     const url = window.location.href;
     const datos = {
-      title: "Find Your Pet MZL",
+      title: "Find Your Pet CO",
       text: "Ayúdanos a encontrar esta mascota 🐾",
       url,
     };

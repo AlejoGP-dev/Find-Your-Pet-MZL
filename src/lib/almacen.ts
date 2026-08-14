@@ -31,11 +31,12 @@ if (!globalDemo.__demoReportes) globalDemo.__demoReportes = [];
 if (!globalDemo.__demoAvistamientos) globalDemo.__demoAvistamientos = [];
 
 const CAMPOS_PUBLICOS =
-  "id,tipo,nombre,especie,raza,color,tamano,sexo,foto_url,barrio,referencia,fecha,descripcion,contacto_nombre,contacto_whatsapp,estado,avistamientos,created_at";
+  "id,tipo,nombre,especie,raza,color,tamano,sexo,foto_url,ciudad,barrio,referencia,fecha,descripcion,contacto_nombre,contacto_whatsapp,estado,avistamientos,created_at";
 
 export type FiltrosReporte = {
   tipo?: string | null;
   especie?: string | null;
+  ciudad?: string | null;
   barrio?: string | null;
   estado?: string | null;
   q?: string | null;
@@ -46,12 +47,13 @@ export async function listarReportes(filtros: FiltrosReporte = {}): Promise<Repo
     let filas = [...globalDemo.__demoReportes!];
     if (filtros.tipo) filas = filas.filter((r) => r.tipo === filtros.tipo);
     if (filtros.especie) filas = filas.filter((r) => r.especie === filtros.especie);
+    if (filtros.ciudad) filas = filas.filter((r) => r.ciudad === filtros.ciudad);
     if (filtros.barrio) filas = filas.filter((r) => r.barrio === filtros.barrio);
     filas = filas.filter((r) => r.estado === (filtros.estado || "activo"));
     if (filtros.q) {
       const q = filtros.q.toLowerCase();
       filas = filas.filter((r) =>
-        [r.nombre, r.raza, r.color, r.barrio, r.descripcion]
+        [r.nombre, r.raza, r.color, r.barrio, r.ciudad, r.descripcion]
           .filter(Boolean)
           .some((campo) => String(campo).toLowerCase().includes(q)),
       );
@@ -69,13 +71,14 @@ export async function listarReportes(filtros: FiltrosReporte = {}): Promise<Repo
 
   if (filtros.tipo) consulta = consulta.eq("tipo", filtros.tipo);
   if (filtros.especie) consulta = consulta.eq("especie", filtros.especie);
+  if (filtros.ciudad) consulta = consulta.eq("ciudad", filtros.ciudad);
   if (filtros.barrio) consulta = consulta.eq("barrio", filtros.barrio);
   consulta = consulta.eq("estado", filtros.estado || "activo");
   if (filtros.q) {
     const q = filtros.q.replace(/[%,()]/g, " ").trim();
     if (q) {
       consulta = consulta.or(
-        `nombre.ilike.%${q}%,raza.ilike.%${q}%,color.ilike.%${q}%,barrio.ilike.%${q}%,descripcion.ilike.%${q}%`,
+        `nombre.ilike.%${q}%,raza.ilike.%${q}%,color.ilike.%${q}%,barrio.ilike.%${q}%,ciudad.ilike.%${q}%,descripcion.ilike.%${q}%`,
       );
     }
   }
@@ -225,13 +228,15 @@ export async function subirFoto(
   return data.publicUrl;
 }
 
-export async function contarPorEstado(): Promise<{
+export async function contarPorEstado(ciudad?: string | null): Promise<{
   perdidas: number;
   encontradas: number;
   reunidas: number;
 }> {
   if (!HAY_SUPABASE) {
-    const filas = globalDemo.__demoReportes!;
+    const filas = globalDemo.__demoReportes!.filter(
+      (r) => !ciudad || r.ciudad === ciudad,
+    );
     return {
       perdidas: filas.filter((r) => r.estado === "activo" && r.tipo === "perdida").length,
       encontradas: filas.filter((r) => r.estado === "activo" && r.tipo === "encontrada")
@@ -241,7 +246,8 @@ export async function contarPorEstado(): Promise<{
   }
 
   const contar = async (filtro: (c: ReturnType<typeof consultaBase>) => typeof c) => {
-    const { count } = await filtro(consultaBase());
+    const base = consultaBase();
+    const { count } = await filtro(ciudad ? base.eq("ciudad", ciudad) : base);
     return count ?? 0;
   };
 

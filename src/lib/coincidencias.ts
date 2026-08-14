@@ -56,6 +56,8 @@ export function compararReportes(
   if (perdida.tipo !== "perdida" || encontrada.tipo !== "encontrada") return null;
   // Distinta especie: no se parecen y punto.
   if (perdida.especie !== encontrada.especie) return null;
+  // Distinta ciudad: una mascota perdida en Cali no aparece en Quibdó.
+  if (normalizar(perdida.ciudad) !== normalizar(encontrada.ciudad)) return null;
 
   let puntaje = 25;
   const razones: string[] = [];
@@ -73,7 +75,7 @@ export function compararReportes(
     puntaje += 6;
   }
 
-  // --- Zona ---
+  // --- Zona --- (la ciudad ya está garantizada igual)
   const barrioA = normalizar(perdida.barrio);
   const barrioB = normalizar(encontrada.barrio);
   if (barrioA && barrioA === barrioB) {

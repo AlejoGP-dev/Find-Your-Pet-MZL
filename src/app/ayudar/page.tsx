@@ -9,9 +9,9 @@ import {
 } from "@/lib/organizaciones";
 
 export const metadata: Metadata = {
-  title: "Fundaciones y albergues que necesitan ayuda — Find Your Pet MZL",
+  title: "Fundaciones y albergues que necesitan ayuda — Find Your Pet CO",
   description:
-    "Fundaciones, albergues y personas que cuidan animales en Manizales y Villamaría. Qué necesitan y cómo contactarlas para ayudar.",
+    "Fundaciones, albergues y personas que cuidan animales en Colombia. Qué necesitan y cómo contactarlas para ayudar.",
 };
 
 const ICONOS: Record<string, string> = {
@@ -35,7 +35,7 @@ export default function PaginaAyudar() {
         Quienes cuidan a los que nadie reclama
       </h1>
       <p className="mt-4 max-w-2xl text-base text-stone-600 sm:text-lg">
-        Después del sismo, las fundaciones y albergues de Manizales y Villamaría
+        Después del sismo, las fundaciones y albergues de las ciudades afectadas
         recibieron muchos más animales de los que ya tenían. Casi todos se
         sostienen con lo que la gente dona. Si puedes aportar algo, por poquito
         que sea, acá están.
@@ -151,13 +151,13 @@ export default function PaginaAyudar() {
         </ul>
 
         <p className="mt-3 text-xs text-stone-500">
-          Estos grupos son de la comunidad, no los administra Find Your Pet MZL.
+          Estos grupos son de la comunidad, no los administra Find Your Pet CO.
           Cada uno tiene sus propias reglas para publicar.
         </p>
       </section>
 
       <p className="mt-6 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">
-        <strong className="font-bold">Ojo:</strong> Find Your Pet MZL no recibe ni
+        <strong className="font-bold">Ojo:</strong> Find Your Pet CO no recibe ni
         administra donaciones, ni intermedia. Contacta directo a cada fundación y
         confirma con ellas qué necesitan y dónde entregarlo antes de comprar nada.
       </p>

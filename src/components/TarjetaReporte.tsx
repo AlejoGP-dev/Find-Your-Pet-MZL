@@ -25,7 +25,14 @@ export function InsigniaTipo({ tipo }: { tipo: Reporte["tipo"] }) {
   );
 }
 
-export default function TarjetaReporte({ reporte }: { reporte: Reporte }) {
+export default function TarjetaReporte({
+  reporte,
+  mostrarCiudad = false,
+}: {
+  reporte: Reporte;
+  /** En la vista nacional mostramos también la ciudad, si no se pierde el dato. */
+  mostrarCiudad?: boolean;
+}) {
   const especie = ESPECIES.find((e) => e.valor === reporte.especie);
   const detalles = [
     reporte.raza,
@@ -83,6 +90,9 @@ export default function TarjetaReporte({ reporte }: { reporte: Reporte }) {
         )}
         <p className="mt-auto flex items-center gap-1.5 pt-2 text-sm font-semibold text-marca">
           📍 {reporte.barrio}
+          {mostrarCiudad && reporte.ciudad && reporte.ciudad !== reporte.barrio
+            ? `, ${reporte.ciudad}`
+            : ""}
         </p>
         <p className="text-xs text-stone-500">
           {formatearFecha(reporte.fecha)}

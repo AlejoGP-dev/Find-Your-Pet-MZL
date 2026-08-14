@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import FormularioReporte from "@/components/FormularioReporte";
 
 export const metadata: Metadata = {
-  title: "Publicar reporte — Find Your Pet MZL",
+  title: "Publicar reporte — Find Your Pet CO",
   description:
     "Reporta una mascota perdida o encontrada en Manizales o Villamaría. Toma menos de un minuto.",
 };

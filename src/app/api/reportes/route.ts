@@ -5,7 +5,11 @@ import {
   listarReportes,
   subirFoto,
 } from "@/lib/almacen";
-import { canonicalizarBarrio, type NuevoReporte } from "@/lib/tipos";
+import {
+  canonicalizarBarrio,
+  canonicalizarCiudad,
+  type NuevoReporte,
+} from "@/lib/tipos";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,6 +20,7 @@ export async function GET(request: NextRequest) {
     const reportes = await listarReportes({
       tipo: p.get("tipo"),
       especie: p.get("especie"),
+      ciudad: p.get("ciudad"),
       barrio: p.get("barrio"),
       estado: p.get("estado"),
       q: p.get("q"),
@@ -61,11 +66,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Selecciona el tipo de mascota." }, { status: 400 });
     }
 
-    const barrio = canonicalizarBarrio(texto(form, "barrio"));
+    const ciudad = canonicalizarCiudad(texto(form, "ciudad"));
+    const barrio = canonicalizarBarrio(texto(form, "barrio"), ciudad);
     const fecha = texto(form, "fecha");
     const contacto_nombre = texto(form, "contacto_nombre");
     const contacto_whatsapp = texto(form, "contacto_whatsapp");
 
+    if (!ciudad) return NextResponse.json({ error: "Falta la ciudad." }, { status: 400 });
     if (!barrio) return NextResponse.json({ error: "Falta el barrio o la zona." }, { status: 400 });
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha))
       return NextResponse.json({ error: "Falta la fecha." }, { status: 400 });
@@ -107,6 +114,7 @@ export async function POST(request: NextRequest) {
       tamano: (textoOpcional(form, "tamano") as NuevoReporte["tamano"]) ?? null,
       sexo: (textoOpcional(form, "sexo") as NuevoReporte["sexo"]) ?? null,
       foto_url,
+      ciudad,
       barrio,
       referencia: textoOpcional(form, "referencia"),
       fecha,

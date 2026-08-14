@@ -1,5 +1,5 @@
 /**
- * Isotipo de Find Your Pet MZL: un corazón que enmarca a un perro y un gato,
+ * Isotipo de Find Your Pet CO: un corazón que enmarca a un perro y un gato,
  * con una huella al pie.
  *
  * La figura usa `currentColor`; `fondo` es el color de los calados (ojos, nariz)
@@ -17,7 +17,7 @@ export default function Isotipo({
       viewBox="0 0 200 200"
       className={className}
       role="img"
-      aria-label="Find Your Pet MZL"
+      aria-label="Find Your Pet CO"
     >
       <path
         d="M100 178 C42 141 14 108 14 77 C14 48 36 29 60 29 C79 29 94 40 100 56 C106 40 121 29 140 29 C164 29 186 48 186 77 C186 108 158 141 100 178 Z"
