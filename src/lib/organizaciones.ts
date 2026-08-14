@@ -3,6 +3,12 @@ export type Enlace = { etiqueta: string; url: string; icono: string };
 export type Organizacion = {
   nombre: string;
   descripcion: string;
+  /** Ciudad principal donde opera. Sirve para agrupar la página de ayuda. */
+  ciudad: string;
+  /** Refugio golpeado directamente por el sismo del 10 de agosto. */
+  afectadaSismo?: boolean;
+  /** Lo que pidieron públicamente, si se sabe. */
+  necesita?: string;
   zona?: string;
   /**
    * Ruta del logo dentro de /public, por ejemplo "/fundaciones/huellitas.jpg".
@@ -34,13 +40,18 @@ export function inicialesDe(nombre: string): string {
 }
 
 /**
- * Fundaciones, albergues y personas que sostienen animales en Manizales y
- * Villamaría. No manejamos donaciones ni intermediamos: cada quien contacta
- * directo con la organización.
+ * Fundaciones, albergues y personas que sostienen animales en el país.
+ * No manejamos donaciones ni intermediamos: cada quien contacta directo.
+ *
+ * Al agregar una organización nueva: verifica que la cuenta enlazada sea la
+ * oficial y que la ciudad coincida. En emergencias circulan cuentas falsas,
+ * así que es preferible dejar la tarjeta sin enlace de contacto (apuntando a
+ * la nota de prensa) antes que enlazar una cuenta que no se pudo confirmar.
  */
 export const ORGANIZACIONES: Organizacion[] = [
   {
     nombre: "Fundación Vecino de 4 Patas",
+    ciudad: "Manizales",
     logo: "/fundaciones/vecino-de-4-patas.jpg",
     descripcion:
       "Rescate y cuidado de animales en situación de calle en Manizales.",
@@ -54,6 +65,7 @@ export const ORGANIZACIONES: Organizacion[] = [
   },
   {
     nombre: "Fundación Estoy Contigo",
+    ciudad: "Manizales",
     logo: "/fundaciones/estoy-contigo.jpg",
     descripcion:
       "Acompañamiento, rescate y adopción de perros y gatos en la ciudad.",
@@ -67,6 +79,9 @@ export const ORGANIZACIONES: Organizacion[] = [
   },
   {
     nombre: "Ángeles de la Calle Manizales",
+    ciudad: "Manizales",
+    afectadaSismo: true,
+    necesita: "Alimento para perros y gatos, agua e insumos",
     logo: "/fundaciones/angeles-de-la-calle.jpg",
     descripcion:
       "Alimentación y atención de animales que viven en la calle en Manizales.",
@@ -80,6 +95,7 @@ export const ORGANIZACIONES: Organizacion[] = [
   },
   {
     nombre: "Fundación Huellitas",
+    ciudad: "Manizales",
     logo: "/fundaciones/huellitas.jpg",
     descripcion: "Rescate y cuidado de animales en Manizales.",
     enlaces: [
@@ -92,6 +108,7 @@ export const ORGANIZACIONES: Organizacion[] = [
   },
   {
     nombre: "Peter Can Manizales",
+    ciudad: "Manizales",
     logo: "/fundaciones/peter-can.jpg",
     etiqueta: "Ofrece hogar de paso",
     descripcion:
@@ -117,6 +134,7 @@ export const ORGANIZACIONES: Organizacion[] = [
   },
   {
     nombre: "Doña Lilia",
+    ciudad: "Manizales",
     descripcion:
       "Sostiene por su cuenta un albergue de gatos. Recibe alimento, arena y todo lo que ayude a cuidarlos.",
     zona: "La Enea, Manizales",
@@ -128,6 +146,205 @@ export const ORGANIZACIONES: Organizacion[] = [
       },
     ],
   },
+
+  // ─── Villamaría ───────────────────────────────────────────────
+  {
+    nombre: "Amigos de Cuatro Patas",
+    ciudad: "Villamaría",
+    afectadaSismo: true,
+    necesita: "Alimento para perros y gatos, agua e insumos",
+    descripcion:
+      "Refugio de Villamaría que quedó afectado por el sismo. Reportado por Semana entre las fundaciones que pidieron ayuda.",
+    enlaces: [
+      {
+        etiqueta: "Nota de Semana",
+        url: "https://www.semana.com/4patas/articulo/terremoto-en-colombia-mascotas-desaparecidas-y-fundaciones-afectadas-piden-ayuda-tras-la-emergencia/202648/",
+        icono: "prensa",
+      },
+    ],
+  },
+
+  // ─── Pereira y Dosquebradas ───────────────────────────────────
+  {
+    nombre: "Fundación Siempre a Tu Lado",
+    ciudad: "Pereira",
+    afectadaSismo: true,
+    necesita:
+      "Alimento, medicamentos, malla eslabonada, planta eléctrica y ayuda económica",
+    zona: "Variante Romelia – El Pollo, Dosquebradas",
+    descripcion:
+      "Se quedó sin electricidad tras el sismo y necesita sede nueva con urgencia. Arrastra además deudas veterinarias.",
+    enlaces: [
+      {
+        etiqueta: "Página de Facebook",
+        url: "https://www.facebook.com/p/Fundaci%C3%B3n-Siempre-a-Tu-Lado-Pereira-100075975846135/",
+        icono: "facebook",
+      },
+    ],
+  },
+  {
+    nombre: "Refugio Huellas de Amor",
+    ciudad: "Pereira",
+    descripcion: "Rescate, refugio y adopción de perros y gatos en Pereira.",
+    enlaces: [
+      {
+        etiqueta: "@refugiohuellasdeamor",
+        url: "https://www.instagram.com/refugiohuellasdeamor",
+        icono: "instagram",
+      },
+    ],
+  },
+  {
+    nombre: "Hogar Sara Reyes",
+    ciudad: "Pereira",
+    descripcion: "Hogar de paso y refugio para animales rescatados en Pereira.",
+    enlaces: [
+      {
+        etiqueta: "@hogarsarareyespereira",
+        url: "https://www.instagram.com/hogarsarareyespereira",
+        icono: "instagram",
+      },
+    ],
+  },
+  {
+    nombre: "Asociación Adóptame Pereira",
+    ciudad: "Pereira",
+    descripcion: "Red de adopciones de perros y gatos en Pereira.",
+    enlaces: [
+      {
+        etiqueta: "@adoptamepereira_",
+        url: "https://www.instagram.com/adoptamepereira_",
+        icono: "instagram",
+      },
+    ],
+  },
+
+  // ─── Armenia ──────────────────────────────────────────────────
+  {
+    nombre: "Fundación Kenovy",
+    ciudad: "Armenia",
+    afectadaSismo: true,
+    necesita:
+      "Materiales de construcción, insumos veterinarios, carpas, alimento y voluntarios",
+    zona: "Vereda Altos de los Guevara",
+    descripcion:
+      "Alberga 113 perros y buena parte de la finca colapsó con el sismo; seis animales quedaron desaparecidos.",
+    enlaces: [
+      {
+        etiqueta: "Nota de El Espectador",
+        url: "https://www.elespectador.com/la-red-zoocial/estos-refugios-de-animales-colapsaron-por-el-terremoto-en-colombia-asi-puede-ayudar/",
+        icono: "prensa",
+      },
+    ],
+  },
+  {
+    nombre: "Corteza Terrestre",
+    ciudad: "Armenia",
+    descripcion:
+      "Sociedad protectora de animales con refugio propio en Armenia.",
+    enlaces: [
+      {
+        etiqueta: "cortezaterrestre.org",
+        url: "https://www.cortezaterrestre.org/",
+        icono: "web",
+      },
+    ],
+  },
+
+  // ─── Cali ─────────────────────────────────────────────────────
+  {
+    nombre: "Fundación Corazón Gatuno",
+    ciudad: "Cali",
+    zona: "Corregimiento Andes, Vía Brisas",
+    descripcion:
+      "Alberga cerca de 150 gatos y 80 perros rescatados del abandono y el maltrato. Recibe adopciones, apadrinamientos y donaciones.",
+    enlaces: [
+      {
+        etiqueta: "@corazongatuno",
+        url: "https://www.instagram.com/corazongatuno",
+        icono: "instagram",
+      },
+      {
+        etiqueta: "corazongatuno.org",
+        url: "https://www.corazongatuno.org/",
+        icono: "web",
+      },
+    ],
+  },
+  {
+    nombre: "Fundación Paraíso de la Mascota",
+    ciudad: "Cali",
+    descripcion: "Adopción responsable de perros y gatos en Cali.",
+    enlaces: [
+      {
+        etiqueta: "paraisodelamascota.org",
+        url: "https://www.paraisodelamascota.org/",
+        icono: "web",
+      },
+    ],
+  },
+
+  // ─── Popayán ──────────────────────────────────────────────────
+  {
+    nombre: "Fundación Vida Animal (FVA)",
+    ciudad: "Popayán",
+    descripcion: "Rescate y protección de animales en Popayán.",
+    enlaces: [
+      {
+        etiqueta: "Página de Facebook",
+        url: "https://www.facebook.com/fvapopayan/",
+        icono: "facebook",
+      },
+    ],
+  },
+  {
+    nombre: "Casa K Rescate",
+    ciudad: "Popayán",
+    descripcion: "Rescate y adopción de perros en Popayán.",
+    enlaces: [
+      {
+        etiqueta: "@casak.rescate",
+        url: "https://www.instagram.com/casak.rescate/",
+        icono: "instagram",
+      },
+    ],
+  },
+
+  // ─── Otras ciudades del Valle golpeadas por el sismo ──────────
+  {
+    nombre: "Salvando Huellitas",
+    ciudad: "Buenaventura",
+    afectadaSismo: true,
+    necesita: "Aportes económicos",
+    descripcion:
+      "Sostiene más de 200 animales y quedó con problemas para conseguir insumos por las restricciones de movilidad tras el sismo.",
+    enlaces: [
+      {
+        etiqueta: "Nota de El Espectador",
+        url: "https://www.elespectador.com/la-red-zoocial/estos-refugios-de-animales-colapsaron-por-el-terremoto-en-colombia-asi-puede-ayudar/",
+        icono: "prensa",
+      },
+    ],
+  },
+  {
+    nombre: "Fundación Latidos de Amor",
+    ciudad: "Tuluá",
+    afectadaSismo: true,
+    necesita: "Ayuda humanitaria",
+    descripcion: "El refugio quedó destruido por el sismo.",
+    enlaces: [
+      {
+        etiqueta: "Nota de El Espectador",
+        url: "https://www.elespectador.com/la-red-zoocial/estos-refugios-de-animales-colapsaron-por-el-terremoto-en-colombia-asi-puede-ayudar/",
+        icono: "prensa",
+      },
+    ],
+  },
+];
+
+/** Ciudades con al menos una organización, en el orden en que se muestran. */
+export const CIUDADES_CON_ORGS = [
+  ...new Set(ORGANIZACIONES.map((o) => o.ciudad)),
 ];
 
 /**

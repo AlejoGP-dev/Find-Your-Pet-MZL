@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  CIUDADES_CON_ORGS,
   GRUPOS_DIFUSION,
   NECESIDADES,
   ORGANIZACIONES,
@@ -19,6 +20,8 @@ const ICONOS: Record<string, string> = {
   tiktok: "🎵",
   whatsapp: "💬",
   facebook: "👥",
+  web: "🌐",
+  prensa: "📰",
 };
 
 export default function PaginaAyudar() {
@@ -36,9 +39,9 @@ export default function PaginaAyudar() {
       </h1>
       <p className="mt-4 max-w-2xl text-base text-stone-600 sm:text-lg">
         Después del sismo, las fundaciones y albergues de las ciudades afectadas
-        recibieron muchos más animales de los que ya tenían. Casi todos se
-        sostienen con lo que la gente dona. Si puedes aportar algo, por poquito
-        que sea, acá están.
+        recibieron muchos más animales de los que ya tenían — y a varios se les
+        cayó el refugio encima. Casi todos se sostienen con lo que la gente dona.
+        Si puedes aportar algo, por poquito que sea, acá están.
       </p>
 
       <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-5">
@@ -55,62 +58,96 @@ export default function PaginaAyudar() {
         </ul>
       </section>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-2">
-        {ORGANIZACIONES.map((org) => (
-          <article
-            key={org.nombre}
-            className="flex flex-col rounded-2xl border border-stone-200 bg-white p-5"
-          >
-            <div className="flex items-start gap-3">
-              {org.logo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={org.logo}
-                  alt={`Logo de ${org.nombre}`}
-                  className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-stone-100"
-                />
-              ) : (
-                <span
-                  aria-hidden="true"
-                  className="grid h-14 w-14 shrink-0 place-items-center rounded-full text-lg font-extrabold text-white"
-                  style={{ backgroundColor: colorDe(org.nombre) }}
-                >
-                  {inicialesDe(org.nombre)}
-                </span>
-              )}
-              <div className="min-w-0">
-                <h2 className="text-lg font-extrabold leading-tight text-stone-900">
-                  {org.nombre}
-                </h2>
-                {org.zona && (
-                  <p className="mt-0.5 text-sm font-semibold text-marca">📍 {org.zona}</p>
-                )}
-                {org.etiqueta && (
-                  <span className="mt-1.5 inline-block rounded-full bg-encontrada-suave px-2.5 py-1 text-xs font-bold text-encontrada">
-                    🏠 {org.etiqueta}
-                  </span>
-                )}
-              </div>
-            </div>
+      {CIUDADES_CON_ORGS.map((ciudad) => {
+        const orgs = ORGANIZACIONES.filter((o) => o.ciudad === ciudad);
+        return (
+          <section key={ciudad} className="mt-8">
+            <h2 className="text-xl font-extrabold text-stone-900">
+              📍 {ciudad}
+              <span className="ml-2 text-sm font-bold text-stone-400">
+                {orgs.length}
+              </span>
+            </h2>
 
-            <p className="mt-3 flex-1 text-stone-600">{org.descripcion}</p>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              {org.enlaces.map((e) => (
-                <a
-                  key={e.url}
-                  href={e.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl border border-stone-300 px-3.5 py-2 text-sm font-bold text-stone-700 transition hover:border-marca hover:bg-marca-suave hover:text-marca-oscuro"
+            <div className="mt-3 grid gap-4 sm:grid-cols-2">
+              {orgs.map((org) => (
+                <article
+                  key={org.nombre}
+                  className={`flex flex-col rounded-2xl border bg-white p-5 ${
+                    org.afectadaSismo
+                      ? "border-perdida/40 ring-1 ring-perdida/20"
+                      : "border-stone-200"
+                  }`}
                 >
-                  {ICONOS[e.icono] ?? "🔗"} {e.etiqueta}
-                </a>
+                  <div className="flex items-start gap-3">
+                    {org.logo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={org.logo}
+                        alt={`Logo de ${org.nombre}`}
+                        className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-stone-100"
+                      />
+                    ) : (
+                      <span
+                        aria-hidden="true"
+                        className="grid h-14 w-14 shrink-0 place-items-center rounded-full text-lg font-extrabold text-white"
+                        style={{ backgroundColor: colorDe(org.nombre) }}
+                      >
+                        {inicialesDe(org.nombre)}
+                      </span>
+                    )}
+                    <div className="min-w-0">
+                      <h3 className="text-lg font-extrabold leading-tight text-stone-900">
+                        {org.nombre}
+                      </h3>
+                      {org.zona && (
+                        <p className="mt-0.5 text-sm font-semibold text-marca">
+                          📍 {org.zona}
+                        </p>
+                      )}
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        {org.afectadaSismo && (
+                          <span className="rounded-full bg-perdida-suave px-2.5 py-1 text-xs font-bold text-perdida">
+                            🚨 Afectada por el sismo
+                          </span>
+                        )}
+                        {org.etiqueta && (
+                          <span className="rounded-full bg-encontrada-suave px-2.5 py-1 text-xs font-bold text-encontrada">
+                            🏠 {org.etiqueta}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="mt-3 flex-1 text-stone-600">{org.descripcion}</p>
+
+                  {org.necesita && (
+                    <p className="mt-3 rounded-xl bg-stone-50 p-3 text-sm text-stone-700">
+                      <strong className="font-bold text-stone-900">Necesita:</strong>{" "}
+                      {org.necesita}
+                    </p>
+                  )}
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {org.enlaces.map((e) => (
+                      <a
+                        key={e.url}
+                        href={e.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-xl border border-stone-300 px-3.5 py-2 text-sm font-bold text-stone-700 transition hover:border-marca hover:bg-marca-suave hover:text-marca-oscuro"
+                      >
+                        {ICONOS[e.icono] ?? "🔗"} {e.etiqueta}
+                      </a>
+                    ))}
+                  </div>
+                </article>
               ))}
             </div>
-          </article>
-        ))}
-      </section>
+          </section>
+        );
+      })}
 
       <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
         <h2 className="text-lg font-extrabold text-stone-900">
@@ -160,6 +197,8 @@ export default function PaginaAyudar() {
         <strong className="font-bold">Ojo:</strong> Find Your Pet CO no recibe ni
         administra donaciones, ni intermedia. Contacta directo a cada fundación y
         confirma con ellas qué necesitan y dónde entregarlo antes de comprar nada.
+        En emergencias circulan cuentas y enlaces falsos: verifica siempre a quién
+        le estás consignando.
       </p>
 
       <div className="mt-8 rounded-2xl border-2 border-dashed border-stone-300 p-5 text-center">
