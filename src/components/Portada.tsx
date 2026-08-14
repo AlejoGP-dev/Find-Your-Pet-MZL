@@ -43,7 +43,9 @@ export default async function Portada({
         q: uno(p.q),
         estado,
       }),
-      contarPorEstado(ciudad ? ciudad.nombre : null),
+      // Los contadores tienen que seguir el mismo filtro que la lista: si no,
+      // en /?ciudad=Villamaría se veían 15 tarjetas con los números del país.
+      contarPorEstado(ciudadFiltro),
     ]);
   } catch (error) {
     errorCarga = error instanceof Error ? error.message : "Error desconocido";
@@ -52,7 +54,7 @@ export default async function Portada({
   const totalReportes = totales.perdidas + totales.encontradas + totales.reunidas;
   const zona = ciudad
     ? `${ciudad.nombre}, ${ciudad.departamento}`
-    : "Colombia";
+    : (ciudadFiltro ?? "Colombia");
 
   return (
     <>
