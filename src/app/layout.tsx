@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Nunito } from "next/font/google";
 import Analytics from "@/components/Analytics";
+import AvisoLegal from "@/components/AvisoLegal";
 import Isotipo from "@/components/Isotipo";
 import MenuMovil from "@/components/MenuMovil";
 import "./globals.css";
@@ -36,6 +37,7 @@ export default function RootLayout({
     <html lang="es-CO" className={nunito.variable}>
       <body className="flex min-h-dvh flex-col font-sans">
         <Analytics />
+        <AvisoLegal />
         <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-crema/90 backdrop-blur">
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-3">
             <Link href="/" className="flex items-center gap-2.5">
