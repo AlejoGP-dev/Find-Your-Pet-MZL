@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Lista, PaginaLegal, Punto } from "@/components/BloqueLegal";
-import { WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
+import { RESPONSABLE, WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Tratamiento de datos personales — Find Your Pet CO",
@@ -34,18 +34,24 @@ export default function PaginaDatos() {
 
       <Punto n={1} titulo="Quién responde por tus datos">
         <p>
-          <strong>Find Your Pet CO</strong>, una iniciativa ciudadana sin ánimo
-          de lucro con sede en Manizales, Caldas, Colombia. No somos una empresa
-          ni tenemos NIT: es un proyecto personal hecho para ayudar después del
-          sismo.
+          <strong>{RESPONSABLE}</strong>, persona natural, domiciliado en
+          Manizales, Caldas, Colombia. Es quien creó y administra{" "}
+          <strong>Find Your Pet CO</strong> y quien responde como responsable del
+          tratamiento de tus datos.
         </p>
         <p>
-          Canal de contacto para todo lo relacionado con datos personales:
-          WhatsApp{" "}
+          No hay empresa ni NIT detrás: es un proyecto personal, gratuito y sin
+          ánimo de lucro, hecho para ayudar después del sismo. La página la
+          atiende una sola persona.
+        </p>
+        <p>
+          Canal de contacto para todo lo relacionado con datos personales
+          —consultas, correcciones, borrados y reclamos—: WhatsApp{" "}
           <a href={enlaceSoporte()} target="_blank" rel="noopener noreferrer">
             {WHATSAPP_SOPORTE_VISIBLE}
           </a>
-          .
+          . Ese mismo canal es el que atiende las peticiones de las que habla el
+          punto 6.
         </p>
       </Punto>
 

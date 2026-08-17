@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Lista, PaginaLegal, Punto } from "@/components/BloqueLegal";
+import { RESPONSABLE } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Términos y condiciones — Find Your Pet CO",
@@ -17,10 +18,12 @@ export default function PaginaTerminos() {
     >
       <Punto n={1} titulo="Qué es Find Your Pet CO">
         <p>
-          Es una página gratuita hecha por una persona, no una empresa ni una
-          autoridad. Nació después del sismo del 10 de agosto de 2026 para que
-          las familias de Colombia pudieran publicar sus mascotas perdidas y
-          encontradas en un solo lugar.
+          Es una página gratuita hecha y administrada por{" "}
+          <strong>{RESPONSABLE}</strong>, una persona natural de Manizales,
+          Caldas. No es una empresa, una fundación ni una autoridad. Nació
+          después del sismo del 10 de agosto de 2026 para que las familias de
+          Colombia pudieran publicar sus mascotas perdidas y encontradas en un
+          solo lugar.
         </p>
         <p>
           <strong>Es un tablón de anuncios, nada más.</strong> Mostramos lo que

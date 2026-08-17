@@ -3,6 +3,9 @@
  * se cambia acá y no en ocho archivos.
  */
 
+/** Persona natural detrás del proyecto y responsable del tratamiento. */
+export const RESPONSABLE = "Alejandro Grajales";
+
 /** Formato internacional sin signos, como lo pide wa.me. */
 export const WHATSAPP_SOPORTE = "573148148380";
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   ACTUALIZADO,
   MOTIVOS_SOPORTE,
+  RESPONSABLE,
   WHATSAPP_SOPORTE_VISIBLE,
   enlaceSoporte,
 } from "@/lib/legal";
@@ -84,8 +85,9 @@ export function CajaSoporte() {
         <strong className="font-bold text-stone-900">
           {WHATSAPP_SOPORTE_VISIBLE}
         </strong>
-        . Contesto yo, no un robot, así que puede que me demore un poco — pero
-        todos los mensajes se leen.
+        . Contesta <strong className="font-bold text-stone-900">{RESPONSABLE}</strong>,
+        que es quien hizo y administra la página — no es un robot ni un equipo de
+        soporte, así que puede demorarse un poco. Pero todos los mensajes se leen.
       </p>
       {/* Cada opción abre WhatsApp con el mensaje ya escrito: llega
           clasificado y la persona no tiene que explicar de dónde viene. */}
