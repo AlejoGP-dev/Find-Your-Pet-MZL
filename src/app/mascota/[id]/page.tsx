@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import AccionesReporte from "@/components/AccionesReporte";
 import Avistamientos from "@/components/Avistamientos";
 import Coincidencias from "@/components/Coincidencias";
+import FotoMascota from "@/components/FotoMascota";
 import { InsigniaTipo } from "@/components/TarjetaReporte";
 import { listarAvistamientos, listarReportes, obtenerReporte } from "@/lib/almacen";
 import { buscarCoincidencias } from "@/lib/coincidencias";
@@ -120,25 +120,14 @@ export default async function PaginaMascota({ params }: Props) {
 
       <div className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
         <div className="self-start overflow-hidden rounded-2xl border border-stone-200 bg-white">
-          {reporte.foto_url ? (
-            // object-contain: muchas fotos son afiches verticales y recortarlos
-            // esconde el número de contacto.
-            <div className="relative aspect-square w-full bg-stone-100 sm:aspect-4/3">
-              <Image
-                src={reporte.foto_url}
-                alt={reporte.nombre ? `Foto de ${reporte.nombre}` : "Foto de la mascota"}
-                fill
-                sizes="(min-width: 768px) 560px, 100vw"
-                quality={75}
-                priority
-                className="object-contain"
-              />
-            </div>
-          ) : (
-            <div className="grid aspect-4/3 w-full place-items-center bg-stone-100 text-7xl opacity-40">
-              {especie?.emoji ?? "🐾"}
-            </div>
-          )}
+          {/* object-contain: muchas fotos son afiches verticales y recortarlos
+              esconde el número de contacto. El recuadro se adapta a la foto y
+              se puede ampliar a pantalla completa. */}
+          <FotoMascota
+            src={reporte.foto_url}
+            alt={reporte.nombre ? `Foto de ${reporte.nombre}` : "Foto de la mascota"}
+            emoji={especie?.emoji ?? "🐾"}
+          />
         </div>
 
         <div className="space-y-5">
