@@ -56,6 +56,53 @@ export default async function Portada({
     ? `${ciudad.nombre}, ${ciudad.departamento}`
     : (ciudadFiltro ?? "Colombia");
 
+  // Las cajas de arriba son atajos a los filtros: conservan lo que ya esté
+  // puesto (especie, barrio, ciudad, búsqueda) y solo cambian tipo/estado.
+  const tipoActual = uno(p.tipo) ?? "";
+  function enlaceFiltro(cambios: { tipo?: string; estado?: string }): string {
+    const q = new URLSearchParams();
+    for (const clave of ["especie", "barrio", "ciudad", "q"] as const) {
+      const valor = uno(p[clave]);
+      if (valor) q.set(clave, valor);
+    }
+    if (cambios.tipo) q.set("tipo", cambios.tipo);
+    if (cambios.estado) q.set("estado", cambios.estado);
+    const cadena = q.toString();
+    return `${base}${cadena ? `?${cadena}` : ""}#reportes`;
+  }
+
+  const cajas = [
+    {
+      n: totales.perdidas,
+      texto: "Perdidas",
+      color: "text-perdida",
+      activa: !viendoReunidas && tipoActual === "perdida",
+      anillo: "ring-perdida",
+      // Volver a tocar la caja activa quita el filtro.
+      href: enlaceFiltro(
+        !viendoReunidas && tipoActual === "perdida" ? {} : { tipo: "perdida" },
+      ),
+    },
+    {
+      n: totales.encontradas,
+      texto: "Encontradas",
+      color: "text-encontrada",
+      activa: !viendoReunidas && tipoActual === "encontrada",
+      anillo: "ring-encontrada",
+      href: enlaceFiltro(
+        !viendoReunidas && tipoActual === "encontrada" ? {} : { tipo: "encontrada" },
+      ),
+    },
+    {
+      n: totales.reunidas,
+      texto: "Ya en casa 🎉",
+      color: "text-marca",
+      activa: viendoReunidas,
+      anillo: "ring-marca",
+      href: enlaceFiltro(viendoReunidas ? {} : { estado: "resuelto" }),
+    },
+  ];
+
   return (
     <>
       <section className="border-b border-stone-200 bg-linear-to-b from-marca-suave to-crema">
@@ -105,14 +152,16 @@ export default async function Portada({
           </div>
 
           <div className="mt-8 grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3 md:mx-auto">
-            {[
-              { n: totales.perdidas, texto: "Perdidas", color: "text-perdida" },
-              { n: totales.encontradas, texto: "Encontradas", color: "text-encontrada" },
-              { n: totales.reunidas, texto: "Ya en casa 🎉", color: "text-marca" },
-            ].map((dato) => (
-              <div
+            {cajas.map((dato) => (
+              <Link
                 key={dato.texto}
-                className="rounded-xl bg-white/70 px-2 py-3 text-center ring-1 ring-stone-200/70 sm:px-4"
+                href={dato.href}
+                aria-pressed={dato.activa}
+                className={`rounded-xl px-2 py-3 text-center transition sm:px-4 ${
+                  dato.activa
+                    ? `bg-white ring-2 ${dato.anillo} shadow-sm`
+                    : "bg-white/70 ring-1 ring-stone-200/70 hover:bg-white hover:ring-stone-300"
+                }`}
               >
                 <Contador
                   hasta={dato.n}
@@ -121,7 +170,7 @@ export default async function Portada({
                 <span className="mt-0.5 block text-xs leading-tight text-stone-600 sm:text-sm">
                   {dato.texto}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

@@ -45,6 +45,37 @@ export default async function ListadoAdopcion({
 
   const zona = ciudad ? `${ciudad.nombre}, ${ciudad.departamento}` : "Colombia";
 
+  // Las cajas son atajos al filtro de estado, conservando lo demás.
+  function enlaceEstado(nuevo: string): string {
+    const q = new URLSearchParams();
+    for (const clave of ["especie", "ciudad", "tamano", "edad", "q"] as const) {
+      const valor = uno(params[clave]);
+      if (valor) q.set(clave, valor);
+    }
+    if (nuevo) q.set("estado", nuevo);
+    const cadena = q.toString();
+    return `${base}${cadena ? `?${cadena}` : ""}#listado`;
+  }
+
+  const cajas = [
+    {
+      n: totales.disponibles,
+      texto: "En adopción",
+      color: "text-marca",
+      activa: !viendoAdoptadas,
+      anillo: "ring-marca",
+      href: enlaceEstado(""),
+    },
+    {
+      n: totales.adoptadas,
+      texto: "Ya tienen hogar 🎉",
+      color: "text-encontrada",
+      activa: viendoAdoptadas,
+      anillo: "ring-encontrada",
+      href: enlaceEstado(viendoAdoptadas ? "" : "adoptado"),
+    },
+  ];
+
   return (
     <>
       <section className="border-b border-stone-200 bg-linear-to-b from-marca-suave to-crema">
@@ -79,13 +110,16 @@ export default async function ListadoAdopcion({
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-2 sm:max-w-sm sm:gap-3 md:mx-auto">
-            {[
-              { n: totales.disponibles, texto: "En adopción", color: "text-marca" },
-              { n: totales.adoptadas, texto: "Ya tienen hogar 🎉", color: "text-encontrada" },
-            ].map((d) => (
-              <div
+            {cajas.map((d) => (
+              <Link
                 key={d.texto}
-                className="rounded-xl bg-white/70 px-2 py-3 text-center ring-1 ring-stone-200/70 sm:px-4"
+                href={d.href}
+                aria-pressed={d.activa}
+                className={`rounded-xl px-2 py-3 text-center transition sm:px-4 ${
+                  d.activa
+                    ? `bg-white ring-2 ${d.anillo} shadow-sm`
+                    : "bg-white/70 ring-1 ring-stone-200/70 hover:bg-white hover:ring-stone-300"
+                }`}
               >
                 <Contador
                   hasta={d.n}
@@ -94,7 +128,7 @@ export default async function ListadoAdopcion({
                 <span className="mt-0.5 block text-xs leading-tight text-stone-600 sm:text-sm">
                   {d.texto}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
