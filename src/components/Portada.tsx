@@ -306,11 +306,11 @@ export default async function Portada({
       </section>
 
       <section className="mx-auto w-full max-w-5xl px-4 pb-14">
-        <div className="rounded-2xl border border-stone-200 bg-white p-6">
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 md:text-center">
           <h2 className="text-xl font-extrabold text-stone-900">
             No sabes por dónde empezar a buscar
           </h2>
-          <p className="mt-2 text-stone-600">
+          <p className="mt-2 text-stone-600 md:mx-auto md:max-w-2xl">
             Buscar un gato no se parece en nada a buscar un perro, y la mayoría de
             la gente hace justo lo que hace huir al animal. Armamos dos guías con
             lo que sí funciona.

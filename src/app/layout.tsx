@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Nunito } from "next/font/google";
 import Analytics from "@/components/Analytics";
 import AvisoLegal from "@/components/AvisoLegal";
+import BotonSoporte from "@/components/BotonSoporte";
 import Isotipo from "@/components/Isotipo";
 import MenuMovil from "@/components/MenuMovil";
 import { WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
@@ -97,18 +98,19 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
 
         <footer className="border-t border-stone-200 bg-white/60">
-          <div className="mx-auto w-full max-w-5xl px-4 py-8 text-sm text-stone-500">
-            <p className="flex items-center gap-2 font-semibold text-stone-700">
+          {/* pb extra: el botón flotante no puede taparle el último renglón. */}
+          <div className="mx-auto w-full max-w-5xl px-4 pb-24 pt-8 text-sm text-stone-500 md:text-center">
+            <p className="flex items-center gap-2 font-semibold text-stone-700 md:justify-center">
               <Isotipo className="h-5 w-5 text-marca" fondo="#faf6f0" />
               Find Your Pet CO — iniciativa ciudadana sin ánimo de lucro.
             </p>
-            <p className="mt-2 max-w-2xl">
+            <p className="mt-2 max-w-2xl md:mx-auto">
               Hecha para ayudar a reunir a las familias de Colombia con sus
               mascotas.
               Verifica siempre la información antes de entregar un animal y prefiere
               encuentros en lugares públicos y acompañado.
             </p>
-            <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+            <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 md:justify-center">
               <Link
                 href="/consejos/perdida"
                 className="font-bold text-marca underline underline-offset-2"
@@ -143,7 +145,7 @@ export default function RootLayout({
 
             {/* Legales y soporte: separados del resto para que se encuentren
                 rápido, que es justo cuando alguien los busca. */}
-            <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-stone-200 pt-5">
+            <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-stone-200 pt-5 md:justify-center">
               <Link
                 href="/terminos"
                 className="font-semibold text-stone-600 underline underline-offset-2 hover:text-marca"
@@ -190,6 +192,8 @@ export default function RootLayout({
             </p>
           </div>
         </footer>
+
+        <BotonSoporte />
       </body>
     </html>
   );
