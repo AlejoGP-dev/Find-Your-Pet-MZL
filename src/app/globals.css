@@ -37,3 +37,22 @@ body {
     @apply inline-flex items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-5 py-3 text-base font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50;
   }
 }
+
+/* Zoom de la foto en la ficha (react-inner-image-zoom).
+   La librería trae su propio CSS; acá solo la acomodamos al sitio. */
+.foto-mascota .iiz {
+  display: block;
+  width: 100%;
+}
+.foto-mascota .iiz__img {
+  width: 100%;
+}
+.foto-mascota .iiz__btn {
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.92);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.18);
+}
+.foto-mascota .iiz__hint {
+  bottom: 12px;
+  right: 12px;
+}
