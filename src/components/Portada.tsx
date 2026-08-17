@@ -96,6 +96,12 @@ export default async function Portada({
             >
               🐕 Encontré una mascota
             </Link>
+            <Link
+              href={`/adopcion${ciudad ? `/${ciudad.slug}` : ""}`}
+              className="boton-secundario border-marca/40 text-marca"
+            >
+              🏡 Quiero adoptar
+            </Link>
           </div>
 
           <div className="mt-8 grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3 md:mx-auto">
