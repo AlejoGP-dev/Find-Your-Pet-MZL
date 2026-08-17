@@ -5,6 +5,7 @@ import Analytics from "@/components/Analytics";
 import AvisoLegal from "@/components/AvisoLegal";
 import Isotipo from "@/components/Isotipo";
 import MenuMovil from "@/components/MenuMovil";
+import { WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -137,6 +138,42 @@ export default function RootLayout({
               · Bomberos Manizales:{" "}
               <a className="font-semibold text-marca underline" href="tel:119">
                 119
+              </a>
+            </p>
+
+            {/* Legales y soporte: separados del resto para que se encuentren
+                rápido, que es justo cuando alguien los busca. */}
+            <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-stone-200 pt-5">
+              <Link
+                href="/terminos"
+                className="font-semibold text-stone-600 underline underline-offset-2 hover:text-marca"
+              >
+                Términos y condiciones
+              </Link>
+              <Link
+                href="/datos"
+                className="font-semibold text-stone-600 underline underline-offset-2 hover:text-marca"
+              >
+                Tratamiento de datos
+              </Link>
+              <a
+                href={enlaceSoporte()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-marca underline underline-offset-2 hover:text-marca-oscuro"
+              >
+                Reportar un problema 💬
+              </a>
+            </p>
+            <p className="mt-1.5">
+              WhatsApp de soporte:{" "}
+              <a
+                href={enlaceSoporte()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-marca underline underline-offset-2"
+              >
+                {WHATSAPP_SOPORTE_VISIBLE}
               </a>
             </p>
 

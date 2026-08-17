@@ -955,8 +955,16 @@ export default function FormularioReporte() {
                   ? "Publicando…"
                   : "Publicar reporte"}
         </button>
-        <p className="mt-2 text-center text-xs text-stone-500 sm:hidden">
-          Al publicar aceptas que tu nombre y WhatsApp queden visibles.
+        <p className="mt-2 text-center text-xs text-stone-500">
+          Al publicar aceptas que tu nombre y WhatsApp queden visibles, los{" "}
+          <Link href="/terminos" className="underline underline-offset-2">
+            términos
+          </Link>{" "}
+          y el{" "}
+          <Link href="/datos" className="underline underline-offset-2">
+            tratamiento de datos
+          </Link>
+          .
         </p>
       </div>
     </form>

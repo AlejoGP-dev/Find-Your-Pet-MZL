@@ -691,7 +691,15 @@ export default function FormularioAdopcion() {
           {preparando ? "Preparando la foto…" : enviando ? "Publicando…" : "Publicar en adopción"}
         </button>
         <p className="mt-2 text-center text-xs text-stone-500">
-          Al publicar aceptas que tu nombre y WhatsApp queden visibles.
+          Al publicar aceptas que tu nombre y WhatsApp queden visibles, los{" "}
+          <Link href="/terminos" className="underline underline-offset-2">
+            términos
+          </Link>{" "}
+          y el{" "}
+          <Link href="/datos" className="underline underline-offset-2">
+            tratamiento de datos
+          </Link>
+          .
         </p>
       </div>
     </form>

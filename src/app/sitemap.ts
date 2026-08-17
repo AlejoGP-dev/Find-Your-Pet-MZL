@@ -19,6 +19,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITIO}/consejos`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITIO}/adopcion`, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITIO}/adopcion/publicar`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITIO}/terminos`, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${SITIO}/datos`, changeFrequency: "yearly", priority: 0.3 },
     ...CIUDADES.map((c) => ({
       url: `${SITIO}/adopcion/${c.slug}`,
       changeFrequency: "daily" as const,

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { enlaceSoporte } from "@/lib/legal";
 
 const CLAVE = "fyp-aviso-legal-visto";
 
@@ -86,6 +87,22 @@ export default function AvisoLegal() {
                 <Link href="/consejos/perdida#estafas" className="font-bold underline underline-offset-2">
                   Más sobre estafas
                 </Link>
+              </p>
+              <p className="flex flex-wrap gap-x-4 gap-y-1">
+                <Link href="/terminos" className="font-bold underline underline-offset-2">
+                  Términos y condiciones
+                </Link>
+                <Link href="/datos" className="font-bold underline underline-offset-2">
+                  Tratamiento de datos
+                </Link>
+                <a
+                  href={enlaceSoporte()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold underline underline-offset-2"
+                >
+                  Reportar un problema
+                </a>
               </p>
               <button
                 type="button"
