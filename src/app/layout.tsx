@@ -78,7 +78,7 @@ export default function RootLayout({
                 href="/adopcion"
                 className="hidden whitespace-nowrap rounded-xl border-2 border-marca px-3.5 py-2 text-sm font-bold text-marca transition hover:bg-marca-suave sm:inline-block sm:px-4"
               >
-                🏡 Adopción
+                Adopción
               </Link>
 
               <Link
