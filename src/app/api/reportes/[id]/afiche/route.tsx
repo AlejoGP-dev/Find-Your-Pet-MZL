@@ -181,7 +181,7 @@ export async function GET(
               marginTop: 14,
             }}
           >
-            🐾 find-your-pet-mzl.vercel.app · Mascotas perdidas y encontradas en Colombia
+            find-your-pet-mzl.vercel.app · Mascotas perdidas y encontradas en Colombia 🐾
           </div>
         </div>
       </div>

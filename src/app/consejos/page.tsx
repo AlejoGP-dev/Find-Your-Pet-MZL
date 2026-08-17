@@ -62,7 +62,7 @@ export default function IndiceConsejos() {
               className={`flex flex-col rounded-2xl border-2 p-6 transition ${e.borde} ${e.fondo}`}
             >
               <span className={`text-xl font-extrabold ${e.texto}`}>
-                {e.emoji} {e.titulo}
+                {e.titulo} {e.emoji}
               </span>
               <span className="mt-2 flex-1 text-stone-700">{g.intro}</span>
               <span className="mt-4 flex flex-wrap gap-1.5">
@@ -71,7 +71,7 @@ export default function IndiceConsejos() {
                     key={b.id}
                     className="rounded-full bg-white/70 px-2.5 py-1 text-xs font-bold text-stone-700"
                   >
-                    {b.emoji} {b.titulo}
+                    {b.titulo} {b.emoji}
                   </span>
                 ))}
               </span>

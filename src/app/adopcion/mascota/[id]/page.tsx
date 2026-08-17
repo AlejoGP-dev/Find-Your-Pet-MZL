@@ -79,7 +79,7 @@ export default async function FichaAdopcion({ params }: Props) {
 
       {a.estado === "adoptado" && (
         <div className="mb-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
-          🎉 Esta mascota ya encontró su familia.{" "}
+          Esta mascota ya encontró su familia. 🎉{" "}
           <Link href="/adopcion?estado=adoptado#listado" className="underline">
             Ver otras adopciones cerradas
           </Link>
@@ -121,7 +121,7 @@ export default async function FichaAdopcion({ params }: Props) {
               </span>
               {a.es_fundacion && (
                 <span className="inline-flex rounded-full bg-encontrada-suave px-3 py-1 text-xs font-bold text-encontrada">
-                  🏛️ Fundación
+                  Fundación 🏛️
                 </span>
               )}
             </div>
@@ -129,7 +129,7 @@ export default async function FichaAdopcion({ params }: Props) {
               {a.nombre || `${especie?.etiqueta ?? "Mascota"} sin nombre`}
             </h1>
             <p className="mt-1 font-semibold text-marca">
-              📍 {a.barrio}, {a.ciudad}
+              {a.barrio}, {a.ciudad} 📍
             </p>
             <p className="mt-1 text-sm text-stone-500">
               Publicado {haceCuanto(a.created_at)}
@@ -158,7 +158,7 @@ export default async function FichaAdopcion({ params }: Props) {
                     key={c.valor}
                     className="rounded-full bg-marca-suave px-3 py-1.5 text-sm font-bold text-marca-oscuro"
                   >
-                    {c.emoji} {c.etiqueta}
+                    {c.etiqueta} {c.emoji}
                   </li>
                 ))}
               </ul>
@@ -193,7 +193,7 @@ export default async function FichaAdopcion({ params }: Props) {
                 rel="noopener noreferrer"
                 className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 text-base font-extrabold text-white shadow-sm transition hover:brightness-95"
               >
-                💬 Preguntar por {a.nombre || "esta mascota"}
+                Preguntar por {a.nombre || "esta mascota"} 💬
               </a>
               <p className="mt-2 text-center text-xs text-stone-500">
                 {a.contacto_whatsapp}

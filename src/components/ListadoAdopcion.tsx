@@ -50,7 +50,7 @@ export default async function ListadoAdopcion({
       <section className="border-b border-stone-200 bg-linear-to-b from-marca-suave to-crema">
         <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14 md:text-center">
           <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-marca-oscuro shadow-sm">
-            🏡 Adopción · {zona}
+            Adopción · {zona} 🏡
           </p>
           <h1 className="max-w-2xl text-3xl font-extrabold leading-tight text-stone-900 sm:text-4xl md:mx-auto">
             {ciudad
@@ -68,20 +68,20 @@ export default async function ListadoAdopcion({
               href={`/adopcion/publicar${ciudad ? `?ciudad=${ciudad.slug}` : ""}`}
               className="boton-primario"
             >
-              🏡 Dar en adopción
+              Dar en adopción 🏡
             </Link>
             <Link
               href="/consejos/adoptar"
               className="boton-secundario border-marca/40 text-marca"
             >
-              📖 Antes de adoptar
+              Antes de adoptar 📖
             </Link>
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-2 sm:max-w-sm sm:gap-3 md:mx-auto">
             {[
-              { n: totales.disponibles, texto: "buscando familia", color: "text-marca" },
-              { n: totales.adoptadas, texto: "ya tienen hogar 🎉", color: "text-encontrada" },
+              { n: totales.disponibles, texto: "En adopción", color: "text-marca" },
+              { n: totales.adoptadas, texto: "Ya tienen hogar 🎉", color: "text-encontrada" },
             ].map((d) => (
               <div
                 key={d.texto}
@@ -112,7 +112,7 @@ export default async function ListadoAdopcion({
                 ciudad ? "bg-stone-100 text-stone-600 hover:bg-stone-200" : "bg-marca text-white"
               }`}
             >
-              🇨🇴 Todo el país
+              Todo el país 🇨🇴
             </Link>
             {CIUDADES.map((c) => (
               <Link
@@ -183,7 +183,7 @@ export default async function ListadoAdopcion({
       <section className="mx-auto w-full max-w-5xl px-4 pb-14">
         <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-6">
           <h2 className="text-lg font-extrabold text-stone-900">
-            ⚠️ ¿Te encontraste esta mascota en la calle?
+            ¿Te encontraste esta mascota en la calle? ⚠️
           </h2>
           <p className="mt-2 text-stone-700">
             Antes de darla en adopción, publícala como <strong>encontrada</strong> y

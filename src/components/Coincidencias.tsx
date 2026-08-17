@@ -32,7 +32,7 @@ export default function Coincidencias({
       }
     >
       <h2 className="text-base font-extrabold leading-snug text-stone-900 sm:text-lg">
-        🔎 {titulo}
+        {titulo} 🔎
       </h2>
       <p className="mt-1 text-sm text-stone-700">{bajada}</p>
 
@@ -74,7 +74,7 @@ export default function Coincidencias({
                 {/* Barrio y fecha en renglones aparte: un barrio largo ya no
                     se come la fecha en pantallas angostas. */}
                 <p className="mt-0.5 truncate text-sm leading-snug text-stone-600">
-                  📍 {reporte.barrio}
+                  {reporte.barrio} 📍
                 </p>
                 <p className="text-xs leading-snug text-stone-500">
                   {formatearFecha(reporte.fecha)}

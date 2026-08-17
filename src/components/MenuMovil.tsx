@@ -109,7 +109,7 @@ export default function MenuMovil() {
                       activa ? "text-marca-oscuro" : "text-stone-800"
                     }`}
                   >
-                    <span aria-hidden="true">{o.emoji}</span> {o.texto}
+                    {o.texto} <span aria-hidden="true">{o.emoji}</span>
                   </span>
                   <span className="mt-0.5 block text-xs leading-snug text-stone-500">
                     {o.detalle}

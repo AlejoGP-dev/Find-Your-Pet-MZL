@@ -49,10 +49,10 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
         className="boton-primario mt-6 w-full sm:w-auto"
       >
         {esAdoptar
-          ? "🏡 Ver mascotas en adopción"
+          ? "Ver mascotas en adopción 🏡"
           : esPerdida
-            ? "😿 Publicar que se perdió"
-            : "🐕 Publicar que la encontré"}
+            ? "Publicar que se perdió 😿"
+            : "Publicar que la encontré 🐕"}
       </Link>
 
       {/* Índice: en una guía larga, poder saltar importa */}
@@ -67,7 +67,7 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
                 href={`#${b.id}`}
                 className="inline-block rounded-full bg-stone-100 px-3 py-1.5 text-sm font-bold text-stone-700 transition hover:bg-marca-suave hover:text-marca-oscuro"
               >
-                {b.emoji} {b.titulo}
+                {b.titulo} {b.emoji}
               </a>
             </li>
           ))}
@@ -86,7 +86,7 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
             }`}
           >
             <h2 className="text-xl font-extrabold leading-tight text-stone-900 sm:text-2xl">
-              {bloque.emoji} {bloque.titulo}
+              {bloque.titulo} {bloque.emoji}
             </h2>
             {bloque.entradilla && (
               <p className="mt-2 text-stone-600">{bloque.entradilla}</p>
@@ -112,7 +112,7 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
                     <p className="mt-1 text-stone-600">{paso.texto}</p>
                     {paso.dato && (
                       <p className="mt-2 rounded-xl bg-stone-50 px-3.5 py-2.5 text-sm font-bold text-stone-800">
-                        📌 {paso.dato}
+                        {paso.dato} 📌
                       </p>
                     )}
                   </div>
@@ -132,10 +132,10 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
           >
             <span className="block text-lg font-extrabold text-stone-900">
               {o.slug === "perdida"
-                ? "😿 Se me perdió una mascota"
+                ? "Se me perdió una mascota 😿"
                 : o.slug === "encontrada"
-                  ? "🐕 Me encontré una mascota"
-                  : "🏡 Quiero adoptar"}
+                  ? "Me encontré una mascota 🐕"
+                  : "Quiero adoptar 🏡"}
             </span>
             <span className="mt-1 block text-sm text-stone-600">Ver esa guía</span>
           </Link>
@@ -145,7 +145,7 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
           className="rounded-2xl border-2 border-marca/30 bg-marca-suave p-5 transition hover:border-marca"
         >
           <span className="block text-lg font-extrabold text-marca-oscuro">
-            💚 Fundaciones y albergues
+            Fundaciones y albergues 💚
           </span>
           <span className="mt-1 block text-sm text-stone-700">
             Quiénes están cuidando animales y qué necesitan

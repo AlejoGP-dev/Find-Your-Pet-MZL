@@ -67,7 +67,7 @@ export default function TarjetaReporte({
             <InsigniaTipo tipo={reporte.tipo} />
             {reporte.avistamientos > 0 && (
               <span className="rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-marca-oscuro shadow-sm">
-                👀 {reporte.avistamientos}
+                {reporte.avistamientos} 👀
               </span>
             )}
           </div>
@@ -89,10 +89,11 @@ export default function TarjetaReporte({
           <p className="text-sm text-stone-600">{detalles.join(" · ")}</p>
         )}
         <p className="mt-auto flex items-center gap-1.5 pt-2 text-sm font-semibold text-marca">
-          📍 {reporte.barrio}
+          {reporte.barrio}
           {mostrarCiudad && reporte.ciudad && reporte.ciudad !== reporte.barrio
             ? `, ${reporte.ciudad}`
-            : ""}
+            : ""}{" "}
+          📍
         </p>
         <p className="text-xs text-stone-500">
           {formatearFecha(reporte.fecha)}

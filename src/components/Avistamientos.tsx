@@ -111,7 +111,7 @@ export default function Avistamientos({
     <section className="rounded-2xl border border-stone-200 bg-white p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 text-lg font-extrabold text-stone-900">
-          👀 Pistas de la comunidad
+          Pistas de la comunidad 👀
           {lista.length > 0 && (
             <span className="rounded-full bg-marca-suave px-2.5 py-0.5 text-sm font-bold text-marca-oscuro">
               {lista.length}
@@ -253,7 +253,7 @@ export default function Avistamientos({
               key={a.id}
               className="relative rounded-xl border border-stone-200 bg-stone-50 p-4"
             >
-              <p className="font-bold text-stone-900">📍 {a.lugar}</p>
+              <p className="font-bold text-stone-900">{a.lugar} 📍</p>
               <p className="mt-0.5 text-sm text-stone-600">
                 La vieron el {formatearFecha(a.fecha)}
               </p>

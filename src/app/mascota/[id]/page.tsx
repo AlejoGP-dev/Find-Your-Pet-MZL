@@ -101,7 +101,7 @@ export default async function PaginaMascota({ params }: Props) {
 
       {reporte.estado === "resuelto" && (
         <div className="mb-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
-          🎉 Esta mascota ya está de vuelta con su familia.{" "}
+          Esta mascota ya está de vuelta con su familia. 🎉{" "}
           <Link href="/?estado=resuelto#reportes" className="underline">
             Ver otros reencuentros
           </Link>
@@ -148,8 +148,8 @@ export default async function PaginaMascota({ params }: Props) {
               {reporte.nombre || `${especie?.etiqueta ?? "Mascota"} sin nombre`}
             </h1>
             <p className="mt-1 font-semibold text-marca">
-              📍 {reporte.barrio}
-              {reporte.ciudad ? `, ${reporte.ciudad}` : ""}
+              {reporte.barrio}
+              {reporte.ciudad ? `, ${reporte.ciudad}` : ""} 📍
             </p>
             <p className="mt-1 text-sm text-stone-500">
               Publicado {haceCuanto(reporte.created_at)}
@@ -185,7 +185,7 @@ export default async function PaginaMascota({ params }: Props) {
                 rel="noopener noreferrer"
                 className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 text-base font-extrabold text-white shadow-sm transition hover:brightness-95"
               >
-                💬 Escribir por WhatsApp
+                Escribir por WhatsApp 💬
               </a>
               <p className="mt-2 text-center text-xs text-stone-500">
                 {reporte.contacto_whatsapp}
@@ -198,8 +198,8 @@ export default async function PaginaMascota({ params }: Props) {
             className="block rounded-2xl border border-stone-200 bg-white p-4 text-center font-bold text-marca transition hover:border-marca hover:bg-marca-suave"
           >
             {esPerdida
-              ? "🔎 Guía: cómo buscar una mascota perdida"
-              : "🤲 Guía: qué hacer si te encontraste una mascota"}
+              ? "Guía: cómo buscar una mascota perdida 🔎"
+              : "Guía: qué hacer si te encontraste una mascota 🤲"}
           </Link>
 
           <a
@@ -207,7 +207,7 @@ export default async function PaginaMascota({ params }: Props) {
             className="boton-secundario w-full"
             download
           >
-            🖼️ Descargar afiche para compartir
+            Descargar afiche para compartir 🖼️
           </a>
 
           <AccionesReporte

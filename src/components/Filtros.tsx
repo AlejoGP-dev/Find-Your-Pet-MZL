@@ -8,7 +8,7 @@ const PESTANAS = [
   { clave: "todas", etiqueta: "Todas", tipo: "", estado: "" },
   { clave: "perdida", etiqueta: "Perdidas", tipo: "perdida", estado: "" },
   { clave: "encontrada", etiqueta: "Encontradas", tipo: "encontrada", estado: "" },
-  { clave: "reunidas", etiqueta: "🎉 Ya aparecieron", tipo: "", estado: "resuelto" },
+  { clave: "reunidas", etiqueta: "Ya aparecieron 🎉", tipo: "", estado: "resuelto" },
 ];
 
 export default function Filtros({
@@ -89,7 +89,7 @@ export default function Filtros({
             <option value="">Perros y gatos</option>
             {ESPECIES.map((e) => (
               <option key={e.valor} value={e.valor}>
-                {e.emoji} {e.etiqueta}
+                {e.etiqueta} {e.emoji}
               </option>
             ))}
           </select>

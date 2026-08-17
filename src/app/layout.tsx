@@ -62,14 +62,14 @@ export default function RootLayout({
                 href="/consejos"
                 className="hidden rounded-lg px-3 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-marca-oscuro lg:inline-block"
               >
-                <span aria-hidden="true">🔎</span> Consejos
+                Consejos <span aria-hidden="true">🔎</span>
               </Link>
 
               <Link
                 href="/ayudar"
                 className="hidden rounded-lg px-3 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-marca-oscuro lg:inline-block"
               >
-                <span aria-hidden="true">💚</span> Ayudar
+                Ayudar <span aria-hidden="true">💚</span>
               </Link>
 
               {/* Dos CTA: adopción va en secundario para no restarle fuerza a
@@ -112,13 +112,13 @@ export default function RootLayout({
                 href="/consejos/perdida"
                 className="font-bold text-marca underline underline-offset-2"
               >
-                🔎 Cómo buscar una mascota perdida
+                Cómo buscar una mascota perdida 🔎
               </Link>
               <Link
                 href="/consejos/encontrada"
                 className="font-bold text-marca underline underline-offset-2"
               >
-                🤲 Me encontré una mascota
+                Me encontré una mascota 🤲
               </Link>
             </p>
             <p className="mt-3">
@@ -126,7 +126,7 @@ export default function RootLayout({
                 href="/ayudar"
                 className="font-bold text-marca underline underline-offset-2"
               >
-                💚 Fundaciones y albergues que necesitan ayuda
+                Fundaciones y albergues que necesitan ayuda 💚
               </Link>
             </p>
             <p className="mt-3">

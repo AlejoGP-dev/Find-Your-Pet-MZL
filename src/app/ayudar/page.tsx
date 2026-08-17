@@ -52,7 +52,7 @@ export default function PaginaAyudar() {
               key={n.texto}
               className="rounded-full bg-marca-suave px-3.5 py-2 text-sm font-bold text-marca-oscuro"
             >
-              {n.emoji} {n.texto}
+              {n.texto} {n.emoji}
             </li>
           ))}
         </ul>
@@ -63,7 +63,7 @@ export default function PaginaAyudar() {
         return (
           <section key={ciudad} className="mt-8">
             <h2 className="text-xl font-extrabold text-stone-900">
-              📍 {ciudad}
+              {ciudad} 📍
               <span className="ml-2 text-sm font-bold text-stone-400">
                 {orgs.length}
               </span>
@@ -102,18 +102,18 @@ export default function PaginaAyudar() {
                       </h3>
                       {org.zona && (
                         <p className="mt-0.5 text-sm font-semibold text-marca">
-                          📍 {org.zona}
+                          {org.zona} 📍
                         </p>
                       )}
                       <div className="mt-1.5 flex flex-wrap gap-1.5">
                         {org.afectadaSismo && (
                           <span className="rounded-full bg-perdida-suave px-2.5 py-1 text-xs font-bold text-perdida">
-                            🚨 Afectada por el sismo
+                            Afectada por el sismo 🚨
                           </span>
                         )}
                         {org.etiqueta && (
                           <span className="rounded-full bg-encontrada-suave px-2.5 py-1 text-xs font-bold text-encontrada">
-                            🏠 {org.etiqueta}
+                            {org.etiqueta} 🏠
                           </span>
                         )}
                       </div>
@@ -138,7 +138,7 @@ export default function PaginaAyudar() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 rounded-xl border border-stone-300 px-3.5 py-2 text-sm font-bold text-stone-700 transition hover:border-marca hover:bg-marca-suave hover:text-marca-oscuro"
                       >
-                        {ICONOS[e.icono] ?? "🔗"} {e.etiqueta}
+                        {e.etiqueta} {ICONOS[e.icono] ?? "🔗"}
                       </a>
                     ))}
                   </div>
@@ -151,7 +151,7 @@ export default function PaginaAyudar() {
 
       <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
         <h2 className="text-lg font-extrabold text-stone-900">
-          📣 Grupos donde también puedes difundir
+          Grupos donde también puedes difundir 📣
         </h2>
         <p className="mt-1 text-stone-600">
           Comunidades de Facebook con miles de personas atentas a mascotas
@@ -214,7 +214,7 @@ export default function PaginaAyudar() {
           rel="noopener noreferrer"
           className="boton-secundario mt-4"
         >
-          📸 Escribirme por Instagram
+          Escribirme por Instagram 📸
         </a>
       </div>
     </div>

@@ -7,7 +7,7 @@ import { CIUDADES, TAMANOS, type Ciudad } from "@/lib/tipos";
 
 const PESTANAS = [
   { clave: "disponible", etiqueta: "Disponibles", estado: "" },
-  { clave: "adoptado", etiqueta: "🎉 Ya tienen hogar", estado: "adoptado" },
+  { clave: "adoptado", etiqueta: "Ya tienen hogar 🎉", estado: "adoptado" },
 ];
 
 export default function FiltrosAdopcion({
@@ -78,7 +78,7 @@ export default function FiltrosAdopcion({
             <option value="">Perros y gatos</option>
             {ESPECIES_ADOPCION.map((e) => (
               <option key={e.valor} value={e.valor}>
-                {e.emoji} {e.etiqueta}
+                {e.etiqueta} {e.emoji}
               </option>
             ))}
           </select>

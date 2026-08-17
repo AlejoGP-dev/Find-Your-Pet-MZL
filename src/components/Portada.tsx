@@ -88,27 +88,27 @@ export default async function Portada({
               href={`/reportar?tipo=perdida${ciudad ? `&ciudad=${ciudad.slug}` : ""}`}
               className="boton-primario"
             >
-              😿 Perdí a mi mascota
+              Perdí a mi mascota 😿
             </Link>
             <Link
               href={`/reportar?tipo=encontrada${ciudad ? `&ciudad=${ciudad.slug}` : ""}`}
               className="boton-secundario border-encontrada/40 text-encontrada"
             >
-              🐕 Encontré una mascota
+              Encontré una mascota 🐕
             </Link>
             <Link
               href={`/adopcion${ciudad ? `/${ciudad.slug}` : ""}`}
               className="boton-secundario border-marca/40 text-marca"
             >
-              🏡 Quiero adoptar
+              Quiero adoptar 🏡
             </Link>
           </div>
 
           <div className="mt-8 grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3 md:mx-auto">
             {[
-              { n: totales.perdidas, texto: "buscando su casa", color: "text-perdida" },
-              { n: totales.encontradas, texto: "buscando dueño", color: "text-encontrada" },
-              { n: totales.reunidas, texto: "ya en casa 🎉", color: "text-marca" },
+              { n: totales.perdidas, texto: "Perdidas", color: "text-perdida" },
+              { n: totales.encontradas, texto: "Encontradas", color: "text-encontrada" },
+              { n: totales.reunidas, texto: "Ya en casa 🎉", color: "text-marca" },
             ].map((dato) => (
               <div
                 key={dato.texto}
@@ -142,7 +142,7 @@ export default async function Portada({
                   : "bg-marca text-white"
               }`}
             >
-              🇨🇴 Todo el país
+              Todo el país 🇨🇴
             </Link>
             {CIUDADES.map((c) => (
               <Link
@@ -225,7 +225,7 @@ export default async function Portada({
         >
           <span>
             <span className="block text-xl font-extrabold text-marca-oscuro">
-              🏡 Mascotas que buscan familia
+              Mascotas que buscan familia 🏡
             </span>
             <span className="mt-1 block text-stone-700">
               Perros y gatos en adopción. Gratis y con contacto directo con quien
@@ -243,7 +243,7 @@ export default async function Portada({
         >
           <span>
             <span className="block text-xl font-extrabold text-marca-oscuro">
-              💚 Las fundaciones también necesitan ayuda
+              Las fundaciones también necesitan ayuda 💚
             </span>
             <span className="mt-1 block text-stone-700">
               Alimento, arena, antipulgas, desparasitante. Mira quiénes están
@@ -272,7 +272,7 @@ export default async function Portada({
               className="rounded-xl border-2 border-perdida/30 bg-perdida-suave p-5 transition hover:border-perdida"
             >
               <span className="block text-lg font-extrabold text-perdida">
-                😿 Se me perdió
+                Se me perdió 😿
               </span>
               <span className="mt-1 block text-sm text-stone-700">
                 Dónde buscar según sea perro o gato, qué NO hacer y cómo evitar
@@ -284,7 +284,7 @@ export default async function Portada({
               className="rounded-xl border-2 border-encontrada/30 bg-encontrada-suave p-5 transition hover:border-encontrada"
             >
               <span className="block text-lg font-extrabold text-encontrada">
-                🐕 Me encontré una
+                Me encontré una 🐕
               </span>
               <span className="mt-1 block text-sm text-stone-700">
                 Cómo acercarte sin espantarla, qué darle de comer y cómo

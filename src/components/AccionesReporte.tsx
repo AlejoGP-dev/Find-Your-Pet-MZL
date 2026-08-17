@@ -89,7 +89,7 @@ export default function AccionesReporte({
   }
 
   const textoBoton =
-    tipo === "perdida" ? "🎉 ¡Mi mascota apareció!" : "🎉 Ya la entregué a su familia";
+    tipo === "perdida" ? "¡Mi mascota apareció! 🎉" : "Ya la entregué a su familia 🎉";
 
   return (
     <div className="space-y-3">
@@ -155,7 +155,7 @@ export default function AccionesReporte({
       )}
 
       <button type="button" onClick={compartir} className="boton-secundario w-full">
-        {copiado ? "✅ Enlace copiado" : "🔗 Compartir este reporte"}
+        {copiado ? "Enlace copiado ✅" : "Compartir este reporte 🔗"}
       </button>
 
       {error && !abierto && (

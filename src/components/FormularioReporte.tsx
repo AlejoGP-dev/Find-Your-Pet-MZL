@@ -157,8 +157,8 @@ function SugerenciasTrasPublicar({ id, tipo }: { id: string; tipo: TipoReporte }
   return (
     <div className="mx-auto mt-6 max-w-md rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-left">
       <p className="font-extrabold text-stone-900">
-        🔎 Encontramos {lista.length}{" "}
-        {lista.length === 1 ? "reporte parecido" : "reportes parecidos"}
+        Encontramos {lista.length}{" "}
+        {lista.length === 1 ? "reporte parecido" : "reportes parecidos"} 🔎
       </p>
       <p className="mt-1 text-sm text-stone-700">
         {tipo === "perdida"
@@ -189,7 +189,7 @@ function SugerenciasTrasPublicar({ id, tipo }: { id: string; tipo: TipoReporte }
                   {c.reporte.nombre || "Sin nombre"} · {c.puntaje}%
                 </span>
                 <span className="block truncate text-xs text-stone-600">
-                  📍 {c.reporte.barrio} · {c.razones.join(" · ")}
+                  {c.reporte.barrio} · {c.razones.join(" · ")} 📍
                 </span>
               </span>
             </Link>
@@ -226,7 +226,7 @@ function AvisoYaTienesReporte({
   return (
     <div className="rounded-2xl border-2 border-amber-400 bg-amber-50 p-5">
       <h3 className="text-lg font-extrabold text-stone-900">
-        ⚠️ Con este número ya hay {reportes.length === 1 ? "un reporte activo" : `${reportes.length} reportes activos`}
+        Con este número ya hay {reportes.length === 1 ? "un reporte activo" : `${reportes.length} reportes activos`} ⚠️
       </h3>
       <p className="mt-1 text-sm text-stone-700">
         Si es la misma mascota, no publiques otro: abre el reporte que ya tienes.
@@ -257,7 +257,7 @@ function AvisoYaTienesReporte({
                   {r.nombre || "Sin nombre"}
                 </span>
                 <span className="block truncate text-xs text-stone-600">
-                  {r.tipo === "perdida" ? "Se perdió" : "La encontraron"} · 📍 {r.barrio}
+                  {r.tipo === "perdida" ? "Se perdió" : "La encontraron"} · {r.barrio} 📍
                 </span>
               </span>
               <span className="shrink-0 text-sm font-bold text-marca">Ver →</span>
@@ -500,7 +500,7 @@ export default function FormularioReporte() {
           download
           className="boton-secundario mx-auto mt-4 w-full max-w-md"
         >
-          🖼️ Descargar afiche para compartir
+          Descargar afiche para compartir 🖼️
         </a>
 
         <SugerenciasTrasPublicar id={exito.id} tipo={tipo} />

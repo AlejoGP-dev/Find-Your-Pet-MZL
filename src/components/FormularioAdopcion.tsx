@@ -114,7 +114,7 @@ function AvisoPosiblesDuenos({
   return (
     <div className="rounded-2xl border-2 border-perdida bg-perdida-suave p-5">
       <h3 className="text-lg font-extrabold text-perdida">
-        🛑 Espera: puede que alguien esté buscando a esta mascota
+        Espera: puede que alguien esté buscando a esta mascota 🛑
       </h3>
       <p className="mt-2 text-stone-800">
         Encontramos {lista.length}{" "}
@@ -148,7 +148,7 @@ function AvisoPosiblesDuenos({
                   {c.reporte.nombre || "Sin nombre"} · {c.puntaje}%
                 </span>
                 <span className="block truncate text-xs text-stone-600">
-                  📍 {c.reporte.barrio} · {c.razones.join(" · ")}
+                  {c.reporte.barrio} · {c.razones.join(" · ")} 📍
                 </span>
               </span>
               <span className="shrink-0 text-xs font-bold text-marca">Abrir ↗</span>
@@ -392,7 +392,7 @@ export default function FormularioAdopcion() {
             <select id="especie" name="especie" className="campo" required defaultValue="">
               <option value="" disabled>Selecciona…</option>
               {ESPECIES_ADOPCION.map((e) => (
-                <option key={e.valor} value={e.valor}>{e.emoji} {e.etiqueta}</option>
+                <option key={e.valor} value={e.valor}>{e.etiqueta} {e.emoji}</option>
               ))}
             </select>
           </div>
@@ -487,7 +487,7 @@ export default function FormularioAdopcion() {
                 className="flex cursor-pointer items-center gap-2 rounded-xl border border-stone-300 px-3.5 py-2.5 text-sm font-bold text-stone-700 transition has-checked:border-marca has-checked:bg-marca-suave has-checked:text-marca-oscuro"
               >
                 <input type="checkbox" name="convive_con" value={c.valor} className="accent-marca" />
-                {c.emoji} {c.etiqueta}
+                {c.etiqueta} {c.emoji}
               </label>
             ))}
           </div>

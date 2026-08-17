@@ -58,7 +58,7 @@ export default function TarjetaAdopcion({
           )}
           {adopcion.es_fundacion && (
             <span className="rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-marca-oscuro shadow-sm">
-              🏛️ Fundación
+              Fundación 🏛️
             </span>
           )}
         </div>
@@ -80,8 +80,8 @@ export default function TarjetaAdopcion({
           <p className="text-sm text-stone-600">{detalles.join(" · ")}</p>
         )}
         <p className="mt-auto pt-2 text-sm font-semibold text-marca">
-          📍 {adopcion.barrio}
-          {mostrarCiudad && adopcion.ciudad ? `, ${adopcion.ciudad}` : ""}
+          {adopcion.barrio}
+          {mostrarCiudad && adopcion.ciudad ? `, ${adopcion.ciudad}` : ""} 📍
         </p>
       </div>
     </Link>
