@@ -24,6 +24,13 @@ const ESTILO = {
     fondo: "bg-encontrada-suave",
     texto: "text-encontrada",
   },
+  adoptar: {
+    emoji: "🏡",
+    titulo: "Quiero adoptar",
+    borde: "border-marca/30 hover:border-marca",
+    fondo: "bg-marca-suave",
+    texto: "text-marca-oscuro",
+  },
 } as const;
 
 export default function IndiceConsejos() {

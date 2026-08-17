@@ -59,8 +59,15 @@ export default function RootLayout({
                   la hamburguesa. El botón de publicar nunca se esconde: es la
                   acción principal. */}
               <Link
-                href="/consejos"
+                href="/adopcion"
                 className="hidden rounded-lg px-3 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-marca-oscuro sm:inline-block"
+              >
+                <span aria-hidden="true">🏡</span> Adopción
+              </Link>
+
+              <Link
+                href="/consejos"
+                className="hidden rounded-lg px-3 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-marca-oscuro md:inline-block"
               >
                 <span aria-hidden="true">🔎</span> Consejos
               </Link>

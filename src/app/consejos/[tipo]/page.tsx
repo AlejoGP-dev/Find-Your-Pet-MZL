@@ -26,8 +26,9 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
   const guia = guiaPorSlug(tipo);
   if (!guia) notFound();
 
-  const otra = GUIAS.find((g) => g.slug !== guia.slug)!;
+  const otras = GUIAS.filter((g) => g.slug !== guia.slug);
   const esPerdida = guia.slug === "perdida";
+  const esAdoptar = guia.slug === "adoptar";
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8">
@@ -44,10 +45,14 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
       <p className="mt-4 text-base text-stone-600 sm:text-lg">{guia.intro}</p>
 
       <Link
-        href={`/reportar?tipo=${guia.slug}`}
+        href={esAdoptar ? "/adopcion" : `/reportar?tipo=${guia.slug}`}
         className="boton-primario mt-6 w-full sm:w-auto"
       >
-        {esPerdida ? "😿 Publicar que se perdió" : "🐕 Publicar que la encontré"}
+        {esAdoptar
+          ? "🏡 Ver mascotas en adopción"
+          : esPerdida
+            ? "😿 Publicar que se perdió"
+            : "🐕 Publicar que la encontré"}
       </Link>
 
       {/* Índice: en una guía larga, poder saltar importa */}
@@ -119,19 +124,22 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
       </div>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        <Link
-          href={`/consejos/${otra.slug}`}
-          className="rounded-2xl border-2 border-stone-300 p-5 transition hover:border-marca hover:bg-marca-suave"
-        >
-          <span className="block text-lg font-extrabold text-stone-900">
-            {otra.slug === "perdida"
-              ? "😿 Se me perdió una mascota"
-              : "🐕 Me encontré una mascota"}
-          </span>
-          <span className="mt-1 block text-sm text-stone-600">
-            Ver la otra guía
-          </span>
-        </Link>
+        {otras.map((o) => (
+          <Link
+            key={o.slug}
+            href={`/consejos/${o.slug}`}
+            className="rounded-2xl border-2 border-stone-300 p-5 transition hover:border-marca hover:bg-marca-suave"
+          >
+            <span className="block text-lg font-extrabold text-stone-900">
+              {o.slug === "perdida"
+                ? "😿 Se me perdió una mascota"
+                : o.slug === "encontrada"
+                  ? "🐕 Me encontré una mascota"
+                  : "🏡 Quiero adoptar"}
+            </span>
+            <span className="mt-1 block text-sm text-stone-600">Ver esa guía</span>
+          </Link>
+        ))}
         <Link
           href="/ayudar"
           className="rounded-2xl border-2 border-marca/30 bg-marca-suave p-5 transition hover:border-marca"

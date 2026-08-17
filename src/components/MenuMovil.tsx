@@ -7,6 +7,12 @@ import { useEffect, useRef, useState } from "react";
 const OPCIONES = [
   { href: "/", emoji: "🏠", texto: "Inicio", detalle: "Todos los reportes" },
   {
+    href: "/adopcion",
+    emoji: "🏡",
+    texto: "Adopción",
+    detalle: "Perros y gatos que buscan familia",
+  },
+  {
     href: "/consejos",
     emoji: "🔎",
     texto: "Guías de búsqueda",

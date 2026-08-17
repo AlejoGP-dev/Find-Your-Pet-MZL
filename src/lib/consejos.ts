@@ -26,7 +26,7 @@ export type Bloque = {
 };
 
 export type Guia = {
-  slug: "perdida" | "encontrada";
+  slug: "perdida" | "encontrada" | "adoptar";
   titulo: string;
   descripcion: string;
   intro: string;
@@ -356,7 +356,143 @@ const ENCONTRADA: Guia = {
   ],
 };
 
-export const GUIAS: Guia[] = [PERDIDA, ENCONTRADA];
+
+const ADOPTAR: Guia = {
+  slug: "adoptar",
+  titulo: "Antes de adoptar: lo que hay que pensar",
+  descripcion:
+    "Qué preguntar antes de adoptar un perro o un gato, qué implica de verdad y cómo hacer una adopción segura para el animal y para ti.",
+  intro:
+    "Adoptar es de las cosas más bonitas que se pueden hacer, y también un compromiso de diez o quince años. Después de un sismo hay mucha gente conmovida queriendo ayudar — esto es para que esa decisión aguante cuando pase la emoción del momento.",
+  bloques: [
+    {
+      id: "antes",
+      emoji: "🤔",
+      titulo: "Antes de escribir por WhatsApp",
+      entradilla:
+        "Cinco preguntas honestas. Si alguna te hace dudar, quizá todavía no es el momento — y está bien.",
+      pasos: [
+        {
+          titulo: "¿Puedes sostenerlo diez o quince años?",
+          texto:
+            "Un perro o un gato vive eso. Cambios de casa, de trabajo, de ciudad, hijos, viajes: el animal va contigo en todos.",
+          dato: "Un perro mediano puede costar entre 150.000 y 300.000 al mes",
+        },
+        {
+          titulo: "¿Y el veterinario?",
+          texto:
+            "Vacunas, desparasitación, esterilización y una urgencia que siempre llega. Una cirugía imprevista se va fácil a un millón.",
+        },
+        {
+          titulo: "¿Todos en la casa están de acuerdo?",
+          texto:
+            "La razón más común por la que devuelven un animal es que alguien de la casa no estaba realmente de acuerdo. Háblalo antes, no después.",
+        },
+        {
+          titulo: "¿Puedes tenerlo donde vives?",
+          texto:
+            "Revisa el reglamento del conjunto o el contrato de arriendo. Enterarse después es lo que termina en abandono.",
+        },
+        {
+          titulo: "¿Tienes tiempo hoy, no en un mes?",
+          texto:
+            "Los primeros días son de adaptación y necesitan presencia. Si vienes de una semana imposible, espera a la siguiente.",
+        },
+      ],
+    },
+    {
+      id: "preguntar",
+      emoji: "💬",
+      titulo: "Qué preguntarle a quien la entrega",
+      pasos: [
+        {
+          titulo: "¿Por qué la da en adopción?",
+          texto:
+            "La respuesta dice mucho. Un rescate de la calle, una camada inesperada o una mudanza son razones normales. Las evasivas no.",
+        },
+        {
+          titulo: "¿Cómo llegó a sus manos?",
+          texto:
+            "Si se la encontró en la calle, pregunta cuánto buscó a la familia y si la publicó como encontrada. Puede que alguien todavía la esté buscando.",
+        },
+        {
+          titulo: "¿Está esterilizada, vacunada, desparasitada?",
+          texto:
+            "Si no, no es motivo para no adoptar — pero sí para saber qué gasto te espera las primeras semanas.",
+        },
+        {
+          titulo: "¿Cómo es con niños, con otros animales, cuando se queda sola?",
+          texto:
+            "Mejor saberlo antes que descubrirlo el primer día.",
+        },
+        {
+          titulo: "¿Puedo conocerla antes de decidir?",
+          texto:
+            "Siempre. Quien no deja verla antes de entregarla, o apura la decisión, es una señal para desconfiar.",
+        },
+      ],
+    },
+    {
+      id: "seguridad",
+      emoji: "🛡️",
+      titulo: "Que la adopción sea segura",
+      alerta: true,
+      pasos: [
+        {
+          titulo: "Adoptar es gratis",
+          texto:
+            "Nadie debería cobrarte por entregarte un animal. Algunas fundaciones piden un aporte para recuperar gastos de veterinaria y lo dicen de frente — eso es distinto de vender.",
+          dato: "Si te piden plata por la mascota, no sigas",
+        },
+        {
+          titulo: "Conócela en persona antes de decidir",
+          texto:
+            "De día, en un lugar público o en donde está viviendo. Nunca cierres una adopción solo por fotos.",
+        },
+        {
+          titulo: "Desconfía del apuro",
+          texto:
+            "«Tiene que ser hoy», «hay otra persona interesada», «mándame algo para apartarla». Todas son señales de estafa.",
+        },
+        {
+          titulo: "Si entregas tú, mira a dónde va",
+          texto:
+            "Pregunta dónde va a vivir, quién más está en la casa, si han tenido animales antes. Pide el número y quedar en contacto las primeras semanas.",
+        },
+      ],
+    },
+    {
+      id: "primeros-dias",
+      emoji: "🏠",
+      titulo: "Los primeros días en casa",
+      pasos: [
+        {
+          titulo: "Dale un rincón propio y déjalo en paz",
+          texto:
+            "Cama, agua, comida y un espacio donde nadie lo moleste. Que se acerque él. Abrumarlo con cariño el primer día es el error más común.",
+        },
+        {
+          titulo: "La regla de 3-3-3",
+          texto:
+            "Tres días para bajar el susto, tres semanas para entender la rutina, tres meses para sentirse en casa. Si a la semana no es el animal que esperabas, es normal: todavía no es él.",
+          dato: "3 días asustado · 3 semanas aprendiendo · 3 meses en casa",
+        },
+        {
+          titulo: "Al veterinario en la primera semana",
+          texto:
+            "Chequeo general, vacunas al día, desparasitación. Si viene de la calle o de un refugio lleno, con más razón.",
+        },
+        {
+          titulo: "Esterilízalo",
+          texto:
+            "Es lo único que corta de raíz el problema que hace que existan páginas como esta.",
+        },
+      ],
+    },
+  ],
+};
+
+export const GUIAS: Guia[] = [PERDIDA, ENCONTRADA, ADOPTAR];
 
 export function guiaPorSlug(slug: string): Guia | null {
   return GUIAS.find((g) => g.slug === slug) ?? null;

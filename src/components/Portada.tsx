@@ -214,6 +214,24 @@ export default async function Portada({
 
       <section className="mx-auto w-full max-w-5xl px-4 pb-6">
         <Link
+          href="/adopcion"
+          className="mb-3 flex flex-col gap-3 rounded-2xl border-2 border-marca/30 bg-white p-6 transition hover:border-marca sm:flex-row sm:items-center sm:justify-between"
+        >
+          <span>
+            <span className="block text-xl font-extrabold text-marca-oscuro">
+              🏡 Mascotas que buscan familia
+            </span>
+            <span className="mt-1 block text-stone-700">
+              Perros y gatos en adopción. Gratis y con contacto directo con quien
+              los está cuidando.
+            </span>
+          </span>
+          <span className="shrink-0 rounded-xl border-2 border-marca px-5 py-3 text-center font-bold text-marca">
+            Ver adopciones
+          </span>
+        </Link>
+
+        <Link
           href="/ayudar"
           className="flex flex-col gap-3 rounded-2xl border-2 border-marca/30 bg-marca-suave p-6 transition hover:border-marca sm:flex-row sm:items-center sm:justify-between"
         >

@@ -136,3 +136,94 @@ export function buscarCoincidencias(
     .sort((x, y) => y.puntaje - x.puntaje)
     .slice(0, maximo);
 }
+
+/* ==================================================================== */
+/* Adopciones ↔ mascotas perdidas                                       */
+/* ==================================================================== */
+
+/** Lo mínimo que necesitamos de una adopción para cruzarla. */
+export type PerfilAdopcion = {
+  especie: string;
+  ciudad: string;
+  barrio: string;
+  color?: string | null;
+  raza?: string | null;
+  sexo?: string | null;
+  tamano?: string | null;
+  descripcion?: string | null;
+  temperamento?: string | null;
+};
+
+/**
+ * Cruza una mascota que se va a dar en adopción contra las perdidas activas.
+ *
+ * Es la validación más importante de toda la sección: evita que alguien
+ * entregue en adopción un animal que su familia está buscando en la otra
+ * pestaña del mismo sitio.
+ *
+ * A propósito NO mira fechas —una mascota perdida hace un mes puede aparecer
+ * en adopción hoy— y usa un umbral más bajo que el cruce normal: acá preferimos
+ * avisar de más que dejar pasar un caso real.
+ */
+export function buscarPosiblesDuenos(
+  perfil: PerfilAdopcion,
+  perdidas: Reporte[],
+  maximo = 4,
+): Coincidencia[] {
+  const textoAdop = palabras(
+    `${perfil.color ?? ""} ${perfil.raza ?? ""} ${perfil.descripcion ?? ""} ${perfil.temperamento ?? ""}`,
+  );
+  const senasAdop = palabras(`${perfil.color ?? ""} ${perfil.raza ?? ""}`);
+
+  return perdidas
+    .map((p): Coincidencia | null => {
+      if (p.tipo !== "perdida" || p.estado !== "activo") return null;
+      if (normalizar(p.especie) !== normalizar(perfil.especie)) return null;
+      if (normalizar(p.ciudad) !== normalizar(perfil.ciudad)) return null;
+
+      let puntaje = 30;
+      const razones: string[] = ["misma ciudad"];
+
+      const barrioA = normalizar(perfil.barrio);
+      const barrioB = normalizar(p.barrio);
+      if (barrioA && barrioA === barrioB) {
+        puntaje += 25;
+        razones.push("mismo barrio");
+      } else if (compartidas(palabras(perfil.barrio), palabras(p.barrio)) > 0) {
+        puntaje += 12;
+        razones.push("zona parecida");
+      }
+
+      const textoP = palabras(`${p.color ?? ""} ${p.raza ?? ""} ${p.descripcion ?? ""}`);
+      const enComun =
+        compartidas(senasAdop, textoP) +
+        compartidas(palabras(`${p.color ?? ""} ${p.raza ?? ""}`), textoAdop);
+      if (enComun >= 2) {
+        puntaje += 25;
+        razones.push("color y raza parecidos");
+      } else if (enComun === 1) {
+        puntaje += 14;
+        razones.push("algo del color coincide");
+      }
+
+      if (perfil.sexo && p.sexo && perfil.sexo !== "no_se" && p.sexo !== "no_se") {
+        if (perfil.sexo === p.sexo) {
+          puntaje += 10;
+          razones.push("mismo sexo");
+        } else {
+          puntaje -= 25;
+        }
+      }
+
+      if (perfil.tamano && p.tamano) {
+        if (perfil.tamano === p.tamano) puntaje += 8;
+        else puntaje -= 10;
+      }
+
+      if (puntaje < 45) return null;
+      return { reporte: p, puntaje: Math.min(puntaje, 100), razones };
+    })
+    .filter((c): c is Coincidencia => c !== null)
+    .sort((x, y) => y.puntaje - x.puntaje)
+    .slice(0, maximo);
+}

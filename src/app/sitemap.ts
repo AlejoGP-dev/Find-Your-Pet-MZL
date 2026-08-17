@@ -17,6 +17,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITIO}/reportar`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITIO}/ayudar`, changeFrequency: "weekly", priority: 0.6 },
     { url: `${SITIO}/consejos`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITIO}/adopcion`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITIO}/adopcion/publicar`, changeFrequency: "monthly", priority: 0.7 },
+    ...CIUDADES.map((c) => ({
+      url: `${SITIO}/adopcion/${c.slug}`,
+      changeFrequency: "daily" as const,
+      priority: 0.7,
+    })),
     ...GUIAS.map((g) => ({
       url: `${SITIO}/consejos/${g.slug}`,
       changeFrequency: "monthly" as const,
