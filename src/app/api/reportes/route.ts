@@ -9,6 +9,7 @@ import {
   canonicalizarBarrio,
   canonicalizarCiudad,
   type NuevoReporte,
+  type Reporte,
 } from "@/lib/tipos";
 
 export const runtime = "nodejs";
@@ -25,7 +26,16 @@ export async function GET(request: NextRequest) {
       estado: p.get("estado"),
       q: p.get("q"),
     });
-    return NextResponse.json({ reportes });
+    // SEO-024: este endpoint es público y sin autenticación. Devolver el
+    // WhatsApp de los 139 reportes en un solo JSON permitía bajarse la lista
+    // completa de números de una. El número se sigue viendo en la ficha —que
+    // es donde tiene que verse— pero deja de poder rasparse en bloque.
+    const publicos = reportes.map((r) => {
+      const copia: Partial<Reporte> = { ...r };
+      delete copia.contacto_whatsapp;
+      return copia;
+    });
+    return NextResponse.json({ reportes: publicos });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Error consultando reportes" },

@@ -518,3 +518,106 @@ export async function contarAdopciones(ciudad?: string | null): Promise<{
   ]);
   return { disponibles: d.count ?? 0, adoptadas: a.count ?? 0 };
 }
+
+/* ------------------------------------------------------------------ */
+/* SEO: consultas ligeras para el sitemap y los umbrales de indexación  */
+/* ------------------------------------------------------------------ */
+
+export type EntradaSitemap = { id: string; created_at: string; estado: string };
+
+/**
+ * Solo los campos que necesita el sitemap.
+ *
+ * No usa CAMPOS_PUBLICOS a propósito: traer 139 filas completas —con
+ * descripción, foto y datos de contacto— para generar URLs sería desperdiciar
+ * ancho de banda en cada regeneración.
+ */
+export async function listarParaSitemap(): Promise<EntradaSitemap[]> {
+  if (!HAY_SUPABASE) {
+    return globalDemo.__demoReportes!.map((r) => ({
+      id: r.id,
+      created_at: r.created_at,
+      estado: r.estado,
+    }));
+  }
+  const { data, error } = await supabase()
+    .from("reportes")
+    .select("id,created_at,estado")
+    .order("created_at", { ascending: false })
+    // Guardarraíl: un sitemap deja de ser válido pasadas las 50.000 URLs.
+    .limit(45000);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as EntradaSitemap[];
+}
+
+/** Igual que la anterior, sobre la tabla de adopciones. */
+export async function listarAdopcionesParaSitemap(): Promise<EntradaSitemap[]> {
+  if (!HAY_SUPABASE) {
+    return globalAdop.__demoAdopciones!.map((a) => ({
+      id: a.id,
+      created_at: a.created_at,
+      estado: a.estado,
+    }));
+  }
+  const { data, error } = await supabase()
+    .from("adopciones")
+    .select("id,created_at,estado")
+    .order("created_at", { ascending: false })
+    .limit(45000);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as EntradaSitemap[];
+}
+
+/**
+ * { "Manizales": 85, "Villamaría": 20, … } sobre reportes activos.
+ *
+ * Agrupa en JS en vez de en SQL porque Supabase no expone GROUP BY por REST y
+ * con estos volúmenes la diferencia es imperceptible. Si el sitio llega a
+ * decenas de miles de filas, esto pide una vista materializada.
+ */
+export async function contarReportesPorCiudad(): Promise<Record<string, number>> {
+  const filas = !HAY_SUPABASE
+    ? globalDemo.__demoReportes!.filter((r) => r.estado === "activo").map((r) => ({
+        ciudad: r.ciudad,
+      }))
+    : await (async () => {
+        const { data, error } = await supabase()
+          .from("reportes")
+          .select("ciudad")
+          .eq("estado", "activo")
+          .limit(50000);
+        if (error) throw new Error(error.message);
+        return (data ?? []) as { ciudad: string }[];
+      })();
+
+  const conteo: Record<string, number> = {};
+  for (const f of filas) {
+    if (!f.ciudad) continue;
+    conteo[f.ciudad] = (conteo[f.ciudad] ?? 0) + 1;
+  }
+  return conteo;
+}
+
+/** Equivalente para adopciones disponibles. */
+export async function contarAdopcionesPorCiudad(): Promise<Record<string, number>> {
+  const filas = !HAY_SUPABASE
+    ? globalAdop.__demoAdopciones!.filter((a) => a.estado === "disponible").map((a) => ({
+        ciudad: a.ciudad,
+      }))
+    : await (async () => {
+        const { data, error } = await supabase()
+          .from("adopciones")
+          .select("ciudad")
+          .eq("estado", "disponible")
+          .limit(50000);
+        if (error) throw new Error(error.message);
+        return (data ?? []) as { ciudad: string }[];
+      })();
+
+  const conteo: Record<string, number> = {};
+  for (const f of filas) {
+    if (!f.ciudad) continue;
+    conteo[f.ciudad] = (conteo[f.ciudad] ?? 0) + 1;
+  }
+  return conteo;
+}

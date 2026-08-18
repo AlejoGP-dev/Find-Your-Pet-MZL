@@ -4,9 +4,12 @@ import { Nunito } from "next/font/google";
 import Analytics from "@/components/Analytics";
 import AvisoLegal from "@/components/AvisoLegal";
 import BotonSoporte from "@/components/BotonSoporte";
+import DatosEstructurados from "@/components/DatosEstructurados";
 import Isotipo from "@/components/Isotipo";
 import MenuMovil from "@/components/MenuMovil";
 import { WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
+import { sitioWeb } from "@/lib/schema";
+import { SITIO } from "@/lib/seo";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -16,6 +19,10 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  // SEO-003: sin metadataBase, Next emite los canonical relativos y cada host
+  // se autocanonicaliza. Con el dominio propio a la vuelta de la esquina, eso
+  // significaría dos copias del sitio diciendo cada una "yo soy la buena".
+  metadataBase: new URL(SITIO),
   title: "Find Your Pet CO — Mascotas perdidas y encontradas en Colombia",
   description:
     "Plataforma comunitaria para reportar mascotas perdidas y encontradas en Colombia después del sismo del 10 de agosto. Publica en un minuto y contacta por WhatsApp.",
@@ -23,9 +30,14 @@ export const metadata: Metadata = {
     title: "Find Your Pet CO",
     description:
       "Reporta mascotas perdidas o encontradas en Colombia. Rápido, gratis y sin registro.",
+    siteName: "Find Your Pet CO",
+    url: "/",
     locale: "es_CO",
     type: "website",
   },
+  // La foto de la mascota es el activo del sitio y casi todo se comparte por
+  // WhatsApp: la tarjeta tiene que ser grande.
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
@@ -39,6 +51,8 @@ export default function RootLayout({
     <html lang="es-CO" className={nunito.variable}>
       <body className="flex min-h-dvh flex-col font-sans">
         <Analytics />
+        {/* SEO-007: WebSite + SearchAction en todas las páginas. */}
+        <DatosEstructurados datos={sitioWeb()} />
         <AvisoLegal />
         <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-crema/90 backdrop-blur">
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-3">

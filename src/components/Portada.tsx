@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import Contador from "@/components/Contador";
+import DatosEstructurados from "@/components/DatosEstructurados";
 import Filtros from "@/components/Filtros";
+import Migas, { type Miga } from "@/components/Migas";
 import TarjetaReporte from "@/components/TarjetaReporte";
 import { HAY_SUPABASE, contarPorEstado, listarReportes } from "@/lib/almacen";
+import * as schema from "@/lib/schema";
 import { CIUDADES, type Ciudad, type Reporte } from "@/lib/tipos";
 
 function uno(valor: string | string[] | undefined): string | null {
@@ -71,6 +74,70 @@ export default async function Portada({
     return `${base}${cadena ? `?${cadena}` : ""}#reportes`;
   }
 
+  // SEO-020: el mismo párrafo estaba repetido en las 9 páginas de listado. Ahora
+  // cada ciudad describe lo suyo con sus propios números. Solo se compone
+  // cuando no hay filtros puestos: si no, el texto cambiaría con cada clic.
+  const hayFiltros = Boolean(
+    uno(p.tipo) || uno(p.especie) || uno(p.barrio) || uno(p.q) || viendoReunidas,
+  );
+
+  function barriosFrecuentes(lista: Reporte[], cuantos = 3): string[] {
+    const cuenta = new Map<string, number>();
+    for (const r of lista) {
+      if (!r.barrio) continue;
+      cuenta.set(r.barrio, (cuenta.get(r.barrio) ?? 0) + 1);
+    }
+    return [...cuenta.entries()]
+      .filter(([, n]) => n > 1)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, cuantos)
+      .map(([barrio]) => barrio);
+  }
+
+  function enumerar(items: string[]): string {
+    if (items.length <= 1) return items[0] ?? "";
+    return `${items.slice(0, -1).join(", ")} y ${items[items.length - 1]}`;
+  }
+
+  let intro =
+    "Después del sismo del 10 de agosto muchas mascotas salieron corriendo y hoy están lejos de su familia. Publica tu reporte en menos de un minuto: sin registro, gratis y con contacto directo por WhatsApp.";
+
+  if (ciudad && !hayFiltros) {
+    const activos = totales.perdidas + totales.encontradas;
+    if (activos === 0) {
+      intro = `Todavía no hay reportes activos en ${ciudad.nombre}. Si se te perdió una mascota o te encontraste una, publicarla acá es gratis y toma menos de un minuto — y ser el primero ayuda a que la página empiece a servir en la ciudad.`;
+    } else {
+      const barrios = barriosFrecuentes(reportes);
+      const partes = [
+        `En ${ciudad.nombre}, ${ciudad.departamento} hay ${activos} ${activos === 1 ? "reporte activo" : "reportes activos"}: ${totales.perdidas} ${totales.perdidas === 1 ? "mascota perdida" : "mascotas perdidas"} y ${totales.encontradas} ${totales.encontradas === 1 ? "encontrada" : "encontradas"}.`,
+      ];
+      if (barrios.length > 0) {
+        partes.push(
+          `Los barrios con más casos son ${enumerar(barrios)}.`,
+        );
+      }
+      if (totales.reunidas > 0) {
+        partes.push(
+          `${totales.reunidas} ${totales.reunidas === 1 ? "mascota ya volvió" : "mascotas ya volvieron"} a casa desde acá.`,
+        );
+      }
+      partes.push(
+        "Si viste alguna o perdiste la tuya, publicar toma menos de un minuto: gratis, sin registro y con contacto directo por WhatsApp.",
+      );
+      intro = partes.join(" ");
+    }
+  }
+
+  const tituloListado = viendoReunidas
+    ? `Mascotas que ya volvieron a casa${ciudad ? ` en ${ciudad.nombre}` : ""}`
+    : ciudad
+      ? `Mascotas perdidas y encontradas en ${ciudad.nombre}`
+      : "Últimos reportes publicados";
+
+  const migas: Miga[] = ciudad
+    ? [{ etiqueta: "Inicio", href: "/" }, { etiqueta: ciudad.nombre }]
+    : [];
+
   const cajas = [
     {
       n: totales.perdidas,
@@ -109,6 +176,11 @@ export default async function Portada({
         {/* En escritorio el hero va centrado; en móvil se queda alineado a la
             izquierda, que se lee mejor en columna angosta. */}
         <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14 md:text-center">
+          {ciudad && (
+            <div className="md:flex md:justify-center">
+              <Migas items={migas} />
+            </div>
+          )}
           <div className="mb-3 flex flex-wrap items-center gap-2 md:justify-center">
             <p className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-marca-oscuro shadow-sm">
               Iniciativa ciudadana · {zona}
@@ -125,9 +197,7 @@ export default async function Portada({
               : "Ayudemos a que cada mascota vuelva a casa."}
           </h1>
           <p className="mt-4 max-w-2xl text-base text-stone-600 sm:text-lg md:mx-auto">
-            Después del sismo del 10 de agosto muchas mascotas salieron corriendo y hoy
-            están lejos de su familia. Publica tu reporte en menos de un minuto: sin
-            registro, gratis y con contacto directo por WhatsApp.
+            {intro}
           </p>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row md:justify-center">
@@ -211,6 +281,30 @@ export default async function Portada({
       </section>
 
       <section id="reportes" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-8">
+        {/* SEO-007: el ItemList lista exactamente las tarjetas que se están
+            renderizando. Un JSON-LD que se contradice con el HTML es peor que
+            no tener JSON-LD. */}
+        {reportes.length > 0 && (
+          <DatosEstructurados
+            datos={schema.coleccion({
+              nombre: tituloListado,
+              descripcion: intro,
+              ruta: ciudad ? `/${ciudad.slug}` : "/",
+              elementos: reportes.map((r) => ({
+                id: r.id,
+                nombre: r.nombre || "Mascota sin nombre",
+              })),
+            })}
+          />
+        )}
+
+        {/* SEO-015: los nombres de las mascotas son <h3> y colgaban del <h1>
+            sin un <h2> intermedio. Este encabezado cierra ese hueco y de paso
+            le dice a la persona qué está viendo. */}
+        <h2 className="mb-4 text-xl font-extrabold text-stone-900 md:text-center">
+          {tituloListado}
+        </h2>
+
         {!HAY_SUPABASE && (
           <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
             <strong className="font-bold">Modo demo.</strong> Todavía no hay base de datos
@@ -260,8 +354,15 @@ export default async function Portada({
           </div>
         ) : (
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {reportes.map((reporte) => (
-              <TarjetaReporte key={reporte.id} reporte={reporte} mostrarCiudad={!ciudad} />
+            {reportes.map((reporte, i) => (
+              <TarjetaReporte
+                key={reporte.id}
+                reporte={reporte}
+                mostrarCiudad={!ciudad}
+                // Solo las 4 primeras: más imágenes prioritarias compiten
+                // entre sí y empeoran el LCP en lugar de mejorarlo.
+                prioridad={i < 4}
+              />
             ))}
           </div>
         )}

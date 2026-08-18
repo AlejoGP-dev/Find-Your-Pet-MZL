@@ -207,8 +207,13 @@ export default async function ListadoAdopcion({
           </div>
         ) : (
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {lista.map((a) => (
-              <TarjetaAdopcion key={a.id} adopcion={a} mostrarCiudad={!ciudad} />
+            {lista.map((a, i) => (
+              <TarjetaAdopcion
+                key={a.id}
+                adopcion={a}
+                mostrarCiudad={!ciudad}
+                prioridad={i < 4}
+              />
             ))}
           </div>
         )}

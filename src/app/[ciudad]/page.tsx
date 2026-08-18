@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Portada from "@/components/Portada";
-import { CIUDADES, ciudadPorSlug } from "@/lib/tipos";
+import { contarReportesPorCiudad } from "@/lib/almacen";
+import { UMBRAL } from "@/lib/seo";
+import { ciudadPorSlug } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
 
@@ -17,17 +19,33 @@ export async function generateMetadata({ params }: { params: Ruta }): Promise<Me
   const titulo = `Mascotas perdidas y encontradas en ${ciudad.nombre} — Find Your Pet CO`;
   const descripcion = `Reporta y busca mascotas perdidas o encontradas en ${ciudad.nombre}, ${ciudad.departamento}. Gratis, sin registro y con contacto directo por WhatsApp.`;
 
+  // SEO-006: la página existe siempre para el usuario, pero solo se le ofrece
+  // a Google cuando tiene algo que mostrar. `follow: true` es deliberado: aunque
+  // la ciudad no se indexe, sus enlaces a fichas sí deben rastrearse.
+  const activos = await contarReportesPorCiudad()
+    .then((c) => c[ciudad.nombre] ?? 0)
+    .catch(() => UMBRAL.ciudad);
+  const indexable = activos >= UMBRAL.ciudad;
+
   return {
     title: titulo,
     description: descripcion,
     alternates: { canonical: `/${ciudad.slug}` },
-    openGraph: { title: titulo, description: descripcion, locale: "es_CO" },
+    robots: indexable ? undefined : { index: false, follow: true },
+    openGraph: {
+      title: titulo,
+      description: descripcion,
+      siteName: "Find Your Pet CO",
+      type: "website",
+      locale: "es_CO",
+      url: `/${ciudad.slug}`,
+    },
   };
 }
 
-export function generateStaticParams() {
-  return CIUDADES.map((c) => ({ ciudad: c.slug }));
-}
+// SEO-014: acá había un generateStaticParams() que force-dynamic anulaba —
+// código inerte que hacía creer que la ruta se prerenderizaba. Si algún día se
+// pasa a `revalidate`, reactivarlo con CIUDADES.map((c) => ({ ciudad: c.slug })).
 
 export default async function PaginaCiudad({
   params,

@@ -5,8 +5,10 @@ import { headers } from "next/headers";
 import AccionesReporte from "@/components/AccionesReporte";
 import Avistamientos from "@/components/Avistamientos";
 import Coincidencias from "@/components/Coincidencias";
+import DatosEstructurados from "@/components/DatosEstructurados";
 import FotoMascota from "@/components/FotoMascota";
-import { InsigniaTipo } from "@/components/TarjetaReporte";
+import Migas, { type Miga } from "@/components/Migas";
+import TarjetaReporte, { InsigniaTipo } from "@/components/TarjetaReporte";
 import { listarAvistamientos, listarReportes, obtenerReporte } from "@/lib/almacen";
 import { buscarCoincidencias } from "@/lib/coincidencias";
 import {
@@ -15,10 +17,13 @@ import {
   TAMANOS,
   enlaceWhatsapp,
   etiquetaDe,
+  ciudadPorNombre,
   diasDesde,
   formatearFecha,
   haceCuanto,
 } from "@/lib/tipos";
+import * as schema from "@/lib/schema";
+import { DIAS_CADUCIDAD, recortar } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -31,15 +36,48 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const nombre = reporte.nombre || "Mascota";
   const accion = reporte.tipo === "perdida" ? "Se perdió" : "Encontrada";
-  const titulo = `${accion}: ${nombre} en ${reporte.barrio}, ${reporte.ciudad} — Find Your Pet CO`;
+  const especie = ESPECIES.find((e) => e.valor === reporte.especie)?.etiqueta ?? "Mascota";
+
+  // SEO-008: una ficha resuelta no se despublica, cambia de historia. El
+  // enlace que ya circula por WhatsApp tiene que seguir funcionando.
+  const titulo =
+    reporte.estado === "resuelto"
+      ? `Reencuentro: ${nombre} volvió a casa en ${reporte.ciudad} — Find Your Pet CO`
+      : `${accion}: ${nombre} en ${reporte.barrio}, ${reporte.ciudad} — Find Your Pet CO`;
+
+  // SEO-019: la descripción del usuario sola no dice ni la ciudad ni el
+  // estado, y un 27 % de los reportes ni siquiera la tiene. Se compone.
+  const base =
+    reporte.estado === "resuelto"
+      ? `${nombre} ya volvió con su familia en ${reporte.barrio}, ${reporte.ciudad}.`
+      : `${accion}: ${especie}${reporte.nombre ? ` ${reporte.nombre}` : ""} en ${reporte.barrio}, ${reporte.ciudad}, el ${formatearFecha(reporte.fecha)}.`;
+  const descripcion = recortar(
+    reporte.descripcion ? `${base} ${reporte.descripcion}` : base,
+  );
+
+  // Caducidad desactivada por defecto (DIAS_CADUCIDAD = 0). Ver lib/seo.ts.
+  const caducado =
+    DIAS_CADUCIDAD > 0 &&
+    reporte.estado === "activo" &&
+    diasDesde(reporte.created_at) > DIAS_CADUCIDAD;
+
   return {
     title: titulo,
-    description:
-      reporte.descripcion ||
-      `${accion} en ${reporte.barrio}, ${reporte.ciudad}, el ${formatearFecha(reporte.fecha)}.`,
+    description: descripcion,
+    alternates: { canonical: `/mascota/${id}` },
+    robots: caducado ? { index: false, follow: true } : undefined,
     openGraph: {
       title: titulo,
-      images: reporte.foto_url ? [reporte.foto_url] : undefined,
+      description: descripcion,
+      siteName: "Find Your Pet CO",
+      type: "article",
+      locale: "es_CO",
+      url: `/mascota/${id}`,
+      // Sin width/height a propósito: las fotos son de todas las formas y
+      // declarar 1200x1200 en una vertical hace que WhatsApp la recorte mal.
+      images: reporte.foto_url
+        ? [{ url: reporte.foto_url, alt: `Foto de ${nombre}` }]
+        : undefined,
     },
   };
 }
@@ -75,7 +113,34 @@ export default async function PaginaMascota({ params }: Props) {
   const diasPublicado = diasDesde(reporte.created_at);
   const esPerdida = reporte.tipo === "perdida";
 
-  const datos: { rotulo: string; valor: string | null }[] = [
+  // SEO-012: la ciudad solo se enlaza si tiene landing. Para Bogotá o
+  // "Quimbaya, Quindío" la miga se pinta como texto, no como enlace roto.
+  const ciudadCatalogo = ciudadPorNombre(reporte.ciudad);
+  const etiquetaListado = esPerdida
+    ? `Mascotas perdidas en ${reporte.ciudad}`
+    : `Mascotas encontradas en ${reporte.ciudad}`;
+  const ruta: Miga[] = [
+    { etiqueta: "Inicio", href: "/" },
+    {
+      etiqueta: etiquetaListado,
+      href: ciudadCatalogo ? `/${ciudadCatalogo.slug}` : undefined,
+    },
+    { etiqueta: reporte.nombre || `${especie?.etiqueta ?? "Mascota"} sin nombre` },
+  ];
+
+  // Otras mascotas de la misma ciudad y el mismo estado. Antes una ficha no le
+  // pasaba ninguna señal a su página de ciudad.
+  const mismaCiudad = (
+    await listarReportes({
+      tipo: reporte.tipo,
+      ciudad: reporte.ciudad,
+      estado: "activo",
+    }).catch(() => [])
+  )
+    .filter((r) => r.id !== reporte.id)
+    .slice(0, 4);
+
+  const datos: { rotulo: string; valor: string | null; fecha?: string }[] = [
     { rotulo: "Tipo", valor: especie ? `${especie.emoji} ${especie.etiqueta}` : null },
     { rotulo: "Raza", valor: reporte.raza },
     { rotulo: "Color", valor: reporte.color },
@@ -87,17 +152,25 @@ export default async function PaginaMascota({ params }: Props) {
     {
       rotulo: esPerdida ? "Se perdió el" : "La encontraron el",
       valor: formatearFecha(reporte.fecha),
+      fecha: reporte.fecha,
     },
   ];
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-6">
-      <Link
-        href="/"
-        className="mb-4 inline-block text-sm font-semibold text-marca hover:underline"
-      >
-        ← Volver a los reportes
-      </Link>
+      <DatosEstructurados datos={schema.migas(ruta)} />
+      <DatosEstructurados
+        datos={schema.ficha({
+          titulo: `${etiquetaListado} — ${reporte.nombre || "Mascota"}`,
+          descripcion: reporte.descripcion || etiquetaListado,
+          ruta: `/mascota/${reporte.id}`,
+          foto: reporte.foto_url,
+          fotoAlt: reporte.nombre ? `Foto de ${reporte.nombre}` : undefined,
+          publicado: reporte.created_at,
+        })}
+      />
+
+      <Migas items={ruta} />
 
       {reporte.estado === "resuelto" && (
         <div className="mb-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
@@ -118,7 +191,7 @@ export default async function PaginaMascota({ params }: Props) {
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
+      <article className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
         <div className="self-start overflow-hidden rounded-2xl border border-stone-200 bg-white">
           {/* object-contain: muchas fotos son afiches verticales y recortarlos
               esconde el número de contacto. El recuadro se adapta a la foto y
@@ -141,7 +214,8 @@ export default async function PaginaMascota({ params }: Props) {
               {reporte.ciudad ? `, ${reporte.ciudad}` : ""} 📍
             </p>
             <p className="mt-1 text-sm text-stone-500">
-              Publicado {haceCuanto(reporte.created_at)}
+              Publicado{" "}
+              <time dateTime={reporte.created_at}>{haceCuanto(reporte.created_at)}</time>
             </p>
           </div>
 
@@ -157,7 +231,9 @@ export default async function PaginaMascota({ params }: Props) {
               .map((d) => (
                 <div key={d.rotulo} className="flex justify-between gap-4 px-4 py-2.5 text-sm">
                   <dt className="text-stone-500">{d.rotulo}</dt>
-                  <dd className="text-right font-semibold text-stone-800">{d.valor}</dd>
+                  <dd className="text-right font-semibold text-stone-800">
+                    {d.fecha ? <time dateTime={d.fecha}>{d.valor}</time> : d.valor}
+                  </dd>
                 </div>
               ))}
           </dl>
@@ -210,12 +286,33 @@ export default async function PaginaMascota({ params }: Props) {
             dinero por adelantado y prefiere encontrarte en un lugar público.
           </p>
         </div>
-      </div>
+      </article>
 
       {coincidencias.length > 0 && (
         <div className="mt-6">
           <Coincidencias lista={coincidencias} tipo={reporte.tipo} />
         </div>
+      )}
+
+      {mismaCiudad.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-xl font-extrabold text-stone-900">
+            {etiquetaListado}
+          </h2>
+          <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {mismaCiudad.map((r) => (
+              <TarjetaReporte key={r.id} reporte={r} />
+            ))}
+          </div>
+          {ciudadCatalogo && (
+            <Link
+              href={`/${ciudadCatalogo.slug}`}
+              className="mt-4 inline-block font-bold text-marca underline underline-offset-2"
+            >
+              Ver todas las de {ciudadCatalogo.nombre} →
+            </Link>
+          )}
+        </section>
       )}
 
       <div className="mt-6">

@@ -1,21 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useTokenGuardado } from "@/lib/misReportes";
 import type { TipoReporte } from "@/lib/tipos";
-
-type Guardado = { id: string; token: string };
-
-function tokenGuardado(id: string): string | null {
-  try {
-    const lista: Guardado[] = JSON.parse(
-      localStorage.getItem("fyp-mis-reportes") || "[]",
-    );
-    return lista.find((r) => r.id === id)?.token ?? null;
-  } catch {
-    return null;
-  }
-}
 
 export default function AccionesReporte({
   id,
@@ -28,20 +16,19 @@ export default function AccionesReporte({
 }) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
-  const [token, setToken] = useState("");
-  const [miReporte, setMiReporte] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [copiado, setCopiado] = useState(false);
 
   // Si el reporte se publicó desde este mismo dispositivo, ya tenemos el código.
-  useEffect(() => {
-    const guardado = tokenGuardado(id);
-    if (guardado) {
-      setToken(guardado);
-      setMiReporte(true);
-    }
-  }, [id]);
+  const guardado = useTokenGuardado(id);
+  // Si el código guardado resulta no servir (lo cambiaron, o el reporte es de
+  // otra persona), caemos al formulario manual.
+  const [rechazado, setRechazado] = useState(false);
+  const [tokenManual, setTokenManual] = useState("");
+  const miReporte = Boolean(guardado) && !rechazado;
+  const token = miReporte ? guardado! : tokenManual;
+  const setToken = setTokenManual;
 
   async function compartir() {
     const url = window.location.href;
@@ -82,7 +69,9 @@ export default function AccionesReporte({
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ocurrió un error.");
-      setMiReporte(false);
+      // Dejamos el código escrito en la caja para que se pueda corregir.
+      setTokenManual(codigo);
+      setRechazado(true);
     } finally {
       setEnviando(false);
     }

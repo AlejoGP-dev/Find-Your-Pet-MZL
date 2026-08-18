@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import DatosEstructurados from "@/components/DatosEstructurados";
 import FotoMascota from "@/components/FotoMascota";
 import GestionAdopcion from "@/components/GestionAdopcion";
+import Migas, { type Miga } from "@/components/Migas";
 import { obtenerAdopcion } from "@/lib/almacen";
 import {
   CONVIVENCIAS,
@@ -14,7 +16,9 @@ import {
   enlaceWhatsappAdopcion,
   etiquetaAdopcion,
 } from "@/lib/adopciones";
-import { SEXOS, TAMANOS, etiquetaDe, haceCuanto } from "@/lib/tipos";
+import * as schema from "@/lib/schema";
+import { recortar } from "@/lib/seo";
+import { SEXOS, TAMANOS, ciudadPorNombre, etiquetaDe, haceCuanto } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
 
@@ -26,12 +30,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!a) return { title: "Publicación no encontrada — Find Your Pet CO" };
   const nombre = a.nombre || "Mascota";
   const titulo = `${nombre} busca hogar en ${a.ciudad} — Find Your Pet CO`;
+  const base = `${nombre} está en adopción en ${a.barrio}, ${a.ciudad}. Adopción gratuita y contacto directo por WhatsApp.`;
+  const descripcion = recortar(a.descripcion ? `${base} ${a.descripcion}` : base);
+
   return {
     title: titulo,
-    description:
-      a.descripcion ||
-      `${nombre} está en adopción en ${a.barrio}, ${a.ciudad}. Contacto directo por WhatsApp.`,
-    openGraph: { title: titulo, images: a.foto_url ? [a.foto_url] : undefined },
+    description: descripcion,
+    alternates: { canonical: `/adopcion/mascota/${id}` },
+    openGraph: {
+      title: titulo,
+      description: descripcion,
+      siteName: "Find Your Pet CO",
+      type: "article",
+      locale: "es_CO",
+      url: `/adopcion/mascota/${id}`,
+      images: a.foto_url ? [{ url: a.foto_url, alt: `Foto de ${nombre}` }] : undefined,
+    },
   };
 }
 
@@ -68,14 +82,32 @@ export default async function FichaAdopcion({ params }: Props) {
 
   const convive = CONVIVENCIAS.filter((c) => a.convive_con?.includes(c.valor));
 
+  const ciudadCatalogo = ciudadPorNombre(a.ciudad);
+  const ruta: Miga[] = [
+    { etiqueta: "Inicio", href: "/" },
+    { etiqueta: "Adopción", href: "/adopcion" },
+    {
+      etiqueta: `Adopción en ${a.ciudad}`,
+      href: ciudadCatalogo ? `/adopcion/${ciudadCatalogo.slug}` : undefined,
+    },
+    { etiqueta: a.nombre || `${especie?.etiqueta ?? "Mascota"} sin nombre` },
+  ];
+
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-6">
-      <Link
-        href="/adopcion"
-        className="mb-4 inline-block text-sm font-semibold text-marca hover:underline"
-      >
-        ← Volver a adopciones
-      </Link>
+      <DatosEstructurados datos={schema.migas(ruta)} />
+      <DatosEstructurados
+        datos={schema.ficha({
+          titulo: `${a.nombre || "Mascota"} en adopción en ${a.ciudad}`,
+          descripcion: a.descripcion || `Mascota en adopción en ${a.barrio}, ${a.ciudad}.`,
+          ruta: `/adopcion/mascota/${a.id}`,
+          foto: a.foto_url,
+          fotoAlt: a.nombre ? `Foto de ${a.nombre}` : undefined,
+          publicado: a.created_at,
+        })}
+      />
+
+      <Migas items={ruta} />
 
       {a.estado === "adoptado" && (
         <div className="mb-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
@@ -92,7 +124,7 @@ export default async function FichaAdopcion({ params }: Props) {
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
+      <article className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
         <div className="self-start overflow-hidden rounded-2xl border border-stone-200 bg-white">
           <FotoMascota
             src={a.foto_url}
@@ -120,7 +152,7 @@ export default async function FichaAdopcion({ params }: Props) {
               {a.barrio}, {a.ciudad} 📍
             </p>
             <p className="mt-1 text-sm text-stone-500">
-              Publicado {haceCuanto(a.created_at)}
+              Publicado <time dateTime={a.created_at}>{haceCuanto(a.created_at)}</time>
             </p>
           </div>
 
@@ -201,7 +233,7 @@ export default async function FichaAdopcion({ params }: Props) {
 
           <GestionAdopcion id={a.id} estado={a.estado} />
         </div>
-      </div>
+      </article>
     </div>
   );
 }

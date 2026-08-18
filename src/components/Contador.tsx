@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+
+const SIN_MOVIMIENTO = "(prefers-reduced-motion: reduce)";
 
 /**
  * Cuenta desde cero hasta el número, con una desaceleración suave.
@@ -16,19 +18,23 @@ export default function Contador({
   duracion?: number;
   className?: string;
 }) {
+  // La preferencia del sistema es un sistema externo, no un efecto. Además,
+  // devolver `true` en el servidor hace que el HTML inicial traiga la cifra
+  // real en vez de un 0: mejor para quien no tiene JS y para Google.
+  const sinAnimacion = useSyncExternalStore(
+    (avisar) => {
+      const mq = window.matchMedia(SIN_MOVIMIENTO);
+      mq.addEventListener("change", avisar);
+      return () => mq.removeEventListener("change", avisar);
+    },
+    () => window.matchMedia(SIN_MOVIMIENTO).matches,
+    () => true,
+  );
+
   const [valor, setValor] = useState(0);
 
   useEffect(() => {
-    if (hasta <= 0) return;
-
-    const sinAnimacion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (sinAnimacion) {
-      setValor(hasta);
-      return;
-    }
+    if (hasta <= 0 || sinAnimacion) return;
 
     let cuadro = 0;
     let inicio = 0;
@@ -44,11 +50,11 @@ export default function Contador({
 
     cuadro = requestAnimationFrame(avanzar);
     return () => cancelAnimationFrame(cuadro);
-  }, [hasta, duracion]);
+  }, [hasta, duracion, sinAnimacion]);
 
   return (
     <span className={className} suppressHydrationWarning>
-      {valor}
+      {sinAnimacion ? hasta : valor}
     </span>
   );
 }

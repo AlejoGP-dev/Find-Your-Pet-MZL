@@ -43,7 +43,9 @@ export default function Coincidencias({
             <Link
               key={reporte.id}
               href={`/mascota/${reporte.id}`}
-              className="flex items-start gap-3 rounded-xl border border-stone-200 bg-white p-2.5 transition hover:border-marca hover:shadow-sm sm:p-3"
+              // min-w-0: sin esto la celda del grid toma el ancho mínimo del
+              // contenido y la tarjeta se sale de la pantalla en 320 px.
+              className="flex min-w-0 items-start gap-3 rounded-xl border border-stone-200 bg-white p-2.5 transition hover:border-marca hover:shadow-sm sm:p-3"
             >
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-stone-100 sm:h-20 sm:w-20">
                 {reporte.foto_url ? (

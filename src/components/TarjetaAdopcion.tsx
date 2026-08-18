@@ -11,9 +11,12 @@ import { SEXOS, TAMANOS, etiquetaDe } from "@/lib/tipos";
 export default function TarjetaAdopcion({
   adopcion,
   mostrarCiudad = false,
+  prioridad = false,
 }: {
   adopcion: Adopcion;
   mostrarCiudad?: boolean;
+  /** Las primeras tarjetas del listado son el LCP: no deben ir en lazy. */
+  prioridad?: boolean;
 }) {
   const especie = ESPECIES_ADOPCION.find((e) => e.valor === adopcion.especie);
   const detalles = [
@@ -25,9 +28,10 @@ export default function TarjetaAdopcion({
   ].filter(Boolean);
 
   return (
+    <article className="h-full">
     <Link
       href={`/adopcion/mascota/${adopcion.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-marca/40 hover:shadow-md"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-marca/40 hover:shadow-md"
     >
       <div className="relative aspect-4/3 w-full overflow-hidden bg-stone-100">
         {adopcion.foto_url ? (
@@ -37,6 +41,11 @@ export default function TarjetaAdopcion({
             fill
             sizes="(min-width: 640px) 240px, 46vw"
             quality={65}
+            priority={prioridad}
+            loading={prioridad ? "eager" : "lazy"}
+            // Explícito: `priority` por sí solo no siempre emite el atributo,
+            // y es justo el que le dice al navegador qué bajar primero.
+            fetchPriority={prioridad ? "high" : "auto"}
             className="object-cover transition duration-300 group-hover:scale-[1.03]"
           />
         ) : (
@@ -85,5 +94,6 @@ export default function TarjetaAdopcion({
         </p>
       </div>
     </Link>
+    </article>
   );
 }

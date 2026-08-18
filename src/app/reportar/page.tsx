@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Publicar reporte — Find Your Pet CO",
   description:
     "Reporta una mascota perdida o encontrada en Colombia. Toma menos de un minuto, gratis y sin registro.",
+  alternates: { canonical: "/reportar" },
 };
 
 export default function PaginaReportar() {

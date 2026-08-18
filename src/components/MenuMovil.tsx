@@ -35,8 +35,14 @@ export default function MenuMovil() {
   const ruta = usePathname();
   const panel = useRef<HTMLDivElement>(null);
 
-  // Al cambiar de página el menú se cierra solo.
-  useEffect(() => setAbierto(false), [ruta]);
+  // Al cambiar de página el menú se cierra solo. Se ajusta durante el render
+  // y no en un efecto: así React no pinta un cuadro con el menú abierto sobre
+  // la página nueva antes de cerrarlo.
+  const [rutaPrevia, setRutaPrevia] = useState(ruta);
+  if (ruta !== rutaPrevia) {
+    setRutaPrevia(ruta);
+    setAbierto(false);
+  }
 
   useEffect(() => {
     if (!abierto) return;

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import DatosEstructurados from "@/components/DatosEstructurados";
+import Migas, { type Miga } from "@/components/Migas";
 import { GUIAS, guiaPorSlug } from "@/lib/consejos";
+import * as schema from "@/lib/schema";
 
 type Ruta = Promise<{ tipo: string }>;
 
@@ -17,7 +20,14 @@ export async function generateMetadata({ params }: { params: Ruta }): Promise<Me
     title: `${guia.titulo} — Find Your Pet CO`,
     description: guia.descripcion,
     alternates: { canonical: `/consejos/${guia.slug}` },
-    openGraph: { title: guia.titulo, description: guia.descripcion, locale: "es_CO" },
+    openGraph: {
+      title: guia.titulo,
+      description: guia.descripcion,
+      siteName: "Find Your Pet CO",
+      type: "article",
+      locale: "es_CO",
+      url: `/consejos/${guia.slug}`,
+    },
   };
 }
 
@@ -30,14 +40,24 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
   const esPerdida = guia.slug === "perdida";
   const esAdoptar = guia.slug === "adoptar";
 
+  const ruta: Miga[] = [
+    { etiqueta: "Inicio", href: "/" },
+    { etiqueta: "Consejos", href: "/consejos" },
+    { etiqueta: guia.titulo },
+  ];
+
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8">
-      <Link
-        href="/"
-        className="mb-4 inline-block text-sm font-semibold text-marca hover:underline"
-      >
-        ← Volver a los reportes
-      </Link>
+      <DatosEstructurados datos={schema.migas(ruta)} />
+      <DatosEstructurados
+        datos={schema.articulo({
+          titulo: guia.titulo,
+          descripcion: guia.descripcion,
+          ruta: `/consejos/${guia.slug}`,
+        })}
+      />
+
+      <Migas items={ruta} />
 
       <h1 className="text-3xl font-extrabold leading-tight text-stone-900 sm:text-4xl">
         {guia.titulo}

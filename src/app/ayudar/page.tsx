@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   CIUDADES_CON_ORGS,
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
   title: "Fundaciones y albergues que necesitan ayuda — Find Your Pet CO",
   description:
     "Fundaciones, albergues y personas que cuidan animales en Colombia. Qué necesitan y cómo contactarlas para ayudar.",
+  alternates: { canonical: "/ayudar" },
 };
 
 const ICONOS: Record<string, string> = {
@@ -81,10 +83,13 @@ export default function PaginaAyudar() {
                 >
                   <div className="flex items-start gap-3">
                     {org.logo ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      // SEO-021: los 5 logos viven en /public/fundaciones. Con
+                      // width/height explícitos no hay salto de layout.
+                      <Image
                         src={org.logo}
                         alt={`Logo de ${org.nombre}`}
+                        width={56}
+                        height={56}
                         className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-stone-100"
                       />
                     ) : (

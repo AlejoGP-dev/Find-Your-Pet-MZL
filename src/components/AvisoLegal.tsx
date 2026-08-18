@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { enlaceSoporte } from "@/lib/legal";
 
 const CLAVE = "fyp-aviso-legal-visto";
@@ -14,21 +14,26 @@ const CLAVE = "fyp-aviso-legal-visto";
  * cerrar, y queda cerrado — pero se ve completo antes de cualquier otra cosa.
  */
 export default function AvisoLegal() {
-  // Arranca oculto y aparece tras hidratar: así nunca parpadea para quien ya
+  // localStorage es un sistema externo, no un efecto: leerlo con
+  // useSyncExternalStore evita el setState en cascada y deja el aviso oculto
+  // en el HTML del servidor, que es lo que impide el parpadeo para quien ya
   // lo cerró.
-  const [visible, setVisible] = useState(false);
+  const cerradoAntes = useSyncExternalStore(
+    () => () => {},
+    () => {
+      try {
+        return localStorage.getItem(CLAVE) === "1";
+      } catch {
+        return false; // si el navegador bloquea el almacenamiento, se muestra
+      }
+    },
+    () => true, // en el servidor asumimos cerrado
+  );
+  const [cerradoAhora, setCerradoAhora] = useState(false);
   const [ampliado, setAmpliado] = useState(false);
 
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(CLAVE) !== "1") setVisible(true);
-    } catch {
-      setVisible(true); // si el navegador bloquea el almacenamiento, se muestra
-    }
-  }, []);
-
   function cerrar() {
-    setVisible(false);
+    setCerradoAhora(true);
     try {
       localStorage.setItem(CLAVE, "1");
     } catch {
@@ -36,7 +41,7 @@ export default function AvisoLegal() {
     }
   }
 
-  if (!visible) return null;
+  if (cerradoAntes || cerradoAhora) return null;
 
   return (
     <div className="border-b border-amber-300 bg-amber-50 text-amber-950">

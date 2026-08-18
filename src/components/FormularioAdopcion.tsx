@@ -173,6 +173,24 @@ function AvisoPosiblesDuenos({
   );
 }
 
+/**
+ * Encabezado numerado de cada sección.
+ *
+ * Va a nivel de módulo y no dentro del formulario: definido adentro, React lo
+ * trataba como un componente nuevo en cada render y desmontaba y volvía a
+ * montar toda la sección, perdiendo el foco mientras se escribe.
+ */
+function Titulo({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <h2 className="mb-4 flex items-center gap-2.5 text-lg font-extrabold text-stone-900">
+      <span className="grid h-7 w-7 place-items-center rounded-full bg-marca text-sm text-white">
+        {n}
+      </span>
+      {children}
+    </h2>
+  );
+}
+
 export default function FormularioAdopcion() {
   const params = useSearchParams();
 
@@ -337,15 +355,6 @@ export default function FormularioAdopcion() {
       />
     );
   }
-
-  const Titulo = ({ n, children }: { n: number; children: React.ReactNode }) => (
-    <h2 className="mb-4 flex items-center gap-2.5 text-lg font-extrabold text-stone-900">
-      <span className="grid h-7 w-7 place-items-center rounded-full bg-marca text-sm text-white">
-        {n}
-      </span>
-      {children}
-    </h2>
-  );
 
   return (
     <form onSubmit={enviar} className="space-y-5">

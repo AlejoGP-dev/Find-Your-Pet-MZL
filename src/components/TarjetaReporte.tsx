@@ -28,10 +28,13 @@ export function InsigniaTipo({ tipo }: { tipo: Reporte["tipo"] }) {
 export default function TarjetaReporte({
   reporte,
   mostrarCiudad = false,
+  prioridad = false,
 }: {
   reporte: Reporte;
   /** En la vista nacional mostramos también la ciudad, si no se pierde el dato. */
   mostrarCiudad?: boolean;
+  /** Las primeras tarjetas del listado son el LCP: no deben ir en lazy. */
+  prioridad?: boolean;
 }) {
   const especie = ESPECIES.find((e) => e.valor === reporte.especie);
   const detalles = [
@@ -42,9 +45,10 @@ export default function TarjetaReporte({
   ].filter(Boolean);
 
   return (
+    <article className="h-full">
     <Link
       href={`/mascota/${reporte.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-marca/40 hover:shadow-md"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-marca/40 hover:shadow-md"
     >
       <div className="relative aspect-4/3 w-full overflow-hidden bg-stone-100">
         {reporte.foto_url ? (
@@ -55,6 +59,11 @@ export default function TarjetaReporte({
             // 2 columnas en móvil, 3 en tablet, 4 en desktop
             sizes="(min-width: 1024px) 240px, (min-width: 640px) 240px, 46vw"
             quality={65}
+            priority={prioridad}
+            loading={prioridad ? "eager" : "lazy"}
+            // Explícito: `priority` por sí solo no siempre emite el atributo,
+            // y es justo el que le dice al navegador qué bajar primero.
+            fetchPriority={prioridad ? "high" : "auto"}
             className="object-cover transition duration-300 group-hover:scale-[1.03]"
           />
         ) : (
@@ -96,14 +105,18 @@ export default function TarjetaReporte({
           📍
         </p>
         <p className="text-xs text-stone-500">
-          {formatearFecha(reporte.fecha)}
+          <time dateTime={reporte.fecha}>{formatearFecha(reporte.fecha)}</time>
           {reporte.estado === "activo" && (
             <span className="block text-stone-400">
-              publicado {haceCuanto(reporte.created_at)}
+              publicado{" "}
+              <time dateTime={reporte.created_at}>
+                {haceCuanto(reporte.created_at)}
+              </time>
             </span>
           )}
         </p>
       </div>
     </Link>
+    </article>
   );
 }

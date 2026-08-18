@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useTokenGuardado } from "@/lib/misReportes";
 import {
   formatearFecha,
   haceCuanto,
@@ -8,19 +9,6 @@ import {
   type Avistamiento,
   type TipoReporte,
 } from "@/lib/tipos";
-
-type Guardado = { id: string; token: string };
-
-function tokenGuardado(reporteId: string): string | null {
-  try {
-    const lista: Guardado[] = JSON.parse(
-      localStorage.getItem("fyp-mis-reportes") || "[]",
-    );
-    return lista.find((r) => r.id === reporteId)?.token ?? null;
-  } catch {
-    return null;
-  }
-}
 
 export default function Avistamientos({
   reporteId,
@@ -38,7 +26,6 @@ export default function Avistamientos({
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [listo, setListo] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
 
   const hoy = new Date().toISOString().slice(0, 10);
   const [lugar, setLugar] = useState("");
@@ -48,7 +35,7 @@ export default function Avistamientos({
   const [whatsapp, setWhatsapp] = useState("");
   const [trampa, setTrampa] = useState("");
 
-  useEffect(() => setToken(tokenGuardado(reporteId)), [reporteId]);
+  const token = useTokenGuardado(reporteId);
 
   async function enviar(evento: React.FormEvent) {
     evento.preventDefault();
