@@ -248,7 +248,11 @@ export async function contarPorEstado(ciudad?: string | null): Promise<{
 
   const contar = async (filtro: (c: ReturnType<typeof consultaBase>) => typeof c) => {
     const base = consultaBase();
-    const { count } = await filtro(ciudad ? base.eq("ciudad", ciudad) : base);
+    const { count, error } = await filtro(ciudad ? base.eq("ciudad", ciudad) : base);
+    // Sin este throw, una consulta que falla devuelve count = null y el
+    // contador muestra un 0 tranquilo, indistinguible de «no hay ninguna».
+    // Es preferible que la página avise que no pudo cargar.
+    if (error) throw new Error(error.message);
     return count ?? 0;
   };
 
@@ -516,6 +520,9 @@ export async function contarAdopciones(ciudad?: string | null): Promise<{
     base().neq("estado", "adoptado"),
     base().eq("estado", "adoptado"),
   ]);
+  // Mismo motivo que en contarPorEstado: un error silencioso se ve igual que un cero.
+  if (d.error) throw new Error(d.error.message);
+  if (a.error) throw new Error(a.error.message);
   return { disponibles: d.count ?? 0, adoptadas: a.count ?? 0 };
 }
 

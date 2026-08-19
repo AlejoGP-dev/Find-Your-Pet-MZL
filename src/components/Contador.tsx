@@ -31,10 +31,26 @@ export default function Contador({
     () => true,
   );
 
+  // El navegador congela requestAnimationFrame en las pestañas de segundo
+  // plano. Si la página carga ahí (un clic con Cmd, una sesión restaurada),
+  // la animación nunca arranca y el contador se queda mostrando 0 — una cifra
+  // falsa sobre datos reales. Mientras la pestaña esté oculta se muestra el
+  // número tal cual; cuando la persona la mira, ahí sí se anima.
+  const oculto = useSyncExternalStore(
+    (avisar) => {
+      document.addEventListener("visibilitychange", avisar);
+      return () => document.removeEventListener("visibilitychange", avisar);
+    },
+    () => document.hidden,
+    () => false,
+  );
+
+  const animando = !sinAnimacion && !oculto && hasta > 0;
+
   const [valor, setValor] = useState(0);
 
   useEffect(() => {
-    if (hasta <= 0 || sinAnimacion) return;
+    if (!animando) return;
 
     let cuadro = 0;
     let inicio = 0;
@@ -49,12 +65,21 @@ export default function Contador({
     };
 
     cuadro = requestAnimationFrame(avanzar);
-    return () => cancelAnimationFrame(cuadro);
-  }, [hasta, duracion, sinAnimacion]);
+
+    // Red de seguridad: si por lo que sea la animación se quedó a medias
+    // (la pestaña pasó a segundo plano, el hilo se atascó), el contador
+    // termina en la cifra correcta de todos modos.
+    const red = setTimeout(() => setValor(hasta), duracion + 600);
+
+    return () => {
+      cancelAnimationFrame(cuadro);
+      clearTimeout(red);
+    };
+  }, [hasta, duracion, animando]);
 
   return (
     <span className={className} suppressHydrationWarning>
-      {sinAnimacion ? hasta : valor}
+      {animando ? valor : hasta}
     </span>
   );
 }
