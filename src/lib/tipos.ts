@@ -14,6 +14,10 @@ export type Reporte = {
   tamano: Tamano | null;
   sexo: Sexo | null;
   foto_url: string | null;
+  /** WPO-003: medidas de la foto para reservarle el espacio exacto en la
+   *  ficha. Null en los reportes publicados antes de la migración 06. */
+  foto_ancho: number | null;
+  foto_alto: number | null;
   ciudad: string;
   barrio: string;
   referencia: string | null;

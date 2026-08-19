@@ -5,6 +5,7 @@ import {
   listarReportes,
   subirFoto,
 } from "@/lib/almacen";
+import { leerMedidas } from "@/lib/medidasImagen";
 import {
   canonicalizarBarrio,
   canonicalizarCiudad,
@@ -124,6 +125,9 @@ export async function POST(request: NextRequest) {
       tamano: (textoOpcional(form, "tamano") as NuevoReporte["tamano"]) ?? null,
       sexo: (textoOpcional(form, "sexo") as NuevoReporte["sexo"]) ?? null,
       foto_url,
+      // WPO-003: solo si hay foto; si no, quedan en null y la ficha usa la
+      // proporción de respaldo.
+      ...(foto_url ? leerMedidas(form) : { foto_ancho: null, foto_alto: null }),
       ciudad,
       barrio,
       referencia: textoOpcional(form, "referencia"),

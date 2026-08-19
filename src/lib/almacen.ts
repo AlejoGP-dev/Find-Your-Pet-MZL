@@ -32,7 +32,7 @@ if (!globalDemo.__demoReportes) globalDemo.__demoReportes = [];
 if (!globalDemo.__demoAvistamientos) globalDemo.__demoAvistamientos = [];
 
 const CAMPOS_PUBLICOS =
-  "id,tipo,nombre,especie,raza,color,tamano,sexo,foto_url,ciudad,barrio,referencia,fecha,descripcion,contacto_nombre,contacto_whatsapp,estado,avistamientos,created_at";
+  "id,tipo,nombre,especie,raza,color,tamano,sexo,foto_url,foto_ancho,foto_alto,ciudad,barrio,referencia,fecha,descripcion,contacto_nombre,contacto_whatsapp,estado,avistamientos,created_at";
 
 export type FiltrosReporte = {
   tipo?: string | null;
@@ -363,7 +363,7 @@ const globalAdop = globalThis as unknown as { __demoAdopciones?: FilaAdopcionDem
 if (!globalAdop.__demoAdopciones) globalAdop.__demoAdopciones = [];
 
 const CAMPOS_ADOPCION =
-  "id,nombre,especie,raza,color,tamano,sexo,edad,foto_url,esterilizado,vacunas,desparasitado,convive_con,temperamento,motivo,entrego_con,ciudad,barrio,descripcion,contacto_nombre,contacto_whatsapp,es_fundacion,estado,created_at";
+  "id,nombre,especie,raza,color,tamano,sexo,edad,foto_url,foto_ancho,foto_alto,esterilizado,vacunas,desparasitado,convive_con,temperamento,motivo,entrego_con,ciudad,barrio,descripcion,contacto_nombre,contacto_whatsapp,es_fundacion,estado,created_at";
 
 export type FiltrosAdopcion = {
   especie?: string | null;

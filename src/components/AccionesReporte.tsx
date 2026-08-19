@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTokenGuardado } from "@/lib/misReportes";
 import type { TipoReporte } from "@/lib/tipos";
 
@@ -19,6 +19,11 @@ export default function AccionesReporte({
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [copiado, setCopiado] = useState(false);
+
+  const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (temporizador.current) clearTimeout(temporizador.current);
+  }, []);
 
   // Si el reporte se publicó desde este mismo dispositivo, ya tenemos el código.
   const guardado = useTokenGuardado(id);
@@ -48,7 +53,10 @@ export default function AccionesReporte({
     try {
       await navigator.clipboard.writeText(url);
       setCopiado(true);
-      setTimeout(() => setCopiado(false), 2500);
+      // WPO-024: con ref y limpieza, para no dejar el temporizador vivo si la
+      // persona navega dentro de los 2,5 s.
+      if (temporizador.current) clearTimeout(temporizador.current);
+      temporizador.current = setTimeout(() => setCopiado(false), 2500);
     } catch {
       setError("No pudimos copiar el enlace. Cópialo desde la barra del navegador.");
     }

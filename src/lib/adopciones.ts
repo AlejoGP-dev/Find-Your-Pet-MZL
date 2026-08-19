@@ -19,6 +19,9 @@ export type Adopcion = {
   sexo: Sexo | null;
   edad: EdadAdopcion | null;
   foto_url: string | null;
+  /** WPO-003: ver el comentario en lib/tipos.ts. */
+  foto_ancho: number | null;
+  foto_alto: number | null;
   esterilizado: Ternaria | null;
   vacunas: Vacunas | null;
   desparasitado: Ternaria | null;

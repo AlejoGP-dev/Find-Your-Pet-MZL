@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { agregarMedidas } from "@/lib/medidasImagen";
 import {
   CONVIVENCIAS,
   EDADES,
@@ -213,6 +214,15 @@ export default function FormularioAdopcion() {
   const barriosDeCiudad =
     ciudad && ciudad !== OTRA_CIUDAD ? (ciudadPorNombre(ciudad)?.barrios ?? []) : [];
 
+  // WPO-024: revoca la previsualización anterior al cambiarla y al desmontar.
+  // Sin esto cada foto dejaba hasta 1,5 MB vivos hasta cerrar la pestaña. Es
+  // el mismo efecto que ya tenía FormularioReporte y que se perdió al copiar.
+  useEffect(() => {
+    return () => {
+      if (previa?.startsWith("blob:")) URL.revokeObjectURL(previa);
+    };
+  }, [previa]);
+
   async function alElegirFoto(e: React.ChangeEvent<HTMLInputElement>) {
     const original = e.target.files?.[0];
     if (!original) {
@@ -240,7 +250,12 @@ export default function FormularioAdopcion() {
     evento.preventDefault();
     const datos = new FormData(evento.currentTarget);
     datos.delete("foto");
-    if (archivoFoto) datos.append("foto", archivoFoto);
+    if (archivoFoto) {
+      datos.append("foto", archivoFoto);
+      // WPO-003: el ancho y el alto viajan con la foto para que la ficha
+      // pueda reservarle su proporción exacta y no salte al cargar.
+      await agregarMedidas(datos, archivoFoto);
+    }
     await publicar(datos);
   }
 

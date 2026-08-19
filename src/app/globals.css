@@ -44,8 +44,19 @@ body {
   display: block;
   width: 100%;
 }
+/* WPO-003: la caja reserva su sitio desde el primer pintado.
+   3/4 y no 1/1 porque la mayoría de las fotos son verticales —fotos de
+   celular y afiches—; con `contain` no se recorta nada, que es innegociable:
+   los afiches llevan el número de contacto impreso. */
 .foto-mascota .iiz__img {
   width: 100%;
+  height: auto;
+  /* La proporción real de la foto la manda el componente en --proporcion-foto
+     (WPO-003). El 3/4 solo aplica a las fotos publicadas antes de guardar las
+     medidas. `contain` es innegociable: los afiches llevan el teléfono
+     impreso y recortarlos lo esconde. */
+  aspect-ratio: var(--proporcion-foto, 0.75);
+  object-fit: contain;
 }
 .foto-mascota .iiz__btn {
   border-radius: 9999px;
@@ -55,4 +66,11 @@ body {
 .foto-mascota .iiz__hint {
   bottom: 12px;
   right: 12px;
+}
+
+/* WPO-002: el aviso legal se renderiza siempre en el servidor (si no, aparece
+   tarde y empuja la página: CLS 0,128 medido). A quien ya lo cerró se lo
+   esconde esta clase, que el script del <head> pone antes del primer pintado. */
+.aviso-visto .aviso-legal {
+  display: none;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { enlaceSoporte } from "@/lib/legal";
 
 const CLAVE = "fyp-aviso-legal-visto";
@@ -14,21 +14,17 @@ const CLAVE = "fyp-aviso-legal-visto";
  * cerrar, y queda cerrado — pero se ve completo antes de cualquier otra cosa.
  */
 export default function AvisoLegal() {
-  // localStorage es un sistema externo, no un efecto: leerlo con
-  // useSyncExternalStore evita el setState en cascada y deja el aviso oculto
-  // en el HTML del servidor, que es lo que impide el parpadeo para quien ya
-  // lo cerró.
-  const cerradoAntes = useSyncExternalStore(
-    () => () => {},
-    () => {
-      try {
-        return localStorage.getItem(CLAVE) === "1";
-      } catch {
-        return false; // si el navegador bloquea el almacenamiento, se muestra
-      }
-    },
-    () => true, // en el servidor asumimos cerrado
-  );
+  // WPO-002: el aviso AHORA SÍ sale en el HTML del servidor.
+  //
+  // Antes el getServerSnapshot devolvía `true` ("en el servidor asumimos
+  // cerrado") para que quien ya lo había cerrado no viera un parpadeo. El
+  // efecto medido fue peor: el banner aparecía 1,6 s después de cargar y
+  // empujaba la página entera hacia abajo. CLS de 0,1276 en TODA primera
+  // visita — justo la de quien llega desde Google o desde WhatsApp.
+  //
+  // A quien ya lo cerró se lo esconde el script del layout, que corre antes
+  // del primer pintado y le pone la clase `aviso-visto` al <html>. Así nadie
+  // ve parpadeo y nadie sufre el salto.
   const [cerradoAhora, setCerradoAhora] = useState(false);
   const [ampliado, setAmpliado] = useState(false);
 
@@ -36,15 +32,16 @@ export default function AvisoLegal() {
     setCerradoAhora(true);
     try {
       localStorage.setItem(CLAVE, "1");
+      document.documentElement.classList.add("aviso-visto");
     } catch {
       /* no pasa nada */
     }
   }
 
-  if (cerradoAntes || cerradoAhora) return null;
+  if (cerradoAhora) return null;
 
   return (
-    <div className="border-b border-amber-300 bg-amber-50 text-amber-950">
+    <div className="aviso-legal border-b border-amber-300 bg-amber-50 text-amber-950">
       <div className="mx-auto flex w-full max-w-5xl items-start gap-3 px-4 py-2.5">
         <span aria-hidden="true" className="mt-0.5 shrink-0 text-base">
           ⚠️

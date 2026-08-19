@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { agregarMedidas } from "@/lib/medidasImagen";
 import {
   ESPECIES,
   CIUDADES,
@@ -364,7 +365,12 @@ export default function FormularioReporte() {
 
     const datos = new FormData(evento.currentTarget);
     datos.delete("foto");
-    if (archivoFoto) datos.append("foto", archivoFoto);
+    if (archivoFoto) {
+      datos.append("foto", archivoFoto);
+      // WPO-003: el ancho y el alto viajan con la foto para que la ficha
+      // pueda reservarle su proporción exacta y no salte al cargar.
+      await agregarMedidas(datos, archivoFoto);
+    }
 
     // Antes de publicar: ¿este número ya tiene reportes activos?
     setRevisando(true);

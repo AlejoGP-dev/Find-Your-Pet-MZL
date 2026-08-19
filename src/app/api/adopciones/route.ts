@@ -5,6 +5,7 @@ import {
   listarReportes,
   subirFoto,
 } from "@/lib/almacen";
+import { leerMedidas } from "@/lib/medidasImagen";
 import type { Convivencia, NuevaAdopcion } from "@/lib/adopciones";
 import { buscarPosiblesDuenos } from "@/lib/coincidencias";
 import { canonicalizarBarrio, canonicalizarCiudad } from "@/lib/tipos";
@@ -148,6 +149,8 @@ export async function POST(request: NextRequest) {
       sexo: (opcional(form, "sexo") as NuevaAdopcion["sexo"]) ?? null,
       edad: (opcional(form, "edad") as NuevaAdopcion["edad"]) ?? null,
       foto_url,
+      // WPO-003: ver el equivalente en api/reportes.
+      ...(foto_url ? leerMedidas(form) : { foto_ancho: null, foto_alto: null }),
       esterilizado: (opcional(form, "esterilizado") as NuevaAdopcion["esterilizado"]) ?? null,
       vacunas: (opcional(form, "vacunas") as NuevaAdopcion["vacunas"]) ?? null,
       desparasitado: (opcional(form, "desparasitado") as NuevaAdopcion["desparasitado"]) ?? null,

@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { obtenerReporte } from "@/lib/almacen";
@@ -23,27 +25,96 @@ const CREMA = "#faf6f0";
 const PERDIDA = "#c2410c";
 const ENCONTRADA = "#047857";
 
+/**
+ * WPO-007 — Las fuentes viven en el repositorio, no en Google Fonts.
+ *
+ * Antes cada afiche disparaba 4 peticiones a fonts.googleapis.com (2 por peso:
+ * el CSS y el archivo). Con `force-dynamic` esas peticiones nunca se cacheaban,
+ * así que se repetían en cada descarga. Y si Google fallaba, el afiche salía en
+ * sans-serif sin que nadie se enterara.
+ *
+ * Se memoiza a nivel de módulo: la lambda las lee una vez y las reutiliza
+ * mientras siga viva.
+ */
+const cacheFuentes = new Map<number, ArrayBuffer | null>();
+
 async function cargarFuente(peso: number): Promise<ArrayBuffer | null> {
+  if (cacheFuentes.has(peso)) return cacheFuentes.get(peso)!;
+
+  let datos: ArrayBuffer | null = null;
   try {
-    const css = await fetch(
-      `https://fonts.googleapis.com/css2?family=Nunito:wght@${peso}&display=swap`,
-      { headers: { "User-Agent": "Mozilla/5.0" } },
-    ).then((r) => r.text());
-    const url = css.match(/src: url\((https:[^)]+)\)/)?.[1];
-    if (!url) return null;
-    return await fetch(url).then((r) => r.arrayBuffer());
+    const bytes = await readFile(
+      join(process.cwd(), "public", "fuentes", `nunito-${peso}.ttf`),
+    );
+    datos = bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength,
+    ) as ArrayBuffer;
   } catch {
-    return null;
+    // Respaldo: si el archivo no viajó en el despliegue, seguimos como antes
+    // en vez de servir el afiche sin tipografía.
+    try {
+      const css = await fetch(
+        `https://fonts.googleapis.com/css2?family=Nunito:wght@${peso}&display=swap`,
+        { headers: { "User-Agent": "Mozilla/5.0" } },
+      ).then((r) => r.text());
+      const url = css.match(/src: url\((https:[^)]+)\)/)?.[1];
+      if (url) datos = await fetch(url).then((r) => r.arrayBuffer());
+    } catch {
+      datos = null;
+    }
+  }
+
+  cacheFuentes.set(peso, datos);
+  return datos;
+}
+
+/**
+ * WPO-007 — La foto entra por el optimizador de Next, no por el original de
+ * Supabase.
+ *
+ * El original puede pesar 4 MB y el afiche solo necesita 1080 px de ancho.
+ * Se descarga acá (en vez de pasarle la URL a Satori) por dos razones: se
+ * puede validar antes de rasterizar, y si el optimizador falla se cae al
+ * original en vez de reventar el afiche entero.
+ */
+async function fotoParaAfiche(fotoUrl: string, origen: string): Promise<string> {
+  // El optimizador no acepta data: URLs ni orígenes fuera de `remotePatterns`.
+  if (!/^https?:/i.test(fotoUrl)) return fotoUrl;
+
+  const optimizada = `${origen}/_next/image?url=${encodeURIComponent(fotoUrl)}&w=1080&q=75`;
+  try {
+    // El `Accept` explícito NO es opcional: sin él el optimizador negocia AVIF
+    // y el rasterizador de `next/og` no sabe decodificarlo — probado, revienta
+    // con "Input buffer contains unsupported image format" y se cae el afiche
+    // entero, no solo la foto.
+    //
+    // Por eso también se pasan los bytes y no la URL: si le diéramos la URL,
+    // Satori la volvería a pedir con su propio Accept y volvería el AVIF.
+    const r = await fetch(optimizada, { headers: { Accept: "image/jpeg" } });
+    if (!r.ok) return fotoUrl;
+    const tipo = r.headers.get("content-type") || "image/jpeg";
+    if (!/jpeg|png/.test(tipo)) return fotoUrl;
+    const b64 = Buffer.from(await r.arrayBuffer()).toString("base64");
+    return `data:${tipo};base64,${b64}`;
+  } catch {
+    // Ante cualquier duda, el original: el afiche es lo que la gente imprime
+    // y pega en un poste. Mejor pesado que roto.
+    return fotoUrl;
   }
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const reporte = await obtenerReporte(id).catch(() => null);
   if (!reporte) return new Response("Reporte no encontrado", { status: 404 });
+
+  const foto = reporte.foto_url
+    ? await fotoParaAfiche(reporte.foto_url, new URL(request.url).origin)
+    : null;
 
   const esPerdida = reporte.tipo === "perdida";
   const acento = esPerdida ? PERDIDA : ENCONTRADA;
@@ -110,10 +181,10 @@ export async function GET(
             overflow: "hidden",
           }}
         >
-          {reporte.foto_url ? (
+          {foto ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={reporte.foto_url}
+              src={foto}
               alt=""
               width={1080}
               height={620}
@@ -196,7 +267,11 @@ export async function GET(
           .replace(/[\u0300-\u036f]/g, "")
           .replace(/[^a-zA-Z0-9]+/g, "-")
           .toLowerCase()}.png"`,
-        "Cache-Control": "public, max-age=300",
+        // WPO-007: `max-age` es directiva de navegador; sin `s-maxage` el CDN de
+        // Vercel respondía MISS en cada descarga y se pagaba 1,3 s de CPU y el
+        // rasterizado completo otra vez. Un afiche solo cambia si cambia el
+        // reporte, así que 24 h es holgado.
+        "Cache-Control": "public, max-age=300, s-maxage=86400, stale-while-revalidate=604800",
       },
     },
   );

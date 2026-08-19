@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTokenGuardado } from "@/lib/misReportes";
 import {
   formatearFecha,
@@ -28,6 +28,11 @@ export default function Avistamientos({
   const [listo, setListo] = useState(false);
 
   const hoy = new Date().toISOString().slice(0, 10);
+
+  const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (temporizador.current) clearTimeout(temporizador.current);
+  }, []);
   const [lugar, setLugar] = useState("");
   const [fecha, setFecha] = useState(hoy);
   const [comentario, setComentario] = useState("");
@@ -65,7 +70,10 @@ export default function Avistamientos({
       setFecha(hoy);
       setAbierto(false);
       setListo(true);
-      setTimeout(() => setListo(false), 5000);
+      // WPO-024: guardado en una ref para poder cancelarlo si el componente
+      // se desmonta antes de los 5 s (o si se manda otra pista seguida).
+      if (temporizador.current) clearTimeout(temporizador.current);
+      temporizador.current = setTimeout(() => setListo(false), 5000);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ocurrió un error.");
     } finally {

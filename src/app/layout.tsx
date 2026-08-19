@@ -7,6 +7,7 @@ import BotonSoporte from "@/components/BotonSoporte";
 import DatosEstructurados from "@/components/DatosEstructurados";
 import Isotipo from "@/components/Isotipo";
 import MenuMovil from "@/components/MenuMovil";
+import Vitals from "@/components/Vitals";
 import { WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
 import { sitioWeb } from "@/lib/schema";
 import { SITIO } from "@/lib/seo";
@@ -49,12 +50,34 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es-CO" className={nunito.variable}>
+      <head>
+        {/* WPO-002: corre antes del primer pintado y esconde el aviso legal a
+            quien ya lo cerró, sin que llegue a verse. Va inline y sin await a
+            propósito: cualquier cosa asíncrona llegaría tarde y volveríamos a
+            tener el salto de layout que este cambio elimina. El try/catch es
+            obligatorio — en incógnito o con el almacenamiento bloqueado,
+            localStorage lanza, y una excepción acá bloquearía el render. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('fyp-aviso-legal-visto')==='1')document.documentElement.classList.add('aviso-visto')}catch(e){}",
+          }}
+        />
+      </head>
       <body className="flex min-h-dvh flex-col font-sans">
         <Analytics />
+        <Vitals />
         {/* SEO-007: WebSite + SearchAction en todas las páginas. */}
         <DatosEstructurados datos={sitioWeb()} />
         <AvisoLegal />
-        <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-crema/90 backdrop-blur">
+        <header
+          // WPO-020: backdrop-filter sobre un elemento fijo de ancho completo
+          // obliga al compositor a re-muestrear esa franja en cada frame de
+          // scroll. En móvil —Android de gama media, el usuario real de este
+          // sitio— sale caro y casi no se nota, así que ahí va fondo opaco y
+          // el blur queda solo de md en adelante.
+          className="sticky top-0 z-40 border-b border-stone-200/80 bg-crema md:bg-crema/90 md:backdrop-blur"
+        >
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-3">
             <Link href="/" className="flex items-center gap-2.5">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-marca text-crema">
