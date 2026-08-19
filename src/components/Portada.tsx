@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import CercaDeMi, { type UbicacionReporte } from "@/components/CercaDeMi";
 import Contador from "@/components/Contador";
 import DatosEstructurados from "@/components/DatosEstructurados";
 import Filtros from "@/components/Filtros";
@@ -64,6 +65,17 @@ export default async function Portada({
   } catch (error) {
     errorCarga = error instanceof Error ? error.message : "Error desconocido";
   }
+
+  // Lo único que baja al navegador para el filtro por cercanía: id y punto.
+  // La ficha completa se queda en el servidor, como debe ser.
+  const ubicaciones: UbicacionReporte[] = reportes
+    .filter((r): r is Reporte & { lat: number; lng: number } => r.lat != null && r.lng != null)
+    .map((r) => ({
+      id: r.id,
+      lat: r.lat,
+      lng: r.lng,
+      aprox: r.ubicacion_precision !== "exacta",
+    }));
 
   const totalReportes = totales.perdidas + totales.encontradas + totales.reunidas;
   const zona = ciudad
@@ -344,6 +356,15 @@ export default async function Portada({
         <Suspense fallback={<div className="h-24" />}>
           <Filtros ciudad={ciudad} base={base} ciudades={ciudadesConReportes} />
         </Suspense>
+
+        {reportes.length > 0 && (
+          <div className="mt-5">
+            <CercaDeMi
+              ubicaciones={ubicaciones}
+              sinUbicacion={reportes.length - ubicaciones.length}
+            />
+          </div>
+        )}
 
         {viendoReunidas && reportes.length > 0 && (
           <p className="mt-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">

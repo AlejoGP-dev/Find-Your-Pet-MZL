@@ -45,7 +45,13 @@ export default function TarjetaReporte({
   ].filter(Boolean);
 
   return (
-    <article className="h-full">
+    // data-reporte-id: por acá encuentra el filtro «cerca de mí» esta tarjeta
+    // para ordenarla por distancia sin volver a renderizarla. Ver CercaDeMi.
+    <article
+      className="h-full"
+      data-reporte-id={reporte.id}
+      data-ciudad={reporte.ciudad}
+    >
     <Link
       href={`/mascota/${reporte.id}`}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-marca/40 hover:shadow-md"
@@ -104,6 +110,12 @@ export default function TarjetaReporte({
             : ""}{" "}
           📍
         </p>
+        {/* Lo llena el filtro por cercanía cuando está activo. */}
+        <p
+          data-distancia
+          hidden
+          className="text-xs font-bold text-marca-oscuro"
+        />
         <p className="text-xs text-stone-500">
           <time dateTime={reporte.fecha}>{formatearFecha(reporte.fecha)}</time>
           {reporte.estado === "activo" && (

@@ -72,6 +72,15 @@ export default function PaginaDatos() {
             recomendamos no ponerla.
           </li>
           <li>
+            <strong>Un punto en el mapa, solo si tú lo compartes.</strong> Al
+            publicar puedes tocar «Usar mi ubicación». Es opcional: si no lo
+            haces, usamos el centro de tu ciudad y el reporte funciona igual.
+            Cuando sí lo compartes, guardamos la coordenada{" "}
+            <strong>redondeada a unos 100 metros</strong>, nunca el punto
+            exacto. Sirve para que tu reporte le salga de primero a los vecinos
+            que estén cerca.
+          </li>
+          <li>
             <strong>La foto y la descripción</strong> de la mascota.
           </li>
           <li>
@@ -82,6 +91,14 @@ export default function PaginaDatos() {
         <p>
           Si solo entras a mirar, no recogemos nada tuyo salvo las estadísticas
           anónimas del punto 7.
+        </p>
+        <p>
+          <strong>Si usas «ver las que están cerca de mí»</strong>, tu ubicación{" "}
+          <strong>no sale de tu dispositivo</strong>. No la enviamos a ningún
+          servidor, no la guardamos y no queda en la dirección de la página. Lo
+          que hace tu navegador es bajar los puntos de los reportes —que ya son
+          públicos— y calcular las distancias ahí mismo. Nosotros ni siquiera
+          nos enteramos de que la usaste.
         </p>
       </Punto>
 

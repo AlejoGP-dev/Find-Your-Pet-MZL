@@ -7,6 +7,7 @@ import {
 } from "@/lib/almacen";
 import { canonicalizarCiudadNacional } from "@/lib/ciudades";
 import { leerMedidas } from "@/lib/medidasImagen";
+import { ubicacionParaGuardar } from "@/lib/ubicacionReporte";
 import {
   canonicalizarBarrio,
   type NuevoReporte,
@@ -130,6 +131,9 @@ export async function POST(request: NextRequest) {
       ...(foto_url ? leerMedidas(form) : { foto_ancho: null, foto_alto: null }),
       ciudad,
       barrio,
+      // Si compartió su ubicación se usa esa (redondeada); si no, el centro
+      // del municipio. Ver lib/ubicacionReporte.ts.
+      ...ubicacionParaGuardar(form, ciudad),
       referencia: textoOpcional(form, "referencia"),
       fecha,
       descripcion: textoOpcional(form, "descripcion"),

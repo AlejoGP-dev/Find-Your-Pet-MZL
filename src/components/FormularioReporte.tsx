@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import CampoUbicacion from "@/components/CampoUbicacion";
 import SelectorCiudad from "@/components/SelectorCiudad";
 import { resolverPorNombre, resolverPorSlug } from "@/lib/ciudades";
 import { agregarMedidas } from "@/lib/medidasImagen";
@@ -847,6 +848,7 @@ export default function FormularioReporte() {
             placeholder="Ej: cerca al parque, calle 65 con carrera 23"
           />
         </div>
+        <CampoUbicacion />
       </section>
 
       <section className="space-y-4 rounded-2xl border border-stone-200 bg-white p-5">

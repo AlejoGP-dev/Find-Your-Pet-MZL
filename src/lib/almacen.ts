@@ -32,7 +32,7 @@ if (!globalDemo.__demoReportes) globalDemo.__demoReportes = [];
 if (!globalDemo.__demoAvistamientos) globalDemo.__demoAvistamientos = [];
 
 const CAMPOS_PUBLICOS =
-  "id,tipo,nombre,especie,raza,color,tamano,sexo,foto_url,foto_ancho,foto_alto,ciudad,barrio,referencia,fecha,descripcion,contacto_nombre,contacto_whatsapp,estado,avistamientos,created_at";
+  "id,tipo,nombre,especie,raza,color,tamano,sexo,foto_url,foto_ancho,foto_alto,ciudad,barrio,lat,lng,ubicacion_precision,referencia,fecha,descripcion,contacto_nombre,contacto_whatsapp,estado,avistamientos,created_at";
 
 export type FiltrosReporte = {
   tipo?: string | null;

@@ -20,6 +20,15 @@ export type Reporte = {
   foto_alto: number | null;
   ciudad: string;
   barrio: string;
+  /** Punto del reporte, redondeado a ~110 m. Null si no se pudo ubicar. */
+  lat: number | null;
+  lng: number | null;
+  /**
+   * De dónde salió la coordenada: «exacta» si la persona compartió su
+   * ubicación al publicar, «ciudad» si es el centro del municipio. Se muestra
+   * en pantalla — una distancia sin contexto se lee como si fuera exacta.
+   */
+  ubicacion_precision: "exacta" | "ciudad" | null;
   referencia: string | null;
   fecha: string;
   descripcion: string | null;
