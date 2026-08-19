@@ -18,7 +18,8 @@ import {
 } from "@/lib/adopciones";
 import * as schema from "@/lib/schema";
 import { recortar } from "@/lib/seo";
-import { SEXOS, TAMANOS, ciudadPorNombre, etiquetaDe, haceCuanto } from "@/lib/tipos";
+import { resolverPorNombre } from "@/lib/ciudades";
+import { SEXOS, TAMANOS, etiquetaDe, haceCuanto } from "@/lib/tipos";
 
 export const dynamic = "force-dynamic";
 
@@ -82,7 +83,7 @@ export default async function FichaAdopcion({ params }: Props) {
 
   const convive = CONVIVENCIAS.filter((c) => a.convive_con?.includes(c.valor));
 
-  const ciudadCatalogo = ciudadPorNombre(a.ciudad);
+  const ciudadCatalogo = resolverPorNombre(a.ciudad);
   const ruta: Miga[] = [
     { etiqueta: "Inicio", href: "/" },
     { etiqueta: "Adopción", href: "/adopcion" },
@@ -130,6 +131,8 @@ export default async function FichaAdopcion({ params }: Props) {
             src={a.foto_url}
             alt={a.nombre ? `Foto de ${a.nombre}` : "Foto de la mascota"}
             emoji={especie?.emoji ?? "🐾"}
+            ancho={a.foto_ancho}
+            alto={a.foto_alto}
           />
         </div>
 

@@ -17,11 +17,11 @@ import {
   TAMANOS,
   enlaceWhatsapp,
   etiquetaDe,
-  ciudadPorNombre,
   diasDesde,
   formatearFecha,
   haceCuanto,
 } from "@/lib/tipos";
+import { resolverPorNombre } from "@/lib/ciudades";
 import * as schema from "@/lib/schema";
 import { DIAS_CADUCIDAD, recortar } from "@/lib/seo";
 
@@ -115,7 +115,7 @@ export default async function PaginaMascota({ params }: Props) {
 
   // SEO-012: la ciudad solo se enlaza si tiene landing. Para Bogotá o
   // "Quimbaya, Quindío" la miga se pinta como texto, no como enlace roto.
-  const ciudadCatalogo = ciudadPorNombre(reporte.ciudad);
+  const ciudadCatalogo = resolverPorNombre(reporte.ciudad);
   const etiquetaListado = esPerdida
     ? `Mascotas perdidas en ${reporte.ciudad}`
     : `Mascotas encontradas en ${reporte.ciudad}`;
@@ -200,6 +200,8 @@ export default async function PaginaMascota({ params }: Props) {
             src={reporte.foto_url}
             alt={reporte.nombre ? `Foto de ${reporte.nombre}` : "Foto de la mascota"}
             emoji={especie?.emoji ?? "🐾"}
+            ancho={reporte.foto_ancho}
+            alto={reporte.foto_alto}
           />
         </div>
 

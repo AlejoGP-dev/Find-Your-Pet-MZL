@@ -3,7 +3,8 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { EDADES, ESPECIES_ADOPCION } from "@/lib/adopciones";
-import { CIUDADES, TAMANOS, type Ciudad } from "@/lib/tipos";
+import type { CiudadConReportes } from "@/lib/ciudades";
+import { TAMANOS, type Ciudad } from "@/lib/tipos";
 
 const PESTANAS = [
   { clave: "disponible", etiqueta: "Disponibles", estado: "" },
@@ -13,9 +14,12 @@ const PESTANAS = [
 export default function FiltrosAdopcion({
   ciudad = null,
   base = "/adopcion",
+  ciudades = [],
 }: {
   ciudad?: Ciudad | null;
   base?: string;
+  /** Ciudades con adopciones publicadas, calculadas en el servidor. */
+  ciudades?: CiudadConReportes[];
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -119,9 +123,9 @@ export default function FiltrosAdopcion({
               aria-label="Filtrar por ciudad"
             >
               <option value="">Todas las ciudades</option>
-              {CIUDADES.map((c) => (
-                <option key={c.slug} value={c.nombre}>
-                  {c.nombre}
+              {ciudades.map((c) => (
+                <option key={c.nombre} value={c.nombre}>
+                  {c.nombre} ({c.reportes})
                 </option>
               ))}
             </select>

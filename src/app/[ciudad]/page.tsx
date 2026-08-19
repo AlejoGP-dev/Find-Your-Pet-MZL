@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Portada from "@/components/Portada";
 import { contarReportesPorCiudad } from "@/lib/almacen";
 import { UMBRAL } from "@/lib/seo";
-import { ciudadPorSlug } from "@/lib/tipos";
+import { resolverPorSlug } from "@/lib/ciudades";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ type Consulta = Promise<Record<string, string | string[] | undefined>>;
 /** Cada ciudad se indexa aparte en Google con su propio título. */
 export async function generateMetadata({ params }: { params: Ruta }): Promise<Metadata> {
   const { ciudad: slug } = await params;
-  const ciudad = ciudadPorSlug(slug);
+  const ciudad = resolverPorSlug(slug);
   if (!ciudad) return {};
 
   const titulo = `Mascotas perdidas y encontradas en ${ciudad.nombre} — Find Your Pet CO`;
@@ -55,7 +55,7 @@ export default async function PaginaCiudad({
   searchParams: Consulta;
 }) {
   const { ciudad: slug } = await params;
-  const ciudad = ciudadPorSlug(slug);
+  const ciudad = resolverPorSlug(slug);
   if (!ciudad) notFound();
 
   return <Portada ciudad={ciudad} params={await searchParams} />;

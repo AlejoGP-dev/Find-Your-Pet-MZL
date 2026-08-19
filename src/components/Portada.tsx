@@ -5,9 +5,16 @@ import DatosEstructurados from "@/components/DatosEstructurados";
 import Filtros from "@/components/Filtros";
 import Migas, { type Miga } from "@/components/Migas";
 import TarjetaReporte from "@/components/TarjetaReporte";
-import { HAY_SUPABASE, contarPorEstado, listarReportes } from "@/lib/almacen";
+import {
+  HAY_SUPABASE,
+  contarPorEstado,
+  contarReportesPorCiudad,
+  listarReportes,
+} from "@/lib/almacen";
 import * as schema from "@/lib/schema";
-import { CIUDADES, type Ciudad, type Reporte } from "@/lib/tipos";
+import { ciudadesDesdeConteo } from "@/lib/ciudades";
+import { UMBRAL } from "@/lib/seo";
+import { type Ciudad, type Reporte } from "@/lib/tipos";
 
 function uno(valor: string | string[] | undefined): string | null {
   if (Array.isArray(valor)) return valor[0] ?? null;
@@ -35,9 +42,10 @@ export default async function Portada({
 
   let reportes: Reporte[] = [];
   let totales = { perdidas: 0, encontradas: 0, reunidas: 0 };
+  let porCiudad: Record<string, number> = {};
   let errorCarga: string | null = null;
   try {
-    [reportes, totales] = await Promise.all([
+    [reportes, totales, porCiudad] = await Promise.all([
       listarReportes({
         tipo: uno(p.tipo),
         especie: uno(p.especie),
@@ -49,6 +57,9 @@ export default async function Portada({
       // Los contadores tienen que seguir el mismo filtro que la lista: si no,
       // en /?ciudad=Villamaría se veían 15 tarjetas con los números del país.
       contarPorEstado(ciudadFiltro),
+      // Las ciudades de los filtros salen de los datos, no de una constante:
+      // solo se ofrece lo que de verdad tiene reportes.
+      contarReportesPorCiudad(),
     ]);
   } catch (error) {
     errorCarga = error instanceof Error ? error.message : "Error desconocido";
@@ -137,6 +148,14 @@ export default async function Portada({
   const migas: Miga[] = ciudad
     ? [{ etiqueta: "Inicio", href: "/" }, { etiqueta: ciudad.nombre }]
     : [];
+
+  // Para el desplegable de filtros: toda ciudad con al menos un reporte.
+  const ciudadesConReportes = ciudadesDesdeConteo(porCiudad);
+  // Para los chips de navegación: solo las que tienen landing propia y pasan
+  // el umbral de indexación, para no mandar a nadie a una página vacía.
+  const ciudadesDestacadas = ciudadesConReportes
+    .filter((c) => c.slug && c.reportes >= UMBRAL.ciudad)
+    .slice(0, 12);
 
   const cajas = [
     {
@@ -263,7 +282,7 @@ export default async function Portada({
             >
               Todo el país 🇨🇴
             </Link>
-            {CIUDADES.map((c) => (
+            {ciudadesDestacadas.map((c) => (
               <Link
                 key={c.slug}
                 href={`/${c.slug}`}
@@ -273,9 +292,18 @@ export default async function Portada({
                     : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                 }`}
               >
-                {c.nombre}
+                {c.nombre}{" "}
+                <span className="tabular-nums opacity-60">{c.reportes}</span>
               </Link>
             ))}
+            {/* Si la ciudad que se está viendo todavía no pasa el umbral, se
+                agrega igual: si no, el chip activo no aparecería por ningún
+                lado y la navegación se sentiría rota. */}
+            {ciudad && !ciudadesDestacadas.some((c) => c.slug === ciudad.slug) && (
+              <span className="shrink-0 whitespace-nowrap rounded-full bg-marca px-3.5 py-2 text-sm font-bold text-white">
+                {ciudad.nombre}
+              </span>
+            )}
           </div>
         </div>
       </section>
@@ -314,7 +342,7 @@ export default async function Portada({
         )}
 
         <Suspense fallback={<div className="h-24" />}>
-          <Filtros ciudad={ciudad} base={base} />
+          <Filtros ciudad={ciudad} base={base} ciudades={ciudadesConReportes} />
         </Suspense>
 
         {viendoReunidas && reportes.length > 0 && (

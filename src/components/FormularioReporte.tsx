@@ -4,14 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import SelectorCiudad from "@/components/SelectorCiudad";
+import { resolverPorNombre, resolverPorSlug } from "@/lib/ciudades";
 import { agregarMedidas } from "@/lib/medidasImagen";
 import {
   ESPECIES,
-  CIUDADES,
-  OTRA_CIUDAD,
   OTRO_BARRIO,
-  ciudadPorNombre,
-  ciudadPorSlug,
   SEXOS,
   TAMANOS,
   type TipoReporte,
@@ -302,15 +300,14 @@ export default function FormularioReporte() {
   const [especie, setEspecie] = useState("perro");
   // Si llega desde /pereira, la ciudad viene preseleccionada en la URL.
   const [ciudad, setCiudad] = useState(
-    () => ciudadPorSlug(params.get("ciudad") ?? "")?.nombre ?? "",
+    () => resolverPorSlug(params.get("ciudad") ?? "")?.nombre ?? "",
   );
-  const [otraCiudad, setOtraCiudad] = useState("");
   const [barrio, setBarrio] = useState("");
   const [otroBarrio, setOtroBarrio] = useState("");
 
   // Barrios de la ciudad elegida. Vacío = ciudad fuera del catálogo.
   const barriosDeCiudad =
-    ciudad && ciudad !== OTRA_CIUDAD ? (ciudadPorNombre(ciudad)?.barrios ?? []) : [];
+    ciudad ? (resolverPorNombre(ciudad)?.barrios ?? []) : [];
   const [previsualizacion, setPrevisualizacion] = useState<string | null>(null);
   const [archivoFoto, setArchivoFoto] = useState<File | null>(null);
   const [enviando, setEnviando] = useState(false);
@@ -754,46 +751,16 @@ export default function FormularioReporte() {
             <label className="etiqueta" htmlFor="ciudad">
               Ciudad *
             </label>
-            <select
-              id="ciudad"
-              className="campo"
-              required
-              value={ciudad}
-              onChange={(e) => {
-                setCiudad(e.target.value);
+            {/* Cualquiera de los 1.121 municipios del país, con buscador. */}
+            <SelectorCiudad
+              valor={ciudad}
+              alCambiar={(nueva) => {
+                setCiudad(nueva);
                 // Los barrios dependen de la ciudad: al cambiarla, se reinicia.
                 setBarrio("");
                 setOtroBarrio("");
               }}
-            >
-              <option value="" disabled>
-                Selecciona…
-              </option>
-              <optgroup label="Más afectadas por el sismo">
-                {CIUDADES.filter((c) => c.afectada).map((c) => (
-                  <option key={c.slug} value={c.nombre}>
-                    {c.nombre} ({c.departamento})
-                  </option>
-                ))}
-              </optgroup>
-              <option value={OTRA_CIUDAD}>Mi ciudad no está en la lista…</option>
-            </select>
-            <input
-              type="hidden"
-              name="ciudad"
-              value={ciudad === OTRA_CIUDAD ? otraCiudad.trim() : ciudad}
             />
-            {ciudad === OTRA_CIUDAD && (
-              <input
-                className="campo mt-2"
-                value={otraCiudad}
-                onChange={(e) => setOtraCiudad(e.target.value)}
-                placeholder="Escribe tu ciudad. Ej: Buenaventura"
-                maxLength={60}
-                required
-                autoFocus
-              />
-            )}
           </div>
 
           <div>

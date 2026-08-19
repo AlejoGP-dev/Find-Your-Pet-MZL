@@ -2,7 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
-import { CIUDADES, ESPECIES, type Ciudad } from "@/lib/tipos";
+import type { CiudadConReportes } from "@/lib/ciudades";
+import { ESPECIES, type Ciudad } from "@/lib/tipos";
 
 const PESTANAS = [
   { clave: "todas", etiqueta: "Todas", tipo: "", estado: "" },
@@ -14,11 +15,20 @@ const PESTANAS = [
 export default function Filtros({
   ciudad = null,
   base = "/",
+  ciudades = [],
 }: {
   /** Ciudad activa: si viene, el selector de barrios es solo de esa ciudad. */
   ciudad?: Ciudad | null;
   /** Ruta sobre la que se arman los filtros ("/" o "/pereira"). */
   base?: string;
+  /**
+   * Ciudades que de verdad tienen reportes, calculadas en el servidor.
+   *
+   * Antes esto era el catálogo fijo de 8: se ofrecían ciudades sin un solo
+   * reporte y no aparecían las que sí tenían. Ahora la lista sale de los datos
+   * y este componente no necesita conocer los 1.121 municipios.
+   */
+  ciudades?: CiudadConReportes[];
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -116,9 +126,9 @@ export default function Filtros({
               aria-label="Filtrar por ciudad"
             >
               <option value="">Todas las ciudades</option>
-              {CIUDADES.map((c) => (
-                <option key={c.slug} value={c.nombre}>
-                  {c.nombre}
+              {ciudades.map((c) => (
+                <option key={c.nombre} value={c.nombre}>
+                  {c.nombre} ({c.reportes})
                 </option>
               ))}
             </select>

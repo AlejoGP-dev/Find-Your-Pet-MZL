@@ -5,10 +5,10 @@ import {
   listarReportes,
   subirFoto,
 } from "@/lib/almacen";
+import { canonicalizarCiudadNacional } from "@/lib/ciudades";
 import { leerMedidas } from "@/lib/medidasImagen";
 import {
   canonicalizarBarrio,
-  canonicalizarCiudad,
   type NuevoReporte,
   type Reporte,
 } from "@/lib/tipos";
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Selecciona el tipo de mascota." }, { status: 400 });
     }
 
-    const ciudad = canonicalizarCiudad(texto(form, "ciudad"));
+    const ciudad = canonicalizarCiudadNacional(texto(form, "ciudad"));
     const barrio = canonicalizarBarrio(texto(form, "barrio"), ciudad);
     const fecha = texto(form, "fecha");
     const contacto_nombre = texto(form, "contacto_nombre");

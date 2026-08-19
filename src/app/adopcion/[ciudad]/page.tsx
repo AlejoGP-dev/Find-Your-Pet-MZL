@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import ListadoAdopcion from "@/components/ListadoAdopcion";
 import { contarAdopcionesPorCiudad } from "@/lib/almacen";
 import { UMBRAL } from "@/lib/seo";
-import { ciudadPorSlug } from "@/lib/tipos";
+import { resolverPorSlug } from "@/lib/ciudades";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,7 @@ type Consulta = Promise<Record<string, string | string[] | undefined>>;
 
 export async function generateMetadata({ params }: { params: Ruta }): Promise<Metadata> {
   const { ciudad: slug } = await params;
-  const ciudad = ciudadPorSlug(slug);
+  const ciudad = resolverPorSlug(slug);
   if (!ciudad) return {};
   const titulo = `Perros y gatos en adopción en ${ciudad.nombre} — Find Your Pet CO`;
   const descripcion = `Mascotas que buscan hogar en ${ciudad.nombre}, ${ciudad.departamento}. Adopción gratuita y contacto directo por WhatsApp.`;
@@ -52,7 +52,7 @@ export default async function AdopcionCiudad({
   searchParams: Consulta;
 }) {
   const { ciudad: slug } = await params;
-  const ciudad = ciudadPorSlug(slug);
+  const ciudad = resolverPorSlug(slug);
   if (!ciudad) notFound();
   return <ListadoAdopcion ciudad={ciudad} params={await searchParams} />;
 }

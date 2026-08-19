@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import SelectorCiudad from "@/components/SelectorCiudad";
+import { resolverPorNombre, resolverPorSlug } from "@/lib/ciudades";
 import { agregarMedidas } from "@/lib/medidasImagen";
 import {
   CONVIVENCIAS,
@@ -13,13 +15,9 @@ import {
   VACUNAS,
 } from "@/lib/adopciones";
 import {
-  CIUDADES,
-  OTRA_CIUDAD,
   OTRO_BARRIO,
   SEXOS,
   TAMANOS,
-  ciudadPorNombre,
-  ciudadPorSlug,
 } from "@/lib/tipos";
 
 const OBJETIVO_FOTO = 1.5 * 1024 * 1024;
@@ -196,9 +194,8 @@ export default function FormularioAdopcion() {
   const params = useSearchParams();
 
   const [ciudad, setCiudad] = useState(
-    () => ciudadPorSlug(params.get("ciudad") ?? "")?.nombre ?? "",
+    () => resolverPorSlug(params.get("ciudad") ?? "")?.nombre ?? "",
   );
-  const [otraCiudad, setOtraCiudad] = useState("");
   const [barrio, setBarrio] = useState("");
   const [otroBarrio, setOtroBarrio] = useState("");
 
@@ -212,7 +209,7 @@ export default function FormularioAdopcion() {
   const [exito, setExito] = useState<{ id: string; token: string } | null>(null);
 
   const barriosDeCiudad =
-    ciudad && ciudad !== OTRA_CIUDAD ? (ciudadPorNombre(ciudad)?.barrios ?? []) : [];
+    ciudad ? (resolverPorNombre(ciudad)?.barrios ?? []) : [];
 
   // WPO-024: revoca la previsualización anterior al cambiarla y al desmontar.
   // Sin esto cada foto dejaba hasta 1,5 MB vivos hasta cerrar la pestaña. Es
@@ -537,41 +534,14 @@ export default function FormularioAdopcion() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="etiqueta" htmlFor="ciudad">Ciudad *</label>
-            <select
-              id="ciudad"
-              className="campo"
-              required
-              value={ciudad}
-              onChange={(e) => {
-                setCiudad(e.target.value);
+            <SelectorCiudad
+              valor={ciudad}
+              alCambiar={(nueva) => {
+                setCiudad(nueva);
                 setBarrio("");
                 setOtroBarrio("");
               }}
-            >
-              <option value="" disabled>Selecciona…</option>
-              <optgroup label="Más afectadas por el sismo">
-                {CIUDADES.filter((c) => c.afectada).map((c) => (
-                  <option key={c.slug} value={c.nombre}>{c.nombre} ({c.departamento})</option>
-                ))}
-              </optgroup>
-              <option value={OTRA_CIUDAD}>Mi ciudad no está en la lista…</option>
-            </select>
-            <input
-              type="hidden"
-              name="ciudad"
-              value={ciudad === OTRA_CIUDAD ? otraCiudad.trim() : ciudad}
             />
-            {ciudad === OTRA_CIUDAD && (
-              <input
-                className="campo mt-2"
-                value={otraCiudad}
-                onChange={(e) => setOtraCiudad(e.target.value)}
-                placeholder="Escribe tu ciudad"
-                maxLength={60}
-                required
-                autoFocus
-              />
-            )}
           </div>
 
           <div>

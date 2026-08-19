@@ -3,9 +3,14 @@ import { Suspense } from "react";
 import Contador from "@/components/Contador";
 import FiltrosAdopcion from "@/components/FiltrosAdopcion";
 import TarjetaAdopcion from "@/components/TarjetaAdopcion";
-import { contarAdopciones, listarAdopciones } from "@/lib/almacen";
+import {
+  contarAdopciones,
+  contarAdopcionesPorCiudad,
+  listarAdopciones,
+} from "@/lib/almacen";
 import type { Adopcion } from "@/lib/adopciones";
-import { CIUDADES, type Ciudad } from "@/lib/tipos";
+import { ciudadesDesdeConteo } from "@/lib/ciudades";
+import { type Ciudad } from "@/lib/tipos";
 
 function uno(v: string | string[] | undefined): string | null {
   if (Array.isArray(v)) return v[0] ?? null;
@@ -26,9 +31,10 @@ export default async function ListadoAdopcion({
 
   let lista: Adopcion[] = [];
   let totales = { disponibles: 0, adoptadas: 0 };
+  let porCiudad: Record<string, number> = {};
   let errorCarga: string | null = null;
   try {
-    [lista, totales] = await Promise.all([
+    [lista, totales, porCiudad] = await Promise.all([
       listarAdopciones({
         especie: uno(params.especie),
         ciudad: ciudadFiltro,
@@ -38,6 +44,8 @@ export default async function ListadoAdopcion({
         estado,
       }),
       contarAdopciones(ciudadFiltro),
+      // Igual que en el listado de reportes: las ciudades salen de los datos.
+      contarAdopcionesPorCiudad(),
     ]);
   } catch (error) {
     errorCarga = error instanceof Error ? error.message : "Error desconocido";
@@ -56,6 +64,9 @@ export default async function ListadoAdopcion({
     const cadena = q.toString();
     return `${base}${cadena ? `?${cadena}` : ""}#listado`;
   }
+
+  const ciudadesConAdopciones = ciudadesDesdeConteo(porCiudad);
+  const ciudadesDestacadas = ciudadesConAdopciones.filter((c) => c.slug).slice(0, 12);
 
   const cajas = [
     {
@@ -148,7 +159,7 @@ export default async function ListadoAdopcion({
             >
               Todo el país 🇨🇴
             </Link>
-            {CIUDADES.map((c) => (
+            {ciudadesDestacadas.map((c) => (
               <Link
                 key={c.slug}
                 href={`/adopcion/${c.slug}`}
@@ -167,7 +178,7 @@ export default async function ListadoAdopcion({
 
       <section id="listado" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-8">
         <Suspense fallback={<div className="h-24" />}>
-          <FiltrosAdopcion ciudad={ciudad} base={base} />
+          <FiltrosAdopcion ciudad={ciudad} base={base} ciudades={ciudadesConAdopciones} />
         </Suspense>
 
         {viendoAdoptadas && lista.length > 0 && (

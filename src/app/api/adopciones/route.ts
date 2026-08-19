@@ -8,7 +8,8 @@ import {
 import { leerMedidas } from "@/lib/medidasImagen";
 import type { Convivencia, NuevaAdopcion } from "@/lib/adopciones";
 import { buscarPosiblesDuenos } from "@/lib/coincidencias";
-import { canonicalizarBarrio, canonicalizarCiudad } from "@/lib/tipos";
+import { canonicalizarCiudadNacional } from "@/lib/ciudades";
+import { canonicalizarBarrio } from "@/lib/tipos";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Selecciona si es perro o gato." }, { status: 400 });
     }
 
-    const ciudad = canonicalizarCiudad(texto(form, "ciudad"));
+    const ciudad = canonicalizarCiudadNacional(texto(form, "ciudad"));
     const barrio = canonicalizarBarrio(texto(form, "barrio"), ciudad);
     const contacto_nombre = texto(form, "contacto_nombre");
     const contacto_whatsapp = texto(form, "contacto_whatsapp");
