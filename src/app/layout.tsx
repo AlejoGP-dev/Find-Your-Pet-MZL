@@ -81,7 +81,7 @@ export default function RootLayout({
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-3">
             <Link href="/" className="flex items-center gap-2.5">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-marca text-crema">
-                <Isotipo className="h-7 w-7" fondo="#0f6f6c" />
+                <Isotipo className="h-7 w-7" />
               </span>
               <span className="leading-tight">
                 <span className="block text-sm font-extrabold tracking-tight text-marca-oscuro min-[400px]:text-base sm:text-lg">
@@ -138,7 +138,7 @@ export default function RootLayout({
           {/* pb extra: el botón flotante no puede taparle el último renglón. */}
           <div className="mx-auto w-full max-w-5xl px-4 pb-24 pt-8 text-sm text-stone-500 md:text-center">
             <p className="flex items-center gap-2 font-semibold text-stone-700 md:justify-center">
-              <Isotipo className="h-5 w-5 text-marca" fondo="#faf6f0" />
+              <Isotipo className="h-5 w-5 text-marca" />
               Find Your Pet CO — iniciativa ciudadana sin ánimo de lucro.
             </p>
             <p className="mt-2 max-w-2xl md:mx-auto">
