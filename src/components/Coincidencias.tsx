@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Icono from "@/components/Icono";
 import type { Coincidencia } from "@/lib/coincidencias";
 import { ESPECIES, formatearFecha, type TipoReporte } from "@/lib/tipos";
 
@@ -32,7 +33,8 @@ export default function Coincidencias({
       }
     >
       <h2 className="text-base font-extrabold leading-snug text-stone-900 sm:text-lg">
-        {titulo} 🔎
+        {titulo}{" "}
+        <Icono nombre="buscar" className="h-[1em] w-[1em]" />
       </h2>
       <p className="mt-1 text-sm text-stone-700">{bajada}</p>
 
@@ -58,8 +60,8 @@ export default function Coincidencias({
                     className="object-cover"
                   />
                 ) : (
-                  <span className="grid h-full w-full place-items-center text-3xl opacity-40">
-                    {especie?.emoji ?? "🐾"}
+                  <span className="grid h-full w-full place-items-center opacity-40">
+                    <Icono nombre={especie?.icono ?? "huella"} className="h-8 w-8" />
                   </span>
                 )}
               </div>
@@ -76,7 +78,11 @@ export default function Coincidencias({
                 {/* Barrio y fecha en renglones aparte: un barrio largo ya no
                     se come la fecha en pantallas angostas. */}
                 <p className="mt-0.5 truncate text-sm leading-snug text-stone-600">
-                  {reporte.barrio} 📍
+                  {reporte.barrio}{" "}
+                  <Icono
+                    nombre="ubicacion"
+                    className="h-[1em] w-[1em]"
+                  />
                 </p>
                 <p className="text-xs leading-snug text-stone-500">
                   {formatearFecha(reporte.fecha)}

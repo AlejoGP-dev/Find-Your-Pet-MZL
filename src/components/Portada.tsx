@@ -4,6 +4,7 @@ import CercaDeMi, { type UbicacionReporte } from "@/components/CercaDeMi";
 import Contador from "@/components/Contador";
 import DatosEstructurados from "@/components/DatosEstructurados";
 import Filtros from "@/components/Filtros";
+import Icono, { type NombreIcono } from "@/components/Icono";
 import Migas, { type Miga } from "@/components/Migas";
 import TarjetaReporte from "@/components/TarjetaReporte";
 import {
@@ -169,7 +170,15 @@ export default async function Portada({
     .filter((c) => c.slug && c.reportes >= UMBRAL.ciudad)
     .slice(0, 12);
 
-  const cajas = [
+  const cajas: {
+    n: number;
+    texto: string;
+    icono?: NombreIcono;
+    color: string;
+    activa: boolean;
+    anillo: string;
+    href: string;
+  }[] = [
     {
       n: totales.perdidas,
       texto: "Perdidas",
@@ -193,7 +202,8 @@ export default async function Portada({
     },
     {
       n: totales.reunidas,
-      texto: "Ya en casa 🎉",
+      texto: "Ya en casa",
+      icono: "sparkles",
       color: "text-marca",
       activa: viendoReunidas,
       anillo: "ring-marca",
@@ -236,19 +246,22 @@ export default async function Portada({
               href={`/reportar?tipo=perdida${ciudad ? `&ciudad=${ciudad.slug}` : ""}`}
               className="boton-primario"
             >
-              Perdí a mi mascota 😿
+              Perdí a mi mascota
+              <Icono nombre="perdida" />
             </Link>
             <Link
               href={`/reportar?tipo=encontrada${ciudad ? `&ciudad=${ciudad.slug}` : ""}`}
               className="boton-secundario border-encontrada/40 text-encontrada"
             >
-              Encontré una mascota 🐕
+              Encontré una mascota
+              <Icono nombre="encontrada" />
             </Link>
             <Link
               href={`/adopcion${ciudad ? `/${ciudad.slug}` : ""}`}
               className="boton-secundario border-marca/40 text-marca"
             >
-              Quiero adoptar 🏡
+              Quiero adoptar
+              <Icono nombre="hogar" />
             </Link>
           </div>
 
@@ -268,8 +281,9 @@ export default async function Portada({
                   hasta={dato.n}
                   className={`block text-2xl font-extrabold tabular-nums sm:text-3xl ${dato.color}`}
                 />
-                <span className="mt-0.5 block text-xs leading-tight text-stone-600 sm:text-sm">
+                <span className="mt-0.5 flex items-center justify-center gap-1 text-xs leading-tight text-stone-600 sm:text-sm">
                   {dato.texto}
+                  {dato.icono && <Icono nombre={dato.icono} />}
                 </span>
               </Link>
             ))}
@@ -292,7 +306,11 @@ export default async function Portada({
                   : "bg-marca text-white"
               }`}
             >
-              Todo el país 🇨🇴
+              Todo el país{" "}
+              <Icono
+                nombre="pais"
+                className="h-[1em] w-[1em]"
+              />
             </Link>
             {ciudadesDestacadas.map((c) => (
               <Link
@@ -367,8 +385,9 @@ export default async function Portada({
         )}
 
         {viendoReunidas && reportes.length > 0 && (
-          <p className="mt-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
-            Estas mascotas ya están de vuelta con su familia. 🎉
+          <p className="mt-5 flex items-center justify-center gap-2 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
+            Estas mascotas ya están de vuelta con su familia.
+            <Icono nombre="sparkles" />
           </p>
         )}
 
@@ -379,7 +398,10 @@ export default async function Portada({
           </div>
         ) : reportes.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center">
-            <p className="text-4xl">{viendoReunidas ? "🎉" : "🐾"}</p>
+            <Icono
+              nombre={viendoReunidas ? "sparkles" : "huella"}
+              className="mx-auto h-10 w-10 text-stone-400"
+            />
             <p className="mt-3 text-lg font-bold text-stone-800">
               {viendoReunidas
                 ? "Todavía no hay reencuentros publicados."
@@ -424,7 +446,11 @@ export default async function Portada({
         >
           <span>
             <span className="block text-xl font-extrabold text-marca-oscuro">
-              Mascotas que buscan familia 🏡
+              Mascotas que buscan familia{" "}
+              <Icono
+                nombre="hogar"
+                className="h-[1em] w-[1em]"
+              />
             </span>
             <span className="mt-1 block text-stone-700">
               Perros y gatos en adopción. Gratis y con contacto directo con quien
@@ -442,7 +468,11 @@ export default async function Portada({
         >
           <span>
             <span className="block text-xl font-extrabold text-marca-oscuro">
-              Las fundaciones también necesitan ayuda 💚
+              Las fundaciones también necesitan ayuda{" "}
+              <Icono
+                nombre="corazon"
+                className="h-[1em] w-[1em]"
+              />
             </span>
             <span className="mt-1 block text-stone-700">
               Alimento, arena, antipulgas, desparasitante. Mira quiénes están
@@ -471,7 +501,11 @@ export default async function Portada({
               className="rounded-xl border-2 border-perdida/30 bg-perdida-suave p-5 transition hover:border-perdida"
             >
               <span className="block text-lg font-extrabold text-perdida">
-                Se me perdió 😿
+                Se me perdió{" "}
+                <Icono
+                  nombre="perdida"
+                  className="h-[1em] w-[1em]"
+                />
               </span>
               <span className="mt-1 block text-sm text-stone-700">
                 Dónde buscar según sea perro o gato, qué NO hacer y cómo evitar
@@ -483,7 +517,11 @@ export default async function Portada({
               className="rounded-xl border-2 border-encontrada/30 bg-encontrada-suave p-5 transition hover:border-encontrada"
             >
               <span className="block text-lg font-extrabold text-encontrada">
-                Me encontré una 🐕
+                Me encontré una{" "}
+                <Icono
+                  nombre="encontrada"
+                  className="h-[1em] w-[1em]"
+                />
               </span>
               <span className="mt-1 block text-sm text-stone-700">
                 Cómo acercarte sin espantarla, qué darle de comer y cómo

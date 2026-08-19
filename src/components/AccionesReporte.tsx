@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import Icono from "@/components/Icono";
 import { useTokenGuardado } from "@/lib/misReportes";
 import type { TipoReporte } from "@/lib/tipos";
 
@@ -39,7 +40,9 @@ export default function AccionesReporte({
     const url = window.location.href;
     const datos = {
       title: "Find Your Pet CO",
-      text: "Ayúdanos a encontrar esta mascota 🐾",
+      // Esto viaja como texto plano a navigator.share y al portapapeles,
+      // así que va sin icono.
+      text: "Ayúdanos a encontrar esta mascota",
       url,
     };
     if (navigator.share) {
@@ -86,7 +89,7 @@ export default function AccionesReporte({
   }
 
   const textoBoton =
-    tipo === "perdida" ? "¡Mi mascota apareció! 🎉" : "Ya la entregué a su familia 🎉";
+    tipo === "perdida" ? "¡Mi mascota apareció!" : "Ya la entregué a su familia";
 
   return (
     <div className="space-y-3">
@@ -99,7 +102,14 @@ export default function AccionesReporte({
               disabled={enviando}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-encontrada px-5 py-3.5 text-base font-extrabold text-white shadow-sm transition hover:brightness-95 disabled:opacity-60"
             >
-              {enviando ? "Guardando…" : textoBoton}
+              {enviando ? (
+                "Guardando…"
+              ) : (
+                <>
+                  {textoBoton}
+                  <Icono nombre="sparkles" />
+                </>
+              )}
             </button>
           ) : abierto ? (
             <div className="rounded-xl border border-stone-200 bg-white p-4">
@@ -146,13 +156,24 @@ export default function AccionesReporte({
               className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-encontrada/40 bg-encontrada-suave px-5 py-3 text-base font-extrabold text-encontrada transition hover:bg-encontrada hover:text-white"
             >
               {textoBoton}
+              <Icono nombre="sparkles" />
             </button>
           )}
         </>
       )}
 
       <button type="button" onClick={compartir} className="boton-secundario w-full">
-        {copiado ? "Enlace copiado ✅" : "Compartir este reporte 🔗"}
+        {copiado ? (
+          <>
+            Enlace copiado
+            <Icono nombre="check" />
+          </>
+        ) : (
+          <>
+            Compartir este reporte
+            <Icono nombre="enlace" />
+          </>
+        )}
       </button>
 
       {error && !abierto && (

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import DatosEstructurados from "@/components/DatosEstructurados";
+import Icono from "@/components/Icono";
 import Migas, { type Miga } from "@/components/Migas";
 import { GUIAS, guiaPorSlug } from "@/lib/consejos";
 import * as schema from "@/lib/schema";
@@ -68,11 +69,22 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
         href={esAdoptar ? "/adopcion" : `/reportar?tipo=${guia.slug}`}
         className="boton-primario mt-6 w-full sm:w-auto"
       >
-        {esAdoptar
-          ? "Ver mascotas en adopción 🏡"
-          : esPerdida
-            ? "Publicar que se perdió 😿"
-            : "Publicar que la encontré 🐕"}
+        {esAdoptar ? (
+          <>
+            Ver mascotas en adopción
+            <Icono nombre="hogar" />
+          </>
+        ) : esPerdida ? (
+          <>
+            Publicar que se perdió
+            <Icono nombre="perdida" />
+          </>
+        ) : (
+          <>
+            Publicar que la encontré
+            <Icono nombre="encontrada" />
+          </>
+        )}
       </Link>
 
       {/* Índice: en una guía larga, poder saltar importa */}
@@ -87,7 +99,7 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
                 href={`#${b.id}`}
                 className="inline-block rounded-full bg-stone-100 px-3 py-1.5 text-sm font-bold text-stone-700 transition hover:bg-marca-suave hover:text-marca-oscuro"
               >
-                {b.titulo} {b.emoji}
+                {b.titulo} <Icono nombre={b.icono} className="h-[1em] w-[1em]" />
               </a>
             </li>
           ))}
@@ -106,7 +118,8 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
             }`}
           >
             <h2 className="text-xl font-extrabold leading-tight text-stone-900 sm:text-2xl">
-              {bloque.titulo} {bloque.emoji}
+              {bloque.titulo}{" "}
+              <Icono nombre={bloque.icono} className="h-[1em] w-[1em]" />
             </h2>
             {bloque.entradilla && (
               <p className="mt-2 text-stone-600">{bloque.entradilla}</p>
@@ -132,7 +145,8 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
                     <p className="mt-1 text-stone-600">{paso.texto}</p>
                     {paso.dato && (
                       <p className="mt-2 rounded-xl bg-stone-50 px-3.5 py-2.5 text-sm font-bold text-stone-800">
-                        {paso.dato} 📌
+                        {paso.dato}{" "}
+                        <Icono nombre="chincheta" className="h-[1em] w-[1em]" />
                       </p>
                     )}
                   </div>
@@ -151,11 +165,21 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
             className="rounded-2xl border-2 border-stone-300 p-5 transition hover:border-marca hover:bg-marca-suave"
           >
             <span className="block text-lg font-extrabold text-stone-900">
-              {o.slug === "perdida"
-                ? "Se me perdió una mascota 😿"
-                : o.slug === "encontrada"
-                  ? "Me encontré una mascota 🐕"
-                  : "Quiero adoptar 🏡"}
+              {o.slug === "perdida" ? (
+                <>
+                  Se me perdió una mascota{" "}
+                  <Icono nombre="perdida" className="h-[1em] w-[1em]" />
+                </>
+              ) : o.slug === "encontrada" ? (
+                <>
+                  Me encontré una mascota{" "}
+                  <Icono nombre="encontrada" className="h-[1em] w-[1em]" />
+                </>
+              ) : (
+                <>
+                  Quiero adoptar <Icono nombre="hogar" className="h-[1em] w-[1em]" />
+                </>
+              )}
             </span>
             <span className="mt-1 block text-sm text-stone-600">Ver esa guía</span>
           </Link>
@@ -165,7 +189,8 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
           className="rounded-2xl border-2 border-marca/30 bg-marca-suave p-5 transition hover:border-marca"
         >
           <span className="block text-lg font-extrabold text-marca-oscuro">
-            Fundaciones y albergues 💚
+            Fundaciones y albergues{" "}
+            <Icono nombre="corazon" className="h-[1em] w-[1em]" />
           </span>
           <span className="mt-1 block text-sm text-stone-700">
             Quiénes están cuidando animales y qué necesitan

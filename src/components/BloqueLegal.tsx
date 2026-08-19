@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Icono from "@/components/Icono";
 import {
   ACTUALIZADO,
   MOTIVOS_SOPORTE,
@@ -101,7 +102,11 @@ export function CajaSoporte() {
               className="flex h-full flex-col rounded-xl border border-stone-300 bg-white p-3.5 transition hover:border-marca hover:shadow-sm"
             >
               <span className="font-bold leading-snug text-stone-800">
-                {m.titulo} 💬
+                {m.titulo}{" "}
+                <Icono
+                  nombre="chat"
+                  className="h-[1em] w-[1em]"
+                />
               </span>
               <span className="mt-0.5 text-sm leading-snug text-stone-600">
                 {m.detalle}
@@ -117,7 +122,8 @@ export function CajaSoporte() {
         rel="noopener noreferrer"
         className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 text-base font-extrabold text-white shadow-sm transition hover:brightness-95"
       >
-        Es otra cosa — escribir por WhatsApp 💬
+        Es otra cosa — escribir por WhatsApp
+        <Icono nombre="chat" />
       </a>
       <p className="mt-3 text-sm text-stone-600">
         Si es sobre un reporte en particular, mándame el enlace de la página —

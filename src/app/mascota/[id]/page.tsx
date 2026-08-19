@@ -7,6 +7,7 @@ import Avistamientos from "@/components/Avistamientos";
 import Coincidencias from "@/components/Coincidencias";
 import DatosEstructurados from "@/components/DatosEstructurados";
 import FotoMascota from "@/components/FotoMascota";
+import Icono, { type NombreIcono } from "@/components/Icono";
 import Migas, { type Miga } from "@/components/Migas";
 import TarjetaReporte, { InsigniaTipo } from "@/components/TarjetaReporte";
 import { listarAvistamientos, listarReportes, obtenerReporte } from "@/lib/almacen";
@@ -140,8 +141,13 @@ export default async function PaginaMascota({ params }: Props) {
     .filter((r) => r.id !== reporte.id)
     .slice(0, 4);
 
-  const datos: { rotulo: string; valor: string | null; fecha?: string }[] = [
-    { rotulo: "Tipo", valor: especie ? `${especie.emoji} ${especie.etiqueta}` : null },
+  const datos: {
+    rotulo: string;
+    valor: string | null;
+    icono?: NombreIcono;
+    fecha?: string;
+  }[] = [
+    { rotulo: "Tipo", valor: especie?.etiqueta ?? null, icono: especie?.icono },
     { rotulo: "Raza", valor: reporte.raza },
     { rotulo: "Color", valor: reporte.color },
     { rotulo: "Tamaño", valor: etiquetaDe(TAMANOS, reporte.tamano) },
@@ -174,7 +180,8 @@ export default async function PaginaMascota({ params }: Props) {
 
       {reporte.estado === "resuelto" && (
         <div className="mb-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
-          Esta mascota ya está de vuelta con su familia. 🎉{" "}
+          Esta mascota ya está de vuelta con su familia.{" "}
+          <Icono nombre="sparkles" className="h-[1em] w-[1em]" />{" "}
           <Link href="/?estado=resuelto#reportes" className="underline">
             Ver otros reencuentros
           </Link>
@@ -199,7 +206,7 @@ export default async function PaginaMascota({ params }: Props) {
           <FotoMascota
             src={reporte.foto_url}
             alt={reporte.nombre ? `Foto de ${reporte.nombre}` : "Foto de la mascota"}
-            emoji={especie?.emoji ?? "🐾"}
+            icono={especie?.icono ?? "huella"}
             ancho={reporte.foto_ancho}
             alto={reporte.foto_alto}
           />
@@ -213,7 +220,8 @@ export default async function PaginaMascota({ params }: Props) {
             </h1>
             <p className="mt-1 font-semibold text-marca">
               {reporte.barrio}
-              {reporte.ciudad ? `, ${reporte.ciudad}` : ""} 📍
+              {reporte.ciudad ? `, ${reporte.ciudad}` : ""}{" "}
+              <Icono nombre="ubicacion" className="h-[1em] w-[1em]" />
             </p>
             <p className="mt-1 text-sm text-stone-500">
               Publicado{" "}
@@ -234,6 +242,9 @@ export default async function PaginaMascota({ params }: Props) {
                 <div key={d.rotulo} className="flex justify-between gap-4 px-4 py-2.5 text-sm">
                   <dt className="text-stone-500">{d.rotulo}</dt>
                   <dd className="text-right font-semibold text-stone-800">
+                    {d.icono && (
+                      <Icono nombre={d.icono} className="mr-1.5 h-[1em] w-[1em] align-[-0.125em]" />
+                    )}
                     {d.fecha ? <time dateTime={d.fecha}>{d.valor}</time> : d.valor}
                   </dd>
                 </div>
@@ -252,7 +263,8 @@ export default async function PaginaMascota({ params }: Props) {
                 rel="noopener noreferrer"
                 className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 text-base font-extrabold text-white shadow-sm transition hover:brightness-95"
               >
-                Escribir por WhatsApp 💬
+                Escribir por WhatsApp
+                <Icono nombre="chat" />
               </a>
               <p className="mt-2 text-center text-xs text-stone-500">
                 {reporte.contacto_whatsapp}
@@ -264,9 +276,17 @@ export default async function PaginaMascota({ params }: Props) {
             href={`/consejos/${reporte.tipo}`}
             className="block rounded-2xl border border-stone-200 bg-white p-4 text-center font-bold text-marca transition hover:border-marca hover:bg-marca-suave"
           >
-            {esPerdida
-              ? "Guía: cómo buscar una mascota perdida 🔎"
-              : "Guía: qué hacer si te encontraste una mascota 🤲"}
+            {esPerdida ? (
+              <>
+                Guía: cómo buscar una mascota perdida{" "}
+                <Icono nombre="buscar" className="h-[1em] w-[1em]" />
+              </>
+            ) : (
+              <>
+                Guía: qué hacer si te encontraste una mascota{" "}
+                <Icono nombre="mano" className="h-[1em] w-[1em]" />
+              </>
+            )}
           </Link>
 
           <a
@@ -274,7 +294,8 @@ export default async function PaginaMascota({ params }: Props) {
             className="boton-secundario w-full"
             download
           >
-            Descargar afiche para compartir 🖼️
+            Descargar afiche para compartir
+            <Icono nombre="imagen" />
           </a>
 
           <AccionesReporte

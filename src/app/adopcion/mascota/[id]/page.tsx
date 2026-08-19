@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import DatosEstructurados from "@/components/DatosEstructurados";
 import FotoMascota from "@/components/FotoMascota";
 import GestionAdopcion from "@/components/GestionAdopcion";
+import Icono, { type NombreIcono } from "@/components/Icono";
 import Migas, { type Miga } from "@/components/Migas";
 import { obtenerAdopcion } from "@/lib/almacen";
 import {
@@ -66,8 +67,8 @@ export default async function FichaAdopcion({ params }: Props) {
   const especie = ESPECIES_ADOPCION.find((e) => e.valor === a.especie);
   const url = await urlActual(id);
 
-  const datos: { rotulo: string; valor: string | null }[] = [
-    { rotulo: "Tipo", valor: especie ? `${especie.emoji} ${especie.etiqueta}` : null },
+  const datos: { rotulo: string; valor: string | null; icono?: NombreIcono }[] = [
+    { rotulo: "Tipo", valor: especie?.etiqueta ?? null, icono: especie?.icono },
     { rotulo: "Edad", valor: etiquetaAdopcion(EDADES, a.edad) },
     { rotulo: "Raza", valor: a.raza },
     { rotulo: "Color", valor: a.color },
@@ -112,7 +113,8 @@ export default async function FichaAdopcion({ params }: Props) {
 
       {a.estado === "adoptado" && (
         <div className="mb-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
-          Esta mascota ya encontró su familia. 🎉{" "}
+          Esta mascota ya encontró su familia.{" "}
+          <Icono nombre="sparkles" className="h-[1em] w-[1em]" />{" "}
           <Link href="/adopcion?estado=adoptado#listado" className="underline">
             Ver otras adopciones cerradas
           </Link>
@@ -130,7 +132,7 @@ export default async function FichaAdopcion({ params }: Props) {
           <FotoMascota
             src={a.foto_url}
             alt={a.nombre ? `Foto de ${a.nombre}` : "Foto de la mascota"}
-            emoji={especie?.emoji ?? "🐾"}
+            icono={especie?.icono ?? "huella"}
             ancho={a.foto_ancho}
             alto={a.foto_alto}
           />
@@ -144,7 +146,7 @@ export default async function FichaAdopcion({ params }: Props) {
               </span>
               {a.es_fundacion && (
                 <span className="inline-flex rounded-full bg-encontrada-suave px-3 py-1 text-xs font-bold text-encontrada">
-                  Fundación 🏛️
+                  Fundación <Icono nombre="institucion" className="h-[1em] w-[1em]" />
                 </span>
               )}
             </div>
@@ -152,7 +154,8 @@ export default async function FichaAdopcion({ params }: Props) {
               {a.nombre || `${especie?.etiqueta ?? "Mascota"} sin nombre`}
             </h1>
             <p className="mt-1 font-semibold text-marca">
-              {a.barrio}, {a.ciudad} 📍
+              {a.barrio}, {a.ciudad}{" "}
+              <Icono nombre="ubicacion" className="h-[1em] w-[1em]" />
             </p>
             <p className="mt-1 text-sm text-stone-500">
               Publicado <time dateTime={a.created_at}>{haceCuanto(a.created_at)}</time>
@@ -181,7 +184,7 @@ export default async function FichaAdopcion({ params }: Props) {
                     key={c.valor}
                     className="rounded-full bg-marca-suave px-3 py-1.5 text-sm font-bold text-marca-oscuro"
                   >
-                    {c.etiqueta} {c.emoji}
+                    {c.etiqueta} <Icono nombre={c.icono} className="h-[1em] w-[1em]" />
                   </li>
                 ))}
               </ul>
@@ -194,7 +197,12 @@ export default async function FichaAdopcion({ params }: Props) {
               .map((d) => (
                 <div key={d.rotulo} className="flex justify-between gap-4 px-4 py-2.5 text-sm">
                   <dt className="text-stone-500">{d.rotulo}</dt>
-                  <dd className="text-right font-semibold text-stone-800">{d.valor}</dd>
+                  <dd className="text-right font-semibold text-stone-800">
+                    {d.icono && (
+                      <Icono nombre={d.icono} className="mr-1.5 h-[1em] w-[1em] align-[-0.125em]" />
+                    )}
+                    {d.valor}
+                  </dd>
                 </div>
               ))}
           </dl>
@@ -216,7 +224,8 @@ export default async function FichaAdopcion({ params }: Props) {
                 rel="noopener noreferrer"
                 className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 text-base font-extrabold text-white shadow-sm transition hover:brightness-95"
               >
-                Preguntar por {a.nombre || "esta mascota"} 💬
+                Preguntar por {a.nombre || "esta mascota"}
+                <Icono nombre="chat" />
               </a>
               <p className="mt-2 text-center text-xs text-stone-500">
                 {a.contacto_whatsapp}

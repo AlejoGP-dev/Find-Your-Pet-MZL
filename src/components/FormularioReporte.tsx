@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import CampoUbicacion from "@/components/CampoUbicacion";
+import Icono from "@/components/Icono";
 import SelectorCiudad from "@/components/SelectorCiudad";
 import { resolverPorNombre, resolverPorSlug } from "@/lib/ciudades";
 import { agregarMedidas } from "@/lib/medidasImagen";
@@ -158,7 +159,8 @@ function SugerenciasTrasPublicar({ id, tipo }: { id: string; tipo: TipoReporte }
     <div className="mx-auto mt-6 max-w-md rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-left">
       <p className="font-extrabold text-stone-900">
         Encontramos {lista.length}{" "}
-        {lista.length === 1 ? "reporte parecido" : "reportes parecidos"} 🔎
+        {lista.length === 1 ? "reporte parecido" : "reportes parecidos"}{" "}
+        <Icono nombre="buscar" className="h-[1em] w-[1em]" />
       </p>
       <p className="mt-1 text-sm text-stone-700">
         {tipo === "perdida"
@@ -189,7 +191,11 @@ function SugerenciasTrasPublicar({ id, tipo }: { id: string; tipo: TipoReporte }
                   {c.reporte.nombre || "Sin nombre"} · {c.puntaje}%
                 </span>
                 <span className="block truncate text-xs text-stone-600">
-                  {c.reporte.barrio} · {c.razones.join(" · ")} 📍
+                  <Icono
+                    nombre="ubicacion"
+                    className="h-[1em] w-[1em]"
+                  />{" "}
+                  {c.reporte.barrio} · {c.razones.join(" · ")}
                 </span>
               </span>
             </Link>
@@ -226,7 +232,9 @@ function AvisoYaTienesReporte({
   return (
     <div className="rounded-2xl border-2 border-amber-400 bg-amber-50 p-5">
       <h3 className="text-lg font-extrabold text-stone-900">
-        Con este número ya hay {reportes.length === 1 ? "un reporte activo" : `${reportes.length} reportes activos`} ⚠️
+        Con este número ya hay{" "}
+        {reportes.length === 1 ? "un reporte activo" : `${reportes.length} reportes activos`}{" "}
+        <Icono nombre="alerta" className="h-[1em] w-[1em]" />
       </h3>
       <p className="mt-1 text-sm text-stone-700">
         Si es la misma mascota, no publiques otro: abre el reporte que ya tienes.
@@ -257,7 +265,12 @@ function AvisoYaTienesReporte({
                   {r.nombre || "Sin nombre"}
                 </span>
                 <span className="block truncate text-xs text-stone-600">
-                  {r.tipo === "perdida" ? "Se perdió" : "La encontraron"} · {r.barrio} 📍
+                  {r.tipo === "perdida" ? "Se perdió" : "La encontraron"} ·{" "}
+                  <Icono
+                    nombre="ubicacion"
+                    className="h-[1em] w-[1em]"
+                  />{" "}
+                  {r.barrio}
                 </span>
               </span>
               <span className="shrink-0 text-sm font-bold text-marca">Ver →</span>
@@ -482,7 +495,7 @@ export default function FormularioReporte() {
   if (exito) {
     return (
       <div className="rounded-2xl border border-encontrada/30 bg-white p-6 text-center sm:p-10">
-        <p className="text-5xl">🐾</p>
+        <Icono nombre="huella" bloque className="mx-auto h-12 w-12 text-encontrada" />
         <h2 className="mt-4 text-2xl font-extrabold text-stone-900">
           ¡Listo, tu reporte ya está publicado!
         </h2>
@@ -504,7 +517,7 @@ export default function FormularioReporte() {
           download
           className="boton-secundario mx-auto mt-4 w-full max-w-md"
         >
-          Descargar afiche para compartir 🖼️
+          Descargar afiche para compartir <Icono nombre="imagen" />
         </a>
 
         <SugerenciasTrasPublicar id={exito.id} tipo={tipo} />
@@ -578,7 +591,7 @@ export default function FormularioReporte() {
                 : "border-stone-200 bg-white hover:border-stone-300"
             }`}
           >
-            <span className="text-2xl">😿</span>
+            <Icono nombre="perdida" className="h-6 w-6 text-perdida" />
             <span className="mt-1 block font-extrabold text-stone-900">
               Perdí a mi mascota
             </span>
@@ -593,7 +606,7 @@ export default function FormularioReporte() {
                 : "border-stone-200 bg-white hover:border-stone-300"
             }`}
           >
-            <span className="text-2xl">🐕</span>
+            <Icono nombre="encontrada" className="h-6 w-6 text-encontrada" />
             <span className="mt-1 block font-extrabold text-stone-900">
               Encontré una mascota
             </span>
@@ -619,8 +632,11 @@ export default function FormularioReporte() {
                 className="h-20 w-20 rounded-lg object-cover"
               />
             ) : (
-              <span className="grid h-20 w-20 place-items-center rounded-lg bg-stone-100 text-3xl">
-                {preparandoFoto ? "⏳" : "📷"}
+              <span className="grid h-20 w-20 place-items-center rounded-lg bg-stone-100 text-stone-400">
+                <Icono
+                  nombre={preparandoFoto ? "reloj" : "camara"}
+                  className="h-8 w-8"
+                />
               </span>
             )}
             <span className="text-sm text-stone-600">
@@ -652,13 +668,14 @@ export default function FormularioReporte() {
                 key={e.valor}
                 type="button"
                 onClick={() => setEspecie(e.valor)}
-                className={`flex-1 rounded-xl border-2 py-3 font-bold transition ${
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 py-3 font-bold transition ${
                   especie === e.valor
                     ? "border-marca bg-marca-suave text-marca-oscuro"
                     : "border-stone-200 text-stone-600 hover:border-stone-300"
                 }`}
               >
-                {e.emoji} {e.etiqueta}
+                <Icono nombre={e.icono} />
+                {e.etiqueta}
               </button>
             ))}
           </div>

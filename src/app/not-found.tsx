@@ -1,9 +1,12 @@
 import Link from "next/link";
+import Icono from "@/components/Icono";
 
 export default function NoEncontrado() {
   return (
     <div className="mx-auto grid max-w-lg place-items-center px-4 py-20 text-center">
-      <p className="text-6xl">🐾</p>
+      <p className="text-6xl">
+        <Icono nombre="huella" />
+      </p>
       <h1 className="mt-4 text-2xl font-extrabold text-stone-900">
         No encontramos esta página
       </h1>

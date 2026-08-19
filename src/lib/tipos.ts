@@ -1,3 +1,5 @@
+import type { NombreIcono } from "@/components/Icono";
+
 export type TipoReporte = "perdida" | "encontrada";
 export type Especie = "perro" | "gato" | "otro";
 export type Tamano = "pequeno" | "mediano" | "grande";
@@ -206,10 +208,10 @@ export function ciudadPorNombre(nombre: string): Ciudad | null {
   return CIUDADES.find((c) => sinTildes(c.nombre) === clave) ?? null;
 }
 
-export const ESPECIES: { valor: Especie; etiqueta: string; emoji: string }[] = [
-  { valor: "perro", etiqueta: "Perro", emoji: "🐶" },
-  { valor: "gato", etiqueta: "Gato", emoji: "🐱" },
-  { valor: "otro", etiqueta: "Otro", emoji: "🐾" },
+export const ESPECIES: { valor: Especie; etiqueta: string; icono: NombreIcono }[] = [
+  { valor: "perro", etiqueta: "Perro", icono: "perro" },
+  { valor: "gato", etiqueta: "Gato", icono: "gato" },
+  { valor: "otro", etiqueta: "Otro", icono: "huella" },
 ];
 
 export const TAMANOS: { valor: Tamano; etiqueta: string }[] = [

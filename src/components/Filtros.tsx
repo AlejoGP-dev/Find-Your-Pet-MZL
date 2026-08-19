@@ -2,14 +2,27 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
+import Icono, { type NombreIcono } from "@/components/Icono";
 import type { CiudadConReportes } from "@/lib/ciudades";
 import { ESPECIES, type Ciudad } from "@/lib/tipos";
 
-const PESTANAS = [
+const PESTANAS: {
+  clave: string;
+  etiqueta: string;
+  icono?: NombreIcono;
+  tipo: string;
+  estado: string;
+}[] = [
   { clave: "todas", etiqueta: "Todas", tipo: "", estado: "" },
   { clave: "perdida", etiqueta: "Perdidas", tipo: "perdida", estado: "" },
   { clave: "encontrada", etiqueta: "Encontradas", tipo: "encontrada", estado: "" },
-  { clave: "reunidas", etiqueta: "Ya aparecieron 🎉", tipo: "", estado: "resuelto" },
+  {
+    clave: "reunidas",
+    etiqueta: "Ya aparecieron",
+    icono: "sparkles",
+    tipo: "",
+    estado: "resuelto",
+  },
 ];
 
 export default function Filtros({
@@ -75,7 +88,7 @@ export default function Filtros({
               key={p.clave}
               type="button"
               onClick={() => actualizar({ tipo: p.tipo, estado: p.estado })}
-              className={`whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-bold transition ${
+              className={`inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-bold transition ${
                 pestanaActual === p.clave
                   ? p.clave === "reunidas"
                     ? "bg-encontrada text-white"
@@ -84,6 +97,7 @@ export default function Filtros({
               }`}
             >
               {p.etiqueta}
+              {p.icono && <Icono nombre={p.icono} />}
             </button>
           ))}
         </div>
@@ -97,9 +111,10 @@ export default function Filtros({
             aria-label="Filtrar por tipo de mascota"
           >
             <option value="">Perros y gatos</option>
+            {/* En un <option> solo cabe texto plano: la especie va sin icono. */}
             {ESPECIES.map((e) => (
               <option key={e.valor} value={e.valor}>
-                {e.etiqueta} {e.emoji}
+                {e.etiqueta}
               </option>
             ))}
           </select>

@@ -38,7 +38,7 @@ export async function POST(request: NextRequest, { params }: Contexto) {
     }
     if (reporte.estado === "resuelto") {
       return NextResponse.json(
-        { error: "Esta mascota ya apareció, no hacen falta más pistas. 🎉" },
+        { error: "Esta mascota ya apareció, no hacen falta más pistas." },
         { status: 409 },
       );
     }

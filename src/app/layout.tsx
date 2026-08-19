@@ -5,6 +5,7 @@ import Analytics from "@/components/Analytics";
 import AvisoLegal from "@/components/AvisoLegal";
 import BotonSoporte from "@/components/BotonSoporte";
 import DatosEstructurados from "@/components/DatosEstructurados";
+import Icono from "@/components/Icono";
 import Isotipo from "@/components/Isotipo";
 import MenuMovil from "@/components/MenuMovil";
 import Vitals from "@/components/Vitals";
@@ -101,14 +102,14 @@ export default function RootLayout({
                 href="/consejos"
                 className="hidden rounded-lg px-3 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-marca-oscuro lg:inline-block"
               >
-                Consejos <span aria-hidden="true">🔎</span>
+                Consejos <Icono nombre="buscar" className="h-[1em] w-[1em]" />
               </Link>
 
               <Link
                 href="/ayudar"
                 className="hidden rounded-lg px-3 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-marca-oscuro lg:inline-block"
               >
-                Ayudar <span aria-hidden="true">💚</span>
+                Ayudar <Icono nombre="corazon" className="h-[1em] w-[1em]" />
               </Link>
 
               {/* Dos CTA: adopción va en secundario para no restarle fuerza a
@@ -152,13 +153,15 @@ export default function RootLayout({
                 href="/consejos/perdida"
                 className="font-bold text-marca underline underline-offset-2"
               >
-                Cómo buscar una mascota perdida 🔎
+                Cómo buscar una mascota perdida{" "}
+                <Icono nombre="buscar" className="h-[1em] w-[1em]" />
               </Link>
               <Link
                 href="/consejos/encontrada"
                 className="font-bold text-marca underline underline-offset-2"
               >
-                Me encontré una mascota 🤲
+                Me encontré una mascota{" "}
+                <Icono nombre="mano" className="h-[1em] w-[1em]" />
               </Link>
             </p>
             <p className="mt-3">
@@ -166,7 +169,8 @@ export default function RootLayout({
                 href="/ayudar"
                 className="font-bold text-marca underline underline-offset-2"
               >
-                Fundaciones y albergues que necesitan ayuda 💚
+                Fundaciones y albergues que necesitan ayuda{" "}
+                <Icono nombre="corazon" className="h-[1em] w-[1em]" />
               </Link>
             </p>
             <p className="mt-3">
@@ -201,7 +205,8 @@ export default function RootLayout({
                 rel="noopener noreferrer"
                 className="font-bold text-marca underline underline-offset-2 hover:text-marca-oscuro"
               >
-                Reportar un problema 💬
+                Reportar un problema{" "}
+                <Icono nombre="chat" className="h-[1em] w-[1em]" />
               </a>
             </p>
             <p className="mt-1.5">

@@ -1,3 +1,5 @@
+import type { NombreIcono } from "@/components/Icono";
+
 import type { Especie, Sexo, Tamano } from "./tipos";
 
 export type EdadAdopcion = "cachorro" | "joven" | "adulto" | "mayor";
@@ -41,9 +43,9 @@ export type Adopcion = {
 
 export type NuevaAdopcion = Omit<Adopcion, "id" | "estado" | "created_at">;
 
-export const ESPECIES_ADOPCION: { valor: EspecieAdopcion; etiqueta: string; emoji: string }[] = [
-  { valor: "perro", etiqueta: "Perro", emoji: "🐶" },
-  { valor: "gato", etiqueta: "Gato", emoji: "🐱" },
+export const ESPECIES_ADOPCION: { valor: EspecieAdopcion; etiqueta: string; icono: NombreIcono }[] = [
+  { valor: "perro", etiqueta: "Perro", icono: "perro" },
+  { valor: "gato", etiqueta: "Gato", icono: "gato" },
 ];
 
 export const EDADES: { valor: EdadAdopcion; etiqueta: string; pista: string }[] = [
@@ -65,10 +67,10 @@ export const VACUNAS: { valor: Vacunas; etiqueta: string }[] = [
   { valor: "no_se", etiqueta: "No sé" },
 ];
 
-export const CONVIVENCIAS: { valor: Convivencia; etiqueta: string; emoji: string }[] = [
-  { valor: "ninos", etiqueta: "Niños", emoji: "🧒" },
-  { valor: "perros", etiqueta: "Otros perros", emoji: "🐶" },
-  { valor: "gatos", etiqueta: "Gatos", emoji: "🐱" },
+export const CONVIVENCIAS: { valor: Convivencia; etiqueta: string; icono: NombreIcono }[] = [
+  { valor: "ninos", etiqueta: "Niños", icono: "nino" },
+  { valor: "perros", etiqueta: "Otros perros", icono: "perro" },
+  { valor: "gatos", etiqueta: "Gatos", icono: "gato" },
 ];
 
 export const ESTADOS_ADOPCION: { valor: EstadoAdopcion; etiqueta: string }[] = [

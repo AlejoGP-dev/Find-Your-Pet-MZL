@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Icono from "@/components/Icono";
 import {
   distanciaKm,
   formatearDistancia,
@@ -168,9 +169,17 @@ export default function CercaDeMi({
       <div className="mb-5 rounded-2xl border border-marca/30 bg-marca-suave p-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <p className="font-extrabold text-marca-oscuro">
-            {dentroDelRadio.length === 0
-              ? `Ninguna a menos de ${radio} km`
-              : `${dentroDelRadio.length} ${dentroDelRadio.length === 1 ? "mascota" : "mascotas"} a menos de ${radio} km de ti 📍`}
+            {dentroDelRadio.length === 0 ? (
+              `Ninguna a menos de ${radio} km`
+            ) : (
+              <>
+                {`${dentroDelRadio.length} ${dentroDelRadio.length === 1 ? "mascota" : "mascotas"} a menos de ${radio} km de ti`}{" "}
+                <Icono
+                  nombre="ubicacion"
+                  className="h-[1em] w-[1em]"
+                />
+              </>
+            )}
           </p>
           <button
             type="button"
@@ -224,9 +233,13 @@ export default function CercaDeMi({
         disabled={estado.paso === "pidiendo"}
         className="boton-secundario w-full justify-center border-marca/40 text-marca sm:w-auto disabled:opacity-60"
       >
-        {estado.paso === "pidiendo"
-          ? "Buscando tu ubicación…"
-          : "Ver las que están cerca de mí 📍"}
+        {estado.paso === "pidiendo" ? (
+          "Buscando tu ubicación…"
+        ) : (
+          <>
+            Ver las que están cerca de mí <Icono nombre="ubicacion" />
+          </>
+        )}
       </button>
       {estado.paso === "error" && (
         <p className="mt-2 text-sm text-stone-600">{estado.mensaje}</p>

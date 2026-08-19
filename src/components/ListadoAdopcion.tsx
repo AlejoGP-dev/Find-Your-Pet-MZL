@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import Contador from "@/components/Contador";
 import FiltrosAdopcion from "@/components/FiltrosAdopcion";
+import Icono, { type NombreIcono } from "@/components/Icono";
 import TarjetaAdopcion from "@/components/TarjetaAdopcion";
 import {
   contarAdopciones,
@@ -68,7 +69,15 @@ export default async function ListadoAdopcion({
   const ciudadesConAdopciones = ciudadesDesdeConteo(porCiudad);
   const ciudadesDestacadas = ciudadesConAdopciones.filter((c) => c.slug).slice(0, 12);
 
-  const cajas = [
+  const cajas: {
+    n: number;
+    texto: string;
+    icono?: NombreIcono;
+    color: string;
+    activa: boolean;
+    anillo: string;
+    href: string;
+  }[] = [
     {
       n: totales.disponibles,
       texto: "En adopción",
@@ -79,7 +88,8 @@ export default async function ListadoAdopcion({
     },
     {
       n: totales.adoptadas,
-      texto: "Ya tienen hogar 🎉",
+      texto: "Ya tienen hogar",
+      icono: "sparkles",
       color: "text-encontrada",
       activa: viendoAdoptadas,
       anillo: "ring-encontrada",
@@ -92,7 +102,8 @@ export default async function ListadoAdopcion({
       <section className="border-b border-stone-200 bg-linear-to-b from-marca-suave to-crema">
         <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14 md:text-center">
           <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-marca-oscuro shadow-sm">
-            Adopción · {zona} 🏡
+            Adopción · {zona}
+            <Icono nombre="hogar" />
           </p>
           <h1 className="max-w-2xl text-3xl font-extrabold leading-tight text-stone-900 sm:text-4xl md:mx-auto">
             {ciudad
@@ -110,13 +121,15 @@ export default async function ListadoAdopcion({
               href={`/adopcion/publicar${ciudad ? `?ciudad=${ciudad.slug}` : ""}`}
               className="boton-primario"
             >
-              Dar en adopción 🏡
+              Dar en adopción
+              <Icono nombre="hogar" />
             </Link>
             <Link
               href="/consejos/adoptar"
               className="boton-secundario border-marca/40 text-marca"
             >
-              Antes de adoptar 📖
+              Antes de adoptar
+              <Icono nombre="libro" />
             </Link>
           </div>
 
@@ -136,8 +149,9 @@ export default async function ListadoAdopcion({
                   hasta={d.n}
                   className={`block text-2xl font-extrabold tabular-nums sm:text-3xl ${d.color}`}
                 />
-                <span className="mt-0.5 block text-xs leading-tight text-stone-600 sm:text-sm">
+                <span className="mt-0.5 flex items-center justify-center gap-1 text-xs leading-tight text-stone-600 sm:text-sm">
                   {d.texto}
+                  {d.icono && <Icono nombre={d.icono} />}
                 </span>
               </Link>
             ))}
@@ -157,7 +171,11 @@ export default async function ListadoAdopcion({
                 ciudad ? "bg-stone-100 text-stone-600 hover:bg-stone-200" : "bg-marca text-white"
               }`}
             >
-              Todo el país 🇨🇴
+              Todo el país{" "}
+              <Icono
+                nombre="pais"
+                className="h-[1em] w-[1em]"
+              />
             </Link>
             {ciudadesDestacadas.map((c) => (
               <Link
@@ -182,8 +200,9 @@ export default async function ListadoAdopcion({
         </Suspense>
 
         {viendoAdoptadas && lista.length > 0 && (
-          <p className="mt-5 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
-            Estas mascotas ya encontraron su familia. 🎉
+          <p className="mt-5 flex items-center justify-center gap-2 rounded-2xl border border-encontrada/30 bg-encontrada-suave p-4 text-center font-bold text-encontrada">
+            Estas mascotas ya encontraron su familia.
+            <Icono nombre="sparkles" />
           </p>
         )}
 
@@ -194,7 +213,10 @@ export default async function ListadoAdopcion({
           </div>
         ) : lista.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center">
-            <p className="text-4xl">{viendoAdoptadas ? "🎉" : "🏡"}</p>
+            <Icono
+              nombre={viendoAdoptadas ? "sparkles" : "hogar"}
+              className="mx-auto h-10 w-10 text-stone-400"
+            />
             <p className="mt-3 text-lg font-bold text-stone-800">
               {viendoAdoptadas
                 ? "Todavía no hay adopciones cerradas."
@@ -233,7 +255,11 @@ export default async function ListadoAdopcion({
       <section className="mx-auto w-full max-w-5xl px-4 pb-14">
         <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-6">
           <h2 className="text-lg font-extrabold text-stone-900">
-            ¿Te encontraste esta mascota en la calle? ⚠️
+            ¿Te encontraste esta mascota en la calle?{" "}
+            <Icono
+              nombre="alerta"
+              className="h-[1em] w-[1em]"
+            />
           </h2>
           <p className="mt-2 text-stone-700">
             Antes de darla en adopción, publícala como <strong>encontrada</strong> y

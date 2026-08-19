@@ -1,3 +1,5 @@
+import type { NombreIcono } from "@/components/Icono";
+
 /**
  * Guías de búsqueda y rescate.
  *
@@ -17,7 +19,7 @@ export type Paso = {
 
 export type Bloque = {
   id: string;
-  emoji: string;
+  icono: NombreIcono;
   titulo: string;
   entradilla?: string;
   pasos: Paso[];
@@ -43,7 +45,7 @@ const PERDIDA: Guia = {
   bloques: [
     {
       id: "primeras-horas",
-      emoji: "⏱️",
+      icono: "reloj",
       titulo: "Las primeras horas",
       entradilla:
         "El error más común es quedarse en casa esperando a que alguien llame.",
@@ -73,7 +75,7 @@ const PERDIDA: Guia = {
     },
     {
       id: "gato",
-      emoji: "🐱",
+      icono: "gato",
       titulo: "Si es un gato",
       entradilla:
         "Los gatos casi nunca se van lejos. Se esconden y se quedan callados, y por eso la gente cree que desaparecieron.",
@@ -109,7 +111,7 @@ const PERDIDA: Guia = {
     },
     {
       id: "perro",
-      emoji: "🐶",
+      icono: "perro",
       titulo: "Si es un perro",
       entradilla:
         "Qué tan lejos llega depende menos del tamaño y más del carácter.",
@@ -139,7 +141,7 @@ const PERDIDA: Guia = {
     },
     {
       id: "difusion",
-      emoji: "📣",
+      icono: "megafono",
       titulo: "Que lo vea la mayor cantidad de gente",
       pasos: [
         {
@@ -166,7 +168,7 @@ const PERDIDA: Guia = {
     },
     {
       id: "sismo",
-      emoji: "🏚️",
+      icono: "sismo",
       titulo: "Después del sismo",
       entradilla:
         "Un temblor cambia el patrón normal de búsqueda y vale la pena tenerlo en cuenta.",
@@ -185,7 +187,7 @@ const PERDIDA: Guia = {
     },
     {
       id: "estafas",
-      emoji: "🚩",
+      icono: "bandera",
       titulo: "Cuidado con las estafas",
       alerta: true,
       pasos: [
@@ -219,7 +221,7 @@ const ENCONTRADA: Guia = {
   bloques: [
     {
       id: "acercarse",
-      emoji: "🤲",
+      icono: "mano",
       titulo: "Cómo acercarte sin espantarlo",
       entradilla:
         "Un animal perdido está en pánico, aunque en su casa sea el más cariñoso.",
@@ -248,7 +250,7 @@ const ENCONTRADA: Guia = {
     },
     {
       id: "identificar",
-      emoji: "🔎",
+      icono: "buscar",
       titulo: "Busca de quién es",
       pasos: [
         {
@@ -275,7 +277,7 @@ const ENCONTRADA: Guia = {
     },
     {
       id: "publicar",
-      emoji: "📝",
+      icono: "documento",
       titulo: "Publica el reporte, pero guárdate un detalle",
       alerta: true,
       pasos: [
@@ -299,7 +301,7 @@ const ENCONTRADA: Guia = {
     },
     {
       id: "mientras",
-      emoji: "🏠",
+      icono: "casa",
       titulo: "Mientras aparece la familia",
       pasos: [
         {
@@ -327,7 +329,7 @@ const ENCONTRADA: Guia = {
     },
     {
       id: "entregar",
-      emoji: "🤝",
+      icono: "acuerdo",
       titulo: "Entregarlo con seguridad",
       alerta: true,
       pasos: [
@@ -367,7 +369,7 @@ const ADOPTAR: Guia = {
   bloques: [
     {
       id: "antes",
-      emoji: "🤔",
+      icono: "pensar",
       titulo: "Antes de escribir por WhatsApp",
       entradilla:
         "Cinco preguntas honestas. Si alguna te hace dudar, quizá todavía no es el momento — y está bien.",
@@ -402,7 +404,7 @@ const ADOPTAR: Guia = {
     },
     {
       id: "preguntar",
-      emoji: "💬",
+      icono: "chat",
       titulo: "Qué preguntarle a quien la entrega",
       pasos: [
         {
@@ -434,7 +436,7 @@ const ADOPTAR: Guia = {
     },
     {
       id: "seguridad",
-      emoji: "🛡️",
+      icono: "escudo",
       titulo: "Que la adopción sea segura",
       alerta: true,
       pasos: [
@@ -463,7 +465,7 @@ const ADOPTAR: Guia = {
     },
     {
       id: "primeros-dias",
-      emoji: "🏠",
+      icono: "casa",
       titulo: "Los primeros días en casa",
       pasos: [
         {

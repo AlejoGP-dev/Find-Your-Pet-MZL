@@ -2,6 +2,8 @@
 
 import { getImageProps } from "next/image";
 import { useState } from "react";
+import Icono from "@/components/Icono";
+import type { NombreIcono } from "@/components/Icono";
 import InnerImageZoom from "react-inner-image-zoom";
 import "react-inner-image-zoom/lib/styles.min.css";
 
@@ -22,13 +24,13 @@ const MAS_ANCHA = 1.9;
 export default function FotoMascota({
   src,
   alt,
-  emoji = "🐾",
+  icono = "huella",
   ancho = null,
   alto = null,
 }: {
   src: string | null;
   alt: string;
-  emoji?: string;
+  icono?: NombreIcono;
   /** WPO-003: medidas reales guardadas al publicar. Con ellas la caja reserva
    *  la proporción exacta y la foto no salta ni queda con franjas. */
   ancho?: number | null;
@@ -44,8 +46,8 @@ export default function FotoMascota({
 
   if (!src) {
     return (
-      <div className="grid aspect-4/3 w-full place-items-center bg-stone-100 text-7xl opacity-40">
-        {emoji}
+      <div className="grid aspect-4/3 w-full place-items-center bg-stone-100 opacity-40">
+        <Icono nombre={icono} className="h-18 w-18" />
       </div>
     );
   }

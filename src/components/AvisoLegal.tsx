@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import Icono from "@/components/Icono";
 import { enlaceSoporte } from "@/lib/legal";
 
 const CLAVE = "fyp-aviso-legal-visto";
@@ -43,9 +44,7 @@ export default function AvisoLegal() {
   return (
     <div className="aviso-legal border-b border-amber-300 bg-amber-50 text-amber-950">
       <div className="mx-auto flex w-full max-w-5xl items-start gap-3 px-4 py-2.5">
-        <span aria-hidden="true" className="mt-0.5 shrink-0 text-base">
-          ⚠️
-        </span>
+        <Icono nombre="alerta" className="mt-0.5 h-5 w-5 shrink-0" />
 
         <div className="min-w-0 flex-1 text-sm leading-snug">
           <p>

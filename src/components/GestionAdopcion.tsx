@@ -76,7 +76,7 @@ export default function GestionAdopcion({
           >
             <option value="disponible">Sigue disponible</option>
             <option value="reservado">Reservada — alguien está en proceso</option>
-            <option value="adoptado">Ya tiene hogar 🎉</option>
+            <option value="adoptado">Ya tiene hogar</option>
           </select>
 
           {error && (

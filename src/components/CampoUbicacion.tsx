@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Icono from "@/components/Icono";
 import { redondearCoordenada, dentroDeColombia } from "@/lib/geo";
 
 type Estado =
@@ -65,8 +66,8 @@ export default function CampoUbicacion() {
       <div className="rounded-xl border border-marca/30 bg-marca-suave p-4">
         <input type="hidden" name="lat" value={estado.lat} />
         <input type="hidden" name="lng" value={estado.lng} />
-        <p className="text-sm font-bold text-marca-oscuro">
-          Ubicación agregada 📍
+        <p className="flex items-center gap-1.5 text-sm font-bold text-marca-oscuro">
+          Ubicación agregada <Icono nombre="ubicacion" />
         </p>
         <p className="mt-1 text-sm text-stone-600">
           Se guarda aproximada, con un margen de unos 100 metros — nunca la
@@ -100,7 +101,13 @@ export default function CampoUbicacion() {
         disabled={estado.paso === "pidiendo"}
         className="boton-secundario mt-3 disabled:opacity-60"
       >
-        {estado.paso === "pidiendo" ? "Buscando…" : "Usar mi ubicación 📍"}
+        {estado.paso === "pidiendo" ? (
+          "Buscando…"
+        ) : (
+          <>
+            Usar mi ubicación <Icono nombre="ubicacion" />
+          </>
+        )}
       </button>
       {estado.paso === "error" && (
         <p className="mt-2 text-sm text-stone-600">{estado.mensaje}</p>

@@ -2,13 +2,24 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
+import Icono, { type NombreIcono } from "@/components/Icono";
 import { EDADES, ESPECIES_ADOPCION } from "@/lib/adopciones";
 import type { CiudadConReportes } from "@/lib/ciudades";
 import { TAMANOS, type Ciudad } from "@/lib/tipos";
 
-const PESTANAS = [
+const PESTANAS: {
+  clave: string;
+  etiqueta: string;
+  icono?: NombreIcono;
+  estado: string;
+}[] = [
   { clave: "disponible", etiqueta: "Disponibles", estado: "" },
-  { clave: "adoptado", etiqueta: "Ya tienen hogar 🎉", estado: "adoptado" },
+  {
+    clave: "adoptado",
+    etiqueta: "Ya tienen hogar",
+    icono: "sparkles",
+    estado: "adoptado",
+  },
 ];
 
 export default function FiltrosAdopcion({
@@ -59,7 +70,7 @@ export default function FiltrosAdopcion({
               key={p.clave}
               type="button"
               onClick={() => actualizar({ estado: p.estado })}
-              className={`whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-bold transition ${
+              className={`inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-bold transition ${
                 (estadoActual === "adoptado" ? "adoptado" : "disponible") === p.clave
                   ? p.clave === "adoptado"
                     ? "bg-encontrada text-white"
@@ -68,6 +79,7 @@ export default function FiltrosAdopcion({
               }`}
             >
               {p.etiqueta}
+              {p.icono && <Icono nombre={p.icono} />}
             </button>
           ))}
         </div>
@@ -80,9 +92,10 @@ export default function FiltrosAdopcion({
             aria-label="Filtrar por tipo de mascota"
           >
             <option value="">Perros y gatos</option>
+            {/* En un <option> solo cabe texto plano: la especie va sin icono. */}
             {ESPECIES_ADOPCION.map((e) => (
               <option key={e.valor} value={e.valor}>
-                {e.etiqueta} {e.emoji}
+                {e.etiqueta}
               </option>
             ))}
           </select>

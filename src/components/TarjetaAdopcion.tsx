@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Icono from "@/components/Icono";
 import {
   EDADES,
   ESPECIES_ADOPCION,
@@ -49,8 +50,8 @@ export default function TarjetaAdopcion({
             className="object-cover transition duration-300 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="grid h-full w-full place-items-center text-5xl opacity-40">
-            {especie?.emoji ?? "🐾"}
+          <div className="grid h-full w-full place-items-center opacity-40">
+            <Icono nombre={especie?.icono ?? "huella"} className="h-12 w-12" />
           </div>
         )}
 
@@ -66,16 +67,18 @@ export default function TarjetaAdopcion({
             </span>
           )}
           {adopcion.es_fundacion && (
-            <span className="rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-marca-oscuro shadow-sm">
-              Fundación 🏛️
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-marca-oscuro shadow-sm">
+              Fundación
+              <Icono nombre="institucion" />
             </span>
           )}
         </div>
 
         {adopcion.estado === "adoptado" && (
           <div className="absolute inset-0 grid place-items-center bg-encontrada/80">
-            <span className="rounded-full bg-white px-4 py-2 text-sm font-extrabold text-encontrada">
-              ¡Ya tiene hogar! 🎉
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-extrabold text-encontrada">
+              ¡Ya tiene hogar!
+              <Icono nombre="sparkles" />
             </span>
           </div>
         )}
@@ -88,9 +91,10 @@ export default function TarjetaAdopcion({
         {detalles.length > 0 && (
           <p className="text-sm text-stone-600">{detalles.join(" · ")}</p>
         )}
-        <p className="mt-auto pt-2 text-sm font-semibold text-marca">
+        <p className="mt-auto flex items-center gap-1.5 pt-2 text-sm font-semibold text-marca">
           {adopcion.barrio}
-          {mostrarCiudad && adopcion.ciudad ? `, ${adopcion.ciudad}` : ""} 📍
+          {mostrarCiudad && adopcion.ciudad ? `, ${adopcion.ciudad}` : ""}
+          <Icono nombre="ubicacion" className="h-[1em] w-[1em] shrink-0" />
         </p>
       </div>
     </Link>

@@ -3,24 +3,30 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import Icono, { type NombreIcono } from "@/components/Icono";
 
-const OPCIONES = [
-  { href: "/", emoji: "🏠", texto: "Inicio", detalle: "Todos los reportes" },
+const OPCIONES: {
+  href: string;
+  icono: NombreIcono;
+  texto: string;
+  detalle: string;
+}[] = [
+  { href: "/", icono: "casa", texto: "Inicio", detalle: "Todos los reportes" },
   {
     href: "/adopcion",
-    emoji: "🏡",
+    icono: "hogar",
     texto: "Adopción",
     detalle: "Perros y gatos que buscan familia",
   },
   {
     href: "/consejos",
-    emoji: "🔎",
+    icono: "buscar",
     texto: "Guías de búsqueda",
     detalle: "Qué hacer si se perdió o si te encontraste una",
   },
   {
     href: "/ayudar",
-    emoji: "💚",
+    icono: "corazon",
     texto: "Fundaciones y albergues",
     detalle: "Quiénes necesitan ayuda y cómo aportar",
   },
@@ -115,7 +121,11 @@ export default function MenuMovil() {
                       activa ? "text-marca-oscuro" : "text-stone-800"
                     }`}
                   >
-                    {o.texto} <span aria-hidden="true">{o.emoji}</span>
+                    {o.texto}{" "}
+                    <Icono
+                      nombre={o.icono}
+                      className="h-[1em] w-[1em]"
+                    />
                   </span>
                   <span className="mt-0.5 block text-xs leading-snug text-stone-500">
                     {o.detalle}

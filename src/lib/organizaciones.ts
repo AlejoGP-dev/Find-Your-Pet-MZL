@@ -1,3 +1,5 @@
+import type { NombreIcono } from "@/components/Icono";
+
 export type Enlace = { etiqueta: string; url: string; icono: string };
 
 export type Organizacion = {
@@ -368,13 +370,13 @@ export const GRUPOS_DIFUSION: { nombre: string; url: string; miembros?: string }
 ];
 
 /** Lo que más les hace falta en el día a día. */
-export const NECESIDADES = [
-  { emoji: "🍖", texto: "Alimento (perro y gato)" },
-  { emoji: "🧴", texto: "Implementos de aseo" },
-  { emoji: "🐈", texto: "Arena para gatos" },
-  { emoji: "💊", texto: "Antipulgas" },
-  { emoji: "🪱", texto: "Desparasitante" },
-  { emoji: "🛏️", texto: "Cobijas y camas" },
-  { emoji: "💵", texto: "Aportes para veterinaria" },
-  { emoji: "🚗", texto: "Transporte y voluntariado" },
+export const NECESIDADES: { icono: NombreIcono; texto: string }[] = [
+  { icono: "comida", texto: "Alimento (perro y gato)" },
+  { icono: "aseo", texto: "Implementos de aseo" },
+  { icono: "arena", texto: "Arena para gatos" },
+  { icono: "medicina", texto: "Antipulgas" },
+  { icono: "gota", texto: "Desparasitante" },
+  { icono: "cama", texto: "Cobijas y camas" },
+  { icono: "dinero", texto: "Aportes para veterinaria" },
+  { icono: "transporte", texto: "Transporte y voluntariado" },
 ];
