@@ -164,7 +164,9 @@ export default async function ListadoAdopcion({
           <p className="text-xs font-bold uppercase tracking-wide text-stone-500">
             {ciudad ? "Cambiar de ciudad" : "Elige tu ciudad"}
           </p>
-          <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+          {/* Mismo criterio que en el listado de reportes: fila deslizable en
+              móvil, chips en varias líneas en escritorio. */}
+          <div className="mt-2 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:gap-y-2 sm:overflow-x-visible sm:pb-0">
             <Link
               href="/adopcion"
               className={`shrink-0 rounded-full px-3.5 py-2 text-sm font-bold transition ${

@@ -309,7 +309,11 @@ export default async function Portada({
           <p className="text-xs font-bold uppercase tracking-wide text-stone-500">
             {ciudad ? "Cambiar de ciudad" : "Elige tu ciudad"}
           </p>
-          <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+          {/* En móvil los chips van en una sola fila que se desliza con el
+              dedo, que es el gesto natural ahí. En escritorio se acomodan en
+              varias líneas: al abrirlos a todas las ciudades ya no caben en
+              una fila y aparecía una barra de scroll horizontal atravesada. */}
+          <div className="mt-2 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:gap-y-2 sm:overflow-x-visible sm:pb-0">
             <Link
               href="/"
               className={`shrink-0 rounded-full px-3.5 py-2 text-sm font-bold transition ${
