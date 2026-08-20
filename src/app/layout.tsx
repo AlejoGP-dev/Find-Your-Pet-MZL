@@ -81,8 +81,10 @@ export default function RootLayout({
         >
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-3">
             <Link href="/" className="flex items-center gap-2.5">
+              {/* El isotipo va a 9/11 del cuadro: con menos, el corazón queda
+                  nadando en verde y el lockup no se lee como el de la marca. */}
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-marca text-crema">
-                <Isotipo className="h-7 w-7" />
+                <Isotipo className="h-9 w-9" />
               </span>
               <span className="leading-tight">
                 <span className="block text-sm font-extrabold tracking-tight text-marca-oscuro min-[400px]:text-base sm:text-lg">
