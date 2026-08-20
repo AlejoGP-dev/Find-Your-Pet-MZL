@@ -23,7 +23,8 @@ const nextConfig: NextConfig = {
   },
 
   /**
-   * El dominio viejo manda al nuevo, con 301 y conservando la ruta.
+   * El dominio viejo manda al nuevo, con redirección permanente y conservando
+   * la ruta.
    *
    * Los afiches que circulan por WhatsApp, la nota de Semana y la de El
    * Espectador apuntan al .vercel.app. Sin esto, esa autoridad se queda en un

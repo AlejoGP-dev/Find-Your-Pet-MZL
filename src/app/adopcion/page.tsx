@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { ogPagina } from "@/lib/seo";
 import ListadoAdopcion from "@/components/ListadoAdopcion";
 import { contarAdopciones } from "@/lib/almacen";
-import { ogPagina } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 

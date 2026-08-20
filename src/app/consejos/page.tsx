@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ogPagina } from "@/lib/seo";
 import Link from "next/link";
+import Icono from "@/components/Icono";
 import { GUIAS } from "@/lib/consejos";
 
 export const metadata: Metadata = {
@@ -18,21 +19,21 @@ export const metadata: Metadata = {
 
 const ESTILO = {
   perdida: {
-    emoji: "😿",
+    icono: "perdida",
     titulo: "Se me perdió una mascota",
     borde: "border-perdida/30 hover:border-perdida",
     fondo: "bg-perdida-suave",
     texto: "text-perdida",
   },
   encontrada: {
-    emoji: "🐕",
+    icono: "encontrada",
     titulo: "Me encontré una mascota",
     borde: "border-encontrada/30 hover:border-encontrada",
     fondo: "bg-encontrada-suave",
     texto: "text-encontrada",
   },
   adoptar: {
-    emoji: "🏡",
+    icono: "hogar",
     titulo: "Quiero adoptar",
     borde: "border-marca/30 hover:border-marca",
     fondo: "bg-marca-suave",
@@ -69,7 +70,7 @@ export default function IndiceConsejos() {
               className={`flex flex-col rounded-2xl border-2 p-6 transition ${e.borde} ${e.fondo}`}
             >
               <span className={`text-xl font-extrabold ${e.texto}`}>
-                {e.titulo} {e.emoji}
+                {e.titulo} <Icono nombre={e.icono} className="h-[1em] w-[1em]" />
               </span>
               <span className="mt-2 flex-1 text-stone-700">{g.intro}</span>
               <span className="mt-4 flex flex-wrap gap-1.5">
@@ -78,7 +79,8 @@ export default function IndiceConsejos() {
                     key={b.id}
                     className="rounded-full bg-white/70 px-2.5 py-1 text-xs font-bold text-stone-700"
                   >
-                    {b.titulo} {b.emoji}
+                    {b.titulo}{" "}
+                    <Icono nombre={b.icono} className="h-[1em] w-[1em]" />
                   </span>
                 ))}
               </span>

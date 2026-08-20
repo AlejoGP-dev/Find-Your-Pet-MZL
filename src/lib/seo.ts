@@ -18,41 +18,6 @@ export const SITIO =
   process.env.NEXT_PUBLIC_SITIO?.replace(/\/$/, "") || "https://find-your-pet.co";
 
 /**
- * El dominio de Vercel donde vivió el sitio hasta agosto de 2026.
- *
- * Sigue sirviendo el mismo contenido, así que sin una redirección permanente
- * quedarían dos sitios idénticos compitiendo entre sí y la autoridad que ya
- * ganó este —enlaces en grupos de WhatsApp, la nota de Semana, El Espectador—
- * se quedaría en el dominio que vamos a dejar de usar.
- */
-export const DOMINIO_ANTERIOR = "find-your-pet-mzl.vercel.app";
-
-/**
- * Umbrales de indexación. Existen para no publicar páginas vacías: una ciudad
- * sin reportes se le muestra igual al usuario, pero no se le ofrece a Google
- * como si tuviera contenido.
- *
- * Con los datos de hoy, `ciudad: 3` deja indexables Manizales, Villamaría y
- * Pereira, y deja fuera las que están en 0 o 1. Se ajusta acá, no por el código.
- */
-export const UMBRAL = {
-  /** Reportes activos mínimos para que una ciudad sea indexable. */
-  ciudad: 3,
-  /** Publicaciones mínimas para que una ciudad de adopción sea indexable. */
-  adopcionCiudad: 1,
-} as const;
-
-/**
- * Días tras los cuales un reporte activo deja de ofrecerse a Google.
- *
- * DESACTIVADO a propósito (0 = nunca caduca). Los reportes del sismo del 10 de
- * agosto de 2026 saldrían todos del índice a la vez al cumplir el plazo, y esa
- * es una decisión del responsable del proyecto, no del código. Para activarlo,
- * poner 90 (o 180 si se prefiere más margen).
- */
-export const DIAS_CADUCIDAD = 0;
-
-/**
  * Open Graph de una página, completo y apuntando a sí misma.
  *
  * Next REEMPLAZA el objeto `openGraph` del layout en vez de mezclarlo. Por eso
@@ -81,6 +46,31 @@ export function ogPagina({
     url: ruta,
   } as const;
 }
+
+/**
+ * Umbrales de indexación. Existen para no publicar páginas vacías: una ciudad
+ * sin reportes se le muestra igual al usuario, pero no se le ofrece a Google
+ * como si tuviera contenido.
+ *
+ * Con los datos de hoy, `ciudad: 3` deja indexables Manizales, Villamaría y
+ * Pereira, y deja fuera las que están en 0 o 1. Se ajusta acá, no por el código.
+ */
+export const UMBRAL = {
+  /** Reportes activos mínimos para que una ciudad sea indexable. */
+  ciudad: 3,
+  /** Publicaciones mínimas para que una ciudad de adopción sea indexable. */
+  adopcionCiudad: 1,
+} as const;
+
+/**
+ * Días tras los cuales un reporte activo deja de ofrecerse a Google.
+ *
+ * DESACTIVADO a propósito (0 = nunca caduca). Los reportes del sismo del 10 de
+ * agosto de 2026 saldrían todos del índice a la vez al cumplir el plazo, y esa
+ * es una decisión del responsable del proyecto, no del código. Para activarlo,
+ * poner 90 (o 180 si se prefiere más margen).
+ */
+export const DIAS_CADUCIDAD = 0;
 
 /**
  * Recorta en el último espacio antes del límite, para que ninguna meta
