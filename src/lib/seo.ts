@@ -5,10 +5,27 @@
  * de constantes compartidas.
  */
 
-/** Dominio público canónico. Se cambia por entorno con NEXT_PUBLIC_SITIO. */
+/**
+ * Dominio público canónico. Todo lo que Google ve —canonical, Open Graph,
+ * sitemap, robots, JSON-LD— sale de acá.
+ *
+ * OJO con la variable de entorno: si en Vercel quedó apuntando al dominio
+ * viejo, manda ella y este valor no se usa. Tiene que apuntar al dominio
+ * propio o no existir. Un canonical equivocado es peor que no tener ninguno:
+ * le dice a Google que la página buena es otra.
+ */
 export const SITIO =
-  process.env.NEXT_PUBLIC_SITIO?.replace(/\/$/, "") ||
-  "https://find-your-pet-mzl.vercel.app";
+  process.env.NEXT_PUBLIC_SITIO?.replace(/\/$/, "") || "https://find-your-pet.co";
+
+/**
+ * El dominio de Vercel donde vivió el sitio hasta agosto de 2026.
+ *
+ * Sigue sirviendo el mismo contenido, así que sin una redirección permanente
+ * quedarían dos sitios idénticos compitiendo entre sí y la autoridad que ya
+ * ganó este —enlaces en grupos de WhatsApp, la nota de Semana, El Espectador—
+ * se quedaría en el dominio que vamos a dejar de usar.
+ */
+export const DOMINIO_ANTERIOR = "find-your-pet-mzl.vercel.app";
 
 /**
  * Umbrales de indexación. Existen para no publicar páginas vacías: una ciudad
@@ -34,6 +51,36 @@ export const UMBRAL = {
  * poner 90 (o 180 si se prefiere más margen).
  */
 export const DIAS_CADUCIDAD = 0;
+
+/**
+ * Open Graph de una página, completo y apuntando a sí misma.
+ *
+ * Next REEMPLAZA el objeto `openGraph` del layout en vez de mezclarlo. Por eso
+ * una página que solo declaraba `title` y `description` heredaba el `url: "/"`
+ * del layout y le decía a WhatsApp y a Facebook que la página compartida era
+ * la portada. Esta ayuda existe para que no haya que acordarse de repetir
+ * `siteName` y `locale` en cada ruta — que es justo lo que se olvida.
+ */
+export function ogPagina({
+  ruta,
+  titulo,
+  descripcion,
+  tipo = "website",
+}: {
+  ruta: string;
+  titulo: string;
+  descripcion: string;
+  tipo?: "website" | "article";
+}) {
+  return {
+    title: titulo,
+    description: descripcion,
+    siteName: "Find Your Pet CO",
+    locale: "es_CO",
+    type: tipo,
+    url: ruta,
+  } as const;
+}
 
 /**
  * Recorta en el último espacio antes del límite, para que ninguna meta

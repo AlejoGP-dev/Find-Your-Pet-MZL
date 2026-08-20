@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogPagina } from "@/lib/seo";
 import Link from "next/link";
 import { Lista, PaginaLegal, Punto } from "@/components/BloqueLegal";
 import { RESPONSABLE } from "@/lib/legal";
@@ -8,6 +9,12 @@ export const metadata: Metadata = {
   description:
     "Reglas de uso de Find Your Pet CO: qué hace y qué no hace la plataforma, cómo publicar, y de qué responde cada quien.",
   alternates: { canonical: "/terminos" },
+  openGraph: ogPagina({
+    ruta: "/terminos",
+    titulo: "Términos y condiciones",
+    descripcion:
+      "Reglas de uso de Find Your Pet CO: qué hace y qué no hace la plataforma, cómo publicar, y de qué responde cada quien.",
+  }),
 };
 
 export default function PaginaTerminos() {

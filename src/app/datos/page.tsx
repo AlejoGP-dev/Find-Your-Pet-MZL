@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { ogPagina } from "@/lib/seo";
 import Link from "next/link";
 import { Lista, PaginaLegal, Punto } from "@/components/BloqueLegal";
-import Icono from "@/components/Icono";
 import { RESPONSABLE, WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
 
 export const metadata: Metadata = {
@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   description:
     "Qué datos recogemos en Find Your Pet CO, para qué los usamos y cómo pedir que los corrijamos o los borremos. Ley 1581 de 2012.",
   alternates: { canonical: "/datos" },
+  openGraph: ogPagina({
+    ruta: "/datos",
+    titulo: "Tratamiento de datos personales",
+    descripcion:
+      "Qué datos recogemos en Find Your Pet CO, para qué los usamos y cómo pedir que los corrijamos o los borremos. Ley 1581 de 2012.",
+  }),
 };
 
 export default function PaginaDatos() {
@@ -19,8 +25,7 @@ export default function PaginaDatos() {
     >
       <section className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
         <h2 className="text-lg font-extrabold text-amber-950">
-          Lo más importante, de una{" "}
-          <Icono nombre="alerta" className="h-[1em] w-[1em]" />
+          Lo más importante, de una ⚠️
         </h2>
         <p className="mt-2 text-amber-950">
           <strong className="font-bold">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogPagina } from "@/lib/seo";
 import Link from "next/link";
 import { Suspense } from "react";
 import FormularioAdopcion from "@/components/FormularioAdopcion";
@@ -8,6 +9,12 @@ export const metadata: Metadata = {
   description:
     "Publica gratis un perro o gato que busca hogar en Colombia. Sin registro, con contacto directo por WhatsApp.",
   alternates: { canonical: "/adopcion/publicar" },
+  openGraph: ogPagina({
+    ruta: "/adopcion/publicar",
+    titulo: "Dar una mascota en adopción",
+    descripcion:
+      "Publica gratis un perro o gato que busca hogar en Colombia. Sin registro, con contacto directo por WhatsApp.",
+  }),
 };
 
 export default function PaginaPublicarAdopcion() {

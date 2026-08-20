@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ListadoAdopcion from "@/components/ListadoAdopcion";
 import { contarAdopciones } from "@/lib/almacen";
+import { ogPagina } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,12 @@ export async function generateMetadata(): Promise<Metadata> {
     description:
       "Mascotas que buscan hogar definitivo en Colombia. Adopción gratuita y contacto directo por WhatsApp con quien las está cuidando.",
     alternates: { canonical: "/adopcion" },
+    openGraph: ogPagina({
+      ruta: "/adopcion",
+      titulo: "Perros y gatos en adopción en Colombia",
+      descripcion:
+        "Mascotas que buscan hogar definitivo en Colombia. Adopción gratuita y contacto directo por WhatsApp con quien las está cuidando.",
+    }),
     robots: total > 0 ? undefined : { index: false, follow: true },
   };
 }

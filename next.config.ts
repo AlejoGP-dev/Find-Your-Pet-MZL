@@ -21,6 +21,35 @@ const nextConfig: NextConfig = {
     // 31 días de caché en el CDN antes de volver a pedirle el original a Supabase.
     minimumCacheTTL: 2678400,
   },
+
+  /**
+   * El dominio viejo manda al nuevo, con 301 y conservando la ruta.
+   *
+   * Los afiches que circulan por WhatsApp, la nota de Semana y la de El
+   * Espectador apuntan al .vercel.app. Sin esto, esa autoridad se queda en un
+   * dominio que vamos a abandonar y Google ve dos sitios idénticos.
+   *
+   * El `has` de host hace que solo aplique al dominio viejo exacto: los
+   * despliegues de vista previa (que tienen otro hostname) siguen navegables,
+   * que es justo lo que uno quiere para revisar un cambio antes de publicarlo.
+   */
+  async redirects() {
+    return [
+      {
+        source: "/:ruta*",
+        has: [{ type: "host", value: "find-your-pet-mzl.vercel.app" }],
+        destination: "https://find-your-pet.co/:ruta*",
+        permanent: true,
+      },
+      // Por si algún día se activa el www en el DNS: un solo host canónico.
+      {
+        source: "/:ruta*",
+        has: [{ type: "host", value: "www.find-your-pet.co" }],
+        destination: "https://find-your-pet.co/:ruta*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

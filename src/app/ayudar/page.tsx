@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { ogPagina } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
-import Icono, { type NombreIcono } from "@/components/Icono";
 import {
   CIUDADES_CON_ORGS,
   GRUPOS_DIFUSION,
@@ -16,15 +16,21 @@ export const metadata: Metadata = {
   description:
     "Fundaciones, albergues y personas que cuidan animales en Colombia. Qué necesitan y cómo contactarlas para ayudar.",
   alternates: { canonical: "/ayudar" },
+  openGraph: ogPagina({
+    ruta: "/ayudar",
+    titulo: "Fundaciones y albergues que necesitan ayuda",
+    descripcion:
+      "Fundaciones, albergues y personas que cuidan animales en Colombia. Qué necesitan y cómo contactarlas para ayudar.",
+  }),
 };
 
-const ICONOS: Record<string, NombreIcono> = {
-  instagram: "instagram",
-  tiktok: "musica",
-  whatsapp: "whatsapp",
-  facebook: "personas",
-  web: "web",
-  prensa: "prensa",
+const ICONOS: Record<string, string> = {
+  instagram: "📸",
+  tiktok: "🎵",
+  whatsapp: "💬",
+  facebook: "👥",
+  web: "🌐",
+  prensa: "📰",
 };
 
 export default function PaginaAyudar() {
@@ -55,7 +61,7 @@ export default function PaginaAyudar() {
               key={n.texto}
               className="rounded-full bg-marca-suave px-3.5 py-2 text-sm font-bold text-marca-oscuro"
             >
-              {n.texto} <Icono nombre={n.icono} className="h-[1em] w-[1em]" />
+              {n.texto} {n.emoji}
             </li>
           ))}
         </ul>
@@ -66,7 +72,7 @@ export default function PaginaAyudar() {
         return (
           <section key={ciudad} className="mt-8">
             <h2 className="text-xl font-extrabold text-stone-900">
-              {ciudad} <Icono nombre="ubicacion" className="h-[1em] w-[1em]" />
+              {ciudad} 📍
               <span className="ml-2 text-sm font-bold text-stone-400">
                 {orgs.length}
               </span>
@@ -108,21 +114,18 @@ export default function PaginaAyudar() {
                       </h3>
                       {org.zona && (
                         <p className="mt-0.5 text-sm font-semibold text-marca">
-                          {org.zona}{" "}
-                          <Icono nombre="ubicacion" className="h-[1em] w-[1em]" />
+                          {org.zona} 📍
                         </p>
                       )}
                       <div className="mt-1.5 flex flex-wrap gap-1.5">
                         {org.afectadaSismo && (
                           <span className="rounded-full bg-perdida-suave px-2.5 py-1 text-xs font-bold text-perdida">
-                            Afectada por el sismo{" "}
-                            <Icono nombre="sirena" className="h-[1em] w-[1em]" />
+                            Afectada por el sismo 🚨
                           </span>
                         )}
                         {org.etiqueta && (
                           <span className="rounded-full bg-encontrada-suave px-2.5 py-1 text-xs font-bold text-encontrada">
-                            {org.etiqueta}{" "}
-                            <Icono nombre="casa" className="h-[1em] w-[1em]" />
+                            {org.etiqueta} 🏠
                           </span>
                         )}
                       </div>
@@ -147,8 +150,7 @@ export default function PaginaAyudar() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 rounded-xl border border-stone-300 px-3.5 py-2 text-sm font-bold text-stone-700 transition hover:border-marca hover:bg-marca-suave hover:text-marca-oscuro"
                       >
-                        {e.etiqueta}
-                        <Icono nombre={ICONOS[e.icono] ?? "enlace"} />
+                        {e.etiqueta} {ICONOS[e.icono] ?? "🔗"}
                       </a>
                     ))}
                   </div>
@@ -161,8 +163,7 @@ export default function PaginaAyudar() {
 
       <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
         <h2 className="text-lg font-extrabold text-stone-900">
-          Grupos donde también puedes difundir{" "}
-          <Icono nombre="megafono" className="h-[1em] w-[1em]" />
+          Grupos donde también puedes difundir 📣
         </h2>
         <p className="mt-1 text-stone-600">
           Comunidades de Facebook con miles de personas atentas a mascotas
@@ -183,7 +184,7 @@ export default function PaginaAyudar() {
                   aria-hidden="true"
                   className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#1877F2]/10 text-xl"
                 >
-                  <Icono nombre="personas" />
+                  👥
                 </span>
                 <span className="min-w-0">
                   <span className="block font-bold leading-snug text-stone-800">
@@ -225,8 +226,7 @@ export default function PaginaAyudar() {
           rel="noopener noreferrer"
           className="boton-secundario mt-4"
         >
-          Escribirme por Instagram
-          <Icono nombre="instagram" />
+          Escribirme por Instagram 📸
         </a>
       </div>
     </div>

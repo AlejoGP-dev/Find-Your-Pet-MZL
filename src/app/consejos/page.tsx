@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { ogPagina } from "@/lib/seo";
 import Link from "next/link";
-import Icono from "@/components/Icono";
 import { GUIAS } from "@/lib/consejos";
 
 export const metadata: Metadata = {
@@ -8,25 +8,31 @@ export const metadata: Metadata = {
   description:
     "Qué hacer si se te perdió una mascota o si te encontraste una en la calle. Guías con lo que sí funciona según quienes se dedican a rastrearlas.",
   alternates: { canonical: "/consejos" },
+  openGraph: ogPagina({
+    ruta: "/consejos",
+    titulo: "Guías: cómo buscar una mascota perdida",
+    descripcion:
+      "Qué hacer si se te perdió una mascota o si te encontraste una en la calle. Guías con lo que sí funciona según quienes se dedican a rastrearlas.",
+  }),
 };
 
 const ESTILO = {
   perdida: {
-    icono: "perdida",
+    emoji: "😿",
     titulo: "Se me perdió una mascota",
     borde: "border-perdida/30 hover:border-perdida",
     fondo: "bg-perdida-suave",
     texto: "text-perdida",
   },
   encontrada: {
-    icono: "encontrada",
+    emoji: "🐕",
     titulo: "Me encontré una mascota",
     borde: "border-encontrada/30 hover:border-encontrada",
     fondo: "bg-encontrada-suave",
     texto: "text-encontrada",
   },
   adoptar: {
-    icono: "hogar",
+    emoji: "🏡",
     titulo: "Quiero adoptar",
     borde: "border-marca/30 hover:border-marca",
     fondo: "bg-marca-suave",
@@ -63,7 +69,7 @@ export default function IndiceConsejos() {
               className={`flex flex-col rounded-2xl border-2 p-6 transition ${e.borde} ${e.fondo}`}
             >
               <span className={`text-xl font-extrabold ${e.texto}`}>
-                {e.titulo} <Icono nombre={e.icono} className="h-[1em] w-[1em]" />
+                {e.titulo} {e.emoji}
               </span>
               <span className="mt-2 flex-1 text-stone-700">{g.intro}</span>
               <span className="mt-4 flex flex-wrap gap-1.5">
@@ -72,8 +78,7 @@ export default function IndiceConsejos() {
                     key={b.id}
                     className="rounded-full bg-white/70 px-2.5 py-1 text-xs font-bold text-stone-700"
                   >
-                    {b.titulo}{" "}
-                    <Icono nombre={b.icono} className="h-[1em] w-[1em]" />
+                    {b.titulo} {b.emoji}
                   </span>
                 ))}
               </span>

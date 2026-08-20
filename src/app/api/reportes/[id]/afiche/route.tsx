@@ -4,7 +4,7 @@ import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { obtenerReporte } from "@/lib/almacen";
 import {
-  type Especie,
+  ESPECIES,
   SEXOS,
   TAMANOS,
   etiquetaDe,
@@ -19,17 +19,6 @@ function telefonoLegible(numero: string): string {
   const d = numero.replace(/\D/g, "").replace(/^57/, "");
   return d.length === 10 ? `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6)}` : numero;
 }
-
-/**
- * El afiche se rasteriza con Satori (`ImageResponse`), que no ejecuta
- * componentes propios ni dibuja SVG arbitrario: acá el set de iconos no sirve
- * y el respaldo cuando no hay foto sigue siendo un emoji, con su propio mapa.
- */
-const EMOJI_ESPECIE: Record<Especie, string> = {
-  perro: "🐶",
-  gato: "🐱",
-  otro: "🐾",
-};
 
 const MARCA = "#0f6f6c";
 const CREMA = "#faf6f0";
@@ -129,6 +118,7 @@ export async function GET(
 
   const esPerdida = reporte.tipo === "perdida";
   const acento = esPerdida ? PERDIDA : ENCONTRADA;
+  const especie = ESPECIES.find((e) => e.valor === reporte.especie);
 
   const titulo = esPerdida ? "¡SE PERDIÓ!" : "¿LO CONOCES?";
   const subtitulo = esPerdida
@@ -201,7 +191,7 @@ export async function GET(
               style={{ width: "1080px", height: "620px", objectFit: "contain" }}
             />
           ) : (
-            <div style={{ display: "flex", fontSize: 200 }}>{EMOJI_ESPECIE[reporte.especie] ?? "🐾"}</div>
+            <div style={{ display: "flex", fontSize: 200 }}>{especie?.emoji ?? "🐾"}</div>
           )}
         </div>
 
@@ -262,7 +252,7 @@ export async function GET(
               marginTop: 14,
             }}
           >
-            find-your-pet-mzl.vercel.app · Mascotas perdidas y encontradas en Colombia 🐾
+            find-your-pet.co · Mascotas perdidas y encontradas en Colombia 🐾
           </div>
         </div>
       </div>

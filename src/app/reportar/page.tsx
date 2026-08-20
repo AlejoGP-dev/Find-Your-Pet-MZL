@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogPagina } from "@/lib/seo";
 import Link from "next/link";
 import { Suspense } from "react";
 import FormularioReporte from "@/components/FormularioReporte";
@@ -8,6 +9,12 @@ export const metadata: Metadata = {
   description:
     "Reporta una mascota perdida o encontrada en Colombia. Toma menos de un minuto, gratis y sin registro.",
   alternates: { canonical: "/reportar" },
+  openGraph: ogPagina({
+    ruta: "/reportar",
+    titulo: "Publicar un reporte",
+    descripcion:
+      "Reporta una mascota perdida o encontrada en Colombia. Toma menos de un minuto, gratis y sin registro.",
+  }),
 };
 
 export default function PaginaReportar() {
