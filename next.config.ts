@@ -2,6 +2,32 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    /**
+     * Las fotos se sirven tal como salen de Supabase, sin pasar por el
+     * optimizador de Vercel.
+     *
+     * Por qué: el plan Hobby tiene un cupo de transformaciones y se agotó. A
+     * partir de ahí `/_next/image` responde 402 y la foto NO carga — que en
+     * una página de mascotas perdidas es el peor error posible, porque la foto
+     * es prácticamente todo el contenido. Las que se ven hoy son las que
+     * alcanzaron a quedar en caché antes de que se acabara el cupo; las nuevas
+     * salían rotas.
+     *
+     * Se puede hacer porque el navegador ya comprime cada foto ANTES de
+     * subirla (ver comprimirImagen en FormularioReporte): máximo 1400 px y
+     * JPEG de calidad ~0.8. Medido sobre 30 fotos publicadas: mediana 189 KB,
+     * promedio 221 KB, ninguna por encima de 1 MB. No es lo que haría el
+     * optimizador, pero es aceptable.
+     *
+     * Lo que se pierde: AVIF/WebP y el srcset por tamaño, así que una tarjeta
+     * de 180 px baja la foto de 1400 px. Lo amortigua el `loading="lazy"`, que
+     * hace que solo bajen las tarjetas visibles.
+     *
+     * El arreglo de verdad es generar una miniatura al publicar y guardarla
+     * junto al original: sale gratis (el navegador ya tiene el canvas abierto)
+     * y devolvería las tarjetas livianas sin depender del cupo de nadie.
+     */
+    unoptimized: true,
     // Las fotos viven en el bucket público de Supabase. Al pasarlas por
     // next/image, Vercel las redimensiona y las sirve desde su CDN: Supabase
     // solo entrega el original una vez y dejamos de quemar egress en cada visita.

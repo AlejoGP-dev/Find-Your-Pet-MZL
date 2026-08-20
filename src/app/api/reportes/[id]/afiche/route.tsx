@@ -81,35 +81,32 @@ async function cargarFuente(peso: number): Promise<ArrayBuffer | null> {
 }
 
 /**
- * WPO-007 — La foto entra por el optimizador de Next, no por el original de
- * Supabase.
+ * La foto del afiche se baja de Supabase y se le pasa a Satori como bytes.
  *
- * El original puede pesar 4 MB y el afiche solo necesita 1080 px de ancho.
- * Se descarga acá (en vez de pasarle la URL a Satori) por dos razones: se
- * puede validar antes de rasterizar, y si el optimizador falla se cae al
- * original en vez de reventar el afiche entero.
+ * Antes esto pasaba por el optimizador de Next (WPO-007), para no rasterizar
+ * un original de 4 MB. Ya no: el cupo de transformaciones del plan Hobby se
+ * agotó, el optimizador responde 402 y ese camino solo agregaba una petición
+ * que siempre falla. Las fotos ya vienen comprimidas del navegador al
+ * publicar, así que el original pesa unos 200 KB y sirve tal cual.
+ *
+ * Se pasan los BYTES y no la URL a propósito: si le diéramos la URL, Satori la
+ * pediría por su cuenta y no podríamos validar el formato antes de rasterizar.
+ * El rasterizador de `next/og` no sabe decodificar AVIF —probado, revienta con
+ * "Input buffer contains unsupported image format" y se cae el afiche entero,
+ * no solo la foto—, así que acá se comprueba que sea JPEG o PNG.
  */
-async function fotoParaAfiche(fotoUrl: string, origen: string): Promise<string> {
-  // El optimizador no acepta data: URLs ni orígenes fuera de `remotePatterns`.
+async function fotoParaAfiche(fotoUrl: string): Promise<string> {
   if (!/^https?:/i.test(fotoUrl)) return fotoUrl;
 
-  const optimizada = `${origen}/_next/image?url=${encodeURIComponent(fotoUrl)}&w=1080&q=75`;
   try {
-    // El `Accept` explícito NO es opcional: sin él el optimizador negocia AVIF
-    // y el rasterizador de `next/og` no sabe decodificarlo — probado, revienta
-    // con "Input buffer contains unsupported image format" y se cae el afiche
-    // entero, no solo la foto.
-    //
-    // Por eso también se pasan los bytes y no la URL: si le diéramos la URL,
-    // Satori la volvería a pedir con su propio Accept y volvería el AVIF.
-    const r = await fetch(optimizada, { headers: { Accept: "image/jpeg" } });
+    const r = await fetch(fotoUrl, { headers: { Accept: "image/jpeg,image/png" } });
     if (!r.ok) return fotoUrl;
     const tipo = r.headers.get("content-type") || "image/jpeg";
     if (!/jpeg|png/.test(tipo)) return fotoUrl;
     const b64 = Buffer.from(await r.arrayBuffer()).toString("base64");
     return `data:${tipo};base64,${b64}`;
   } catch {
-    // Ante cualquier duda, el original: el afiche es lo que la gente imprime
+    // Ante cualquier duda, la URL pelada: el afiche es lo que la gente imprime
     // y pega en un poste. Mejor pesado que roto.
     return fotoUrl;
   }
@@ -124,7 +121,7 @@ export async function GET(
   if (!reporte) return new Response("Reporte no encontrado", { status: 404 });
 
   const foto = reporte.foto_url
-    ? await fotoParaAfiche(reporte.foto_url, new URL(request.url).origin)
+    ? await fotoParaAfiche(reporte.foto_url)
     : null;
 
   const esPerdida = reporte.tipo === "perdida";
