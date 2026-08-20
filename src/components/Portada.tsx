@@ -15,7 +15,6 @@ import {
 } from "@/lib/almacen";
 import * as schema from "@/lib/schema";
 import { ciudadesDesdeConteo } from "@/lib/ciudades";
-import { UMBRAL } from "@/lib/seo";
 import { type Ciudad, type Reporte } from "@/lib/tipos";
 
 function uno(valor: string | string[] | undefined): string | null {
@@ -164,10 +163,23 @@ export default async function Portada({
 
   // Para el desplegable de filtros: toda ciudad con al menos un reporte.
   const ciudadesConReportes = ciudadesDesdeConteo(porCiudad);
-  // Para los chips de navegación: solo las que tienen landing propia y pasan
-  // el umbral de indexación, para no mandar a nadie a una página vacía.
+  // Para los chips: toda ciudad con reportes y con landing propia.
+  //
+  // Antes acá también se exigía el umbral de indexación (3 reportes), y eso
+  // estaba mal: mezclaba dos cosas distintas. Que una página sea muy flaca
+  // para ofrecérsela a Google no significa que haya que escondérsela a quien
+  // vive ahí — alguien en Medellín entraba, veía «Manizales, Villamaría,
+  // Pereira, Bogotá» y concluía que su ciudad no existía en el sitio, cuando
+  // sí había reportes.
+  //
+  // El lado SEO ya está resuelto donde corresponde: /[ciudad] se marca sola
+  // como noindex cuando no llega al umbral, y el sitemap solo ofrece las que
+  // sí. Verificado en producción: /medellin responde 200 con noindex.
+  //
+  // El número va en el chip, así que nadie entra engañado: «Medellín 2» dice
+  // exactamente lo que va a encontrar.
   const ciudadesDestacadas = ciudadesConReportes
-    .filter((c) => c.slug && c.reportes >= UMBRAL.ciudad)
+    .filter((c) => c.slug)
     .slice(0, 12);
 
   const cajas: {
