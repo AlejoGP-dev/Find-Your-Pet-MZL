@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Nunito } from "next/font/google";
 import { Analytics as AnaliticaVercel } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Analytics from "@/components/Analytics";
 import AvisoLegal from "@/components/AvisoLegal";
 import BotonSoporte from "@/components/BotonSoporte";
@@ -77,6 +78,15 @@ export default function RootLayout({
             Ojo: en el plan Hobby tiene un tope mensual de eventos. Si se pasa,
             deja de contar hasta el otro mes; no rompe nada del sitio. */}
         <AnaliticaVercel />
+        {/* Core Web Vitals medidos en los equipos reales de la gente, con el
+            detalle por ruta. Se queda junto a <Vitals />, que manda las mismas
+            métricas a Google Analytics: esa es la que sirve para cruzarlas con
+            el comportamiento (si la ficha lenta es la que abandonan), y esta
+            es la que dice qué ruta arreglar. Ninguna reemplaza a la otra.
+
+            Se carga después de que la página es interactiva, así que no le
+            quita tiempo al primer pintado. */}
+        <SpeedInsights />
         <Vitals />
         {/* SEO-007: WebSite + SearchAction en todas las páginas. */}
         <DatosEstructurados datos={sitioWeb()} />
