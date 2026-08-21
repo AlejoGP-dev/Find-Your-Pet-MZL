@@ -3,34 +3,30 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     /**
-     * Las fotos se sirven tal como salen de Supabase, sin pasar por el
-     * optimizador de Vercel.
+     * Las fotos se transforman en el CDN de Supabase, no en el de Vercel.
      *
-     * Por qué: el plan Hobby tiene un cupo de transformaciones y se agotó. A
-     * partir de ahí `/_next/image` responde 402 y la foto NO carga — que en
-     * una página de mascotas perdidas es el peor error posible, porque la foto
-     * es prácticamente todo el contenido. Las que se ven hoy son las que
-     * alcanzaron a quedar en caché antes de que se acabara el cupo; las nuevas
-     * salían rotas.
+     * Historia corta: pasaban por el optimizador de Vercel hasta que se agotó
+     * el cupo del plan Hobby. `/_next/image` empezó a responder 402 y las fotos
+     * nuevas salían ROTAS, así que se puso `unoptimized: true` para salir del
+     * paso. Eso arregló lo roto, pero dejó cada tarjeta de 234 px bajando la
+     * foto entera de 1400 px: medido en producción sobre las 125 publicadas,
+     * 227 KB de promedio (máximo 473 KB) y 27,7 MB para recorrer el listado.
      *
-     * Se puede hacer porque el navegador ya comprime cada foto ANTES de
-     * subirla (ver comprimirImagen en FormularioReporte): máximo 1400 px y
-     * JPEG de calidad ~0.8. Medido sobre 30 fotos publicadas: mediana 189 KB,
-     * promedio 221 KB, ninguna por encima de 1 MB. No es lo que haría el
-     * optimizador, pero es aceptable.
+     * Con el loader propio la foto sale del transformador de Supabase, en WebP
+     * y al ancho exacto que pide el navegador: la misma foto pasa de 227 KB a
+     * ~29 KB. No toca el cupo de Vercel, y Supabase cobra por imagen ORIGEN al
+     * mes —no por variante—, así que las cinco anchuras del `srcset` de una
+     * misma foto cuentan como una sola. Ver src/lib/loaderSupabase.ts.
      *
-     * Lo que se pierde: AVIF/WebP y el srcset por tamaño, así que una tarjeta
-     * de 180 px baja la foto de 1400 px. Lo amortigua el `loading="lazy"`, que
-     * hace que solo bajen las tarjetas visibles.
-     *
-     * El arreglo de verdad es generar una miniatura al publicar y guardarla
-     * junto al original: sale gratis (el navegador ya tiene el canvas abierto)
-     * y devolvería las tarjetas livianas sin depender del cupo de nadie.
+     * Si algún día el transformador de Supabase deja de estar disponible, el
+     * camino de vuelta es una línea: quitar `loader`/`loaderFile` y volver a
+     * `unoptimized: true`. Las fotos se ven igual, solo pesan más.
      */
-    unoptimized: true,
-    // Las fotos viven en el bucket público de Supabase. Al pasarlas por
-    // next/image, Vercel las redimensiona y las sirve desde su CDN: Supabase
-    // solo entrega el original una vez y dejamos de quemar egress en cada visita.
+    loader: "custom",
+    loaderFile: "./src/lib/loaderSupabase.ts",
+    // Con loader personalizado Next ya no valida el host, pero la lista se
+    // queda: documenta de dónde salen las fotos y vuelve a hacer falta el día
+    // que se regrese al optimizador propio.
     remotePatterns: [
       {
         protocol: "https",

@@ -44,10 +44,23 @@ type Estado =
 export default function CercaDeMi({
   ubicaciones,
   sinUbicacion,
+  fueraDeEstaPagina = 0,
+  hrefVerTodos,
 }: {
   ubicaciones: UbicacionReporte[];
   /** Cuántos reportes visibles no tienen coordenada. Se dice, no se esconde. */
   sinUbicacion: number;
+  /**
+   * Cuántos reportes del filtro quedaron en otras páginas.
+   *
+   * El filtro trabaja sobre las tarjetas que ya pintó el servidor, así que con
+   * el listado paginado solo puede mirar las de esta página. Callarlo sería
+   * peor que no tener el filtro: alguien podría concluir que no hay nada cerca
+   * cuando su mascota está en la página siguiente.
+   */
+  fueraDeEstaPagina?: number;
+  /** Enlace al listado completo en una sola página, para poder buscar en todos. */
+  hrefVerTodos?: string;
 }) {
   const [estado, setEstado] = useState<Estado>({ paso: "inactivo" });
   const [radio, setRadio] = useState<Radio>(RADIO_POR_DEFECTO);
@@ -214,6 +227,19 @@ export default function CercaDeMi({
             </button>
           ))}
         </div>
+
+        {fueraDeEstaPagina > 0 && hrefVerTodos && (
+          <p className="mt-3 rounded-xl bg-white/70 p-3 text-sm text-stone-700">
+            Esta búsqueda mira las {ubicaciones.length + sinUbicacion} mascotas de
+            esta página. Hay {fueraDeEstaPagina} más en otras.{" "}
+            <a
+              href={hrefVerTodos}
+              className="font-bold text-marca underline underline-offset-2"
+            >
+              Buscar en todas
+            </a>
+          </p>
+        )}
 
         <p className="mt-3 text-xs text-stone-500">
           Tu ubicación se usa solo en este dispositivo: no se envía a ningún

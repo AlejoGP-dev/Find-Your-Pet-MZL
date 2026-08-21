@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { obtenerReporte } from "@/lib/almacen";
+import loaderSupabase from "@/lib/loaderSupabase";
 import {
   type Especie,
   SEXOS,
@@ -83,23 +84,27 @@ async function cargarFuente(peso: number): Promise<ArrayBuffer | null> {
 /**
  * La foto del afiche se baja de Supabase y se le pasa a Satori como bytes.
  *
- * Antes esto pasaba por el optimizador de Next (WPO-007), para no rasterizar
- * un original de 4 MB. Ya no: el cupo de transformaciones del plan Hobby se
- * agotó, el optimizador responde 402 y ese camino solo agregaba una petición
- * que siempre falla. Las fotos ya vienen comprimidas del navegador al
- * publicar, así que el original pesa unos 200 KB y sirve tal cual.
+ * Se pide por el transformador de Supabase, al ancho que la foto ocupa en el
+ * afiche (1080 px) en lugar del original: el rasterizado sale más barato y
+ * bajan menos datos. El optimizador de Vercel no sirve para esto —su cupo se
+ * agotó y responde 402—, pero el de Supabase no toca ese cupo. Si la
+ * transformación falla, el `catch` devuelve la URL original y el afiche sale
+ * igual: es lo que la gente imprime y pega en un poste, mejor pesado que roto.
  *
  * Se pasan los BYTES y no la URL a propósito: si le diéramos la URL, Satori la
  * pediría por su cuenta y no podríamos validar el formato antes de rasterizar.
  * El rasterizador de `next/og` no sabe decodificar AVIF —probado, revienta con
  * "Input buffer contains unsupported image format" y se cae el afiche entero,
- * no solo la foto—, así que acá se comprueba que sea JPEG o PNG.
+ * no solo la foto—, así que se pide JPEG explícitamente y además se comprueba.
  */
 async function fotoParaAfiche(fotoUrl: string): Promise<string> {
   if (!/^https?:/i.test(fotoUrl)) return fotoUrl;
 
+  // Calidad 82 y no 70: esto termina impreso en papel, no en una pantalla.
+  const paraImprimir = loaderSupabase({ src: fotoUrl, width: 1080, quality: 82 });
+
   try {
-    const r = await fetch(fotoUrl, { headers: { Accept: "image/jpeg,image/png" } });
+    const r = await fetch(paraImprimir, { headers: { Accept: "image/jpeg,image/png" } });
     if (!r.ok) return fotoUrl;
     const tipo = r.headers.get("content-type") || "image/jpeg";
     if (!/jpeg|png/.test(tipo)) return fotoUrl;

@@ -4,6 +4,7 @@ import Portada from "@/components/Portada";
 import { contarReportesPorCiudad } from "@/lib/almacen";
 import { UMBRAL } from "@/lib/seo";
 import { resolverPorSlug } from "@/lib/ciudades";
+import { canonicalPaginado, paginaDe } from "@/lib/paginacion";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +12,21 @@ type Ruta = Promise<{ ciudad: string }>;
 type Consulta = Promise<Record<string, string | string[] | undefined>>;
 
 /** Cada ciudad se indexa aparte en Google con su propio título. */
-export async function generateMetadata({ params }: { params: Ruta }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Ruta;
+  searchParams: Consulta;
+}): Promise<Metadata> {
   const { ciudad: slug } = await params;
   const ciudad = resolverPorSlug(slug);
   if (!ciudad) return {};
+
+  // Paginar no es duplicar: `/manizales?pagina=2` lista otras mascotas, así que
+  // se canonicaliza a sí misma. Si apuntara a la página 1, Google dejaría de
+  // rastrear las fichas que solo se enlazan desde ahí.
+  const pagina = paginaDe(await searchParams);
 
   const titulo = `Mascotas perdidas y encontradas en ${ciudad.nombre} — Find Your Pet CO`;
   const descripcion = `Reporta y busca mascotas perdidas o encontradas en ${ciudad.nombre}, ${ciudad.departamento}. Gratis, sin registro y con contacto directo por WhatsApp.`;
@@ -30,7 +42,7 @@ export async function generateMetadata({ params }: { params: Ruta }): Promise<Me
   return {
     title: titulo,
     description: descripcion,
-    alternates: { canonical: `/${ciudad.slug}` },
+    alternates: { canonical: canonicalPaginado(`/${ciudad.slug}`, pagina) },
     robots: indexable ? undefined : { index: false, follow: true },
     openGraph: {
       title: titulo,

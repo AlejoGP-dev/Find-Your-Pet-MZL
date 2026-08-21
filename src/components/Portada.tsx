@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import CercaDeMi, { type UbicacionReporte } from "@/components/CercaDeMi";
 import Contador from "@/components/Contador";
@@ -11,16 +12,18 @@ import {
   HAY_SUPABASE,
   contarPorEstado,
   contarReportesPorCiudad,
-  listarReportes,
+  listarPaginaReportes,
 } from "@/lib/almacen";
 import * as schema from "@/lib/schema";
 import { ciudadesDesdeConteo } from "@/lib/ciudades";
+import { POR_PAGINA, TOPE_VER_TODOS, paginaDe, verTodosDe } from "@/lib/paginacion";
 import { type Ciudad, type Reporte } from "@/lib/tipos";
 
 function uno(valor: string | string[] | undefined): string | null {
   if (Array.isArray(valor)) return valor[0] ?? null;
   return valor ?? null;
 }
+
 
 /**
  * El listado. Sirve para la portada nacional (ciudad = null) y para la página
@@ -41,20 +44,31 @@ export default async function Portada({
   // En la página de ciudad manda la ruta; en la nacional, el filtro.
   const ciudadFiltro = ciudad ? ciudad.nombre : uno(p.ciudad);
 
+  // «Ver todos» apaga la paginación. Lo usa quien activa el filtro por
+  // cercanía y necesita que estén todas las tarjetas en la misma página.
+  const verTodos = verTodosDe(p);
+  const paginaPedida = paginaDe(p);
+  const porPagina = verTodos ? TOPE_VER_TODOS : POR_PAGINA;
+
   let reportes: Reporte[] = [];
+  let totalFiltrado = 0;
   let totales = { perdidas: 0, encontradas: 0, reunidas: 0 };
   let porCiudad: Record<string, number> = {};
   let errorCarga: string | null = null;
   try {
-    [reportes, totales, porCiudad] = await Promise.all([
-      listarReportes({
-        tipo: uno(p.tipo),
-        especie: uno(p.especie),
-        ciudad: ciudadFiltro,
-        barrio: uno(p.barrio),
-        q: uno(p.q),
-        estado,
-      }),
+    const [pagina, cuenta, ciudades] = await Promise.all([
+      listarPaginaReportes(
+        {
+          tipo: uno(p.tipo),
+          especie: uno(p.especie),
+          ciudad: ciudadFiltro,
+          barrio: uno(p.barrio),
+          q: uno(p.q),
+          estado,
+        },
+        verTodos ? 1 : paginaPedida,
+        porPagina,
+      ),
       // Los contadores tienen que seguir el mismo filtro que la lista: si no,
       // en /?ciudad=Villamaría se veían 15 tarjetas con los números del país.
       contarPorEstado(ciudadFiltro),
@@ -62,8 +76,42 @@ export default async function Portada({
       // solo se ofrece lo que de verdad tiene reportes.
       contarReportesPorCiudad(),
     ]);
+    reportes = pagina.reportes;
+    totalFiltrado = pagina.total;
+    totales = cuenta;
+    porCiudad = ciudades;
   } catch (error) {
     errorCarga = error instanceof Error ? error.message : "Error desconocido";
+  }
+
+  const totalPaginas = Math.max(1, Math.ceil(totalFiltrado / porPagina));
+  const paginaActual = Math.min(paginaPedida, totalPaginas);
+
+  // Pedir `?pagina=9` cuando solo hay 2 devolvía una página vacía que además
+  // era indexable. Se manda a la última que sí tiene contenido, conservando
+  // los filtros. No hay bucle posible: el destino siempre existe.
+  if (!errorCarga && reportes.length === 0 && totalFiltrado > 0 && paginaPedida > totalPaginas) {
+    redirect(
+      conParametros({ pagina: totalPaginas > 1 ? String(totalPaginas) : null }),
+    );
+  }
+  // Cuántos reportes del filtro se quedaron fuera de esta página. El filtro por
+  // cercanía necesita saberlo para no dar a entender que buscó en todos.
+  const fueraDeEstaPagina = Math.max(0, totalFiltrado - reportes.length);
+
+  /** Conserva los filtros puestos y cambia solo lo que se le pida. */
+  function conParametros(cambios: Record<string, string | null>): string {
+    const q = new URLSearchParams();
+    for (const clave of ["tipo", "especie", "ciudad", "barrio", "q", "estado"] as const) {
+      const valor = uno(p[clave]);
+      if (valor) q.set(clave, valor);
+    }
+    for (const [clave, valor] of Object.entries(cambios)) {
+      if (valor) q.set(clave, valor);
+      else q.delete(clave);
+    }
+    const cadena = q.toString();
+    return `${base}${cadena ? `?${cadena}` : ""}#reportes`;
   }
 
   // Lo único que baja al navegador para el filtro por cercanía: id y punto.
@@ -396,6 +444,11 @@ export default async function Portada({
             <CercaDeMi
               ubicaciones={ubicaciones}
               sinUbicacion={reportes.length - ubicaciones.length}
+              // El filtro solo puede ordenar las tarjetas que el servidor pintó.
+              // Si el listado está paginado, hay que decirlo y dar la salida, en
+              // vez de dejar creer que se buscó en todos los reportes.
+              fueraDeEstaPagina={fueraDeEstaPagina}
+              hrefVerTodos={conParametros({ ver: "todos", pagina: null })}
             />
           </div>
         )}
@@ -440,6 +493,7 @@ export default async function Portada({
             )}
           </div>
         ) : (
+          <>
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {reportes.map((reporte, i) => (
               <TarjetaReporte
@@ -452,6 +506,53 @@ export default async function Portada({
               />
             ))}
           </div>
+
+          {/* Paginación con enlaces de verdad, no con botones: Google los
+              rastrea y la persona puede abrirlos en otra pestaña o compartir
+              la página 3 tal cual. */}
+          {totalPaginas > 1 && !verTodos && (
+            <nav
+              aria-label="Páginas de resultados"
+              className="mt-8 flex flex-wrap items-center justify-center gap-3"
+            >
+              {paginaActual > 1 && (
+                <Link
+                  href={conParametros({
+                    pagina: paginaActual === 2 ? null : String(paginaActual - 1),
+                  })}
+                  rel="prev"
+                  className="boton-secundario"
+                >
+                  Anteriores
+                </Link>
+              )}
+
+              <span className="text-sm font-semibold text-stone-600">
+                Página {paginaActual} de {totalPaginas}
+                <span className="block text-xs font-normal text-stone-500">
+                  {totalFiltrado} {totalFiltrado === 1 ? "reporte" : "reportes"} en total
+                </span>
+              </span>
+
+              {paginaActual < totalPaginas && (
+                <Link
+                  href={conParametros({ pagina: String(paginaActual + 1) })}
+                  rel="next"
+                  className="boton-primario"
+                >
+                  Ver más mascotas
+                </Link>
+              )}
+            </nav>
+          )}
+
+          {verTodos && totalFiltrado > TOPE_VER_TODOS && (
+            <p className="mt-6 text-center text-sm text-stone-500">
+              Mostrando {reportes.length} de {totalFiltrado}. Usa los filtros o la
+              búsqueda para acotar.
+            </p>
+          )}
+          </>
         )}
       </section>
 

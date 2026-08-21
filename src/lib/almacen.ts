@@ -43,6 +43,34 @@ export type FiltrosReporte = {
   q?: string | null;
 };
 
+/**
+ * Los filtros del listado, en un solo sitio.
+ *
+ * Los usan la consulta completa y la paginada. Estaban duplicados y esa es
+ * justo la clase de duplicación que termina mal: el día que se agregue un
+ * filtro nuevo, una de las dos listas se queda atrás y el contador deja de
+ * cuadrar con las tarjetas.
+ */
+function aplicarFiltros<
+  T extends { eq: (columna: string, valor: string) => T; or: (filtro: string) => T },
+>(consulta: T, filtros: FiltrosReporte): T {
+  let q = consulta;
+  if (filtros.tipo) q = q.eq("tipo", filtros.tipo);
+  if (filtros.especie) q = q.eq("especie", filtros.especie);
+  if (filtros.ciudad) q = q.eq("ciudad", filtros.ciudad);
+  if (filtros.barrio) q = q.eq("barrio", filtros.barrio);
+  q = q.eq("estado", filtros.estado || "activo");
+  if (filtros.q) {
+    const busqueda = filtros.q.replace(/[%,()]/g, " ").trim();
+    if (busqueda) {
+      q = q.or(
+        `nombre.ilike.%${busqueda}%,raza.ilike.%${busqueda}%,color.ilike.%${busqueda}%,barrio.ilike.%${busqueda}%,ciudad.ilike.%${busqueda}%,descripcion.ilike.%${busqueda}%`,
+      );
+    }
+  }
+  return q;
+}
+
 export async function listarReportes(filtros: FiltrosReporte = {}): Promise<Reporte[]> {
   if (!HAY_SUPABASE) {
     let filas = [...globalDemo.__demoReportes!];
@@ -64,29 +92,67 @@ export async function listarReportes(filtros: FiltrosReporte = {}): Promise<Repo
       .map(({ token_gestion: _token, ...resto }) => resto as Reporte);
   }
 
-  let consulta = supabase()
-    .from("reportes")
-    .select(CAMPOS_PUBLICOS)
-    .order("created_at", { ascending: false })
-    .limit(300);
-
-  if (filtros.tipo) consulta = consulta.eq("tipo", filtros.tipo);
-  if (filtros.especie) consulta = consulta.eq("especie", filtros.especie);
-  if (filtros.ciudad) consulta = consulta.eq("ciudad", filtros.ciudad);
-  if (filtros.barrio) consulta = consulta.eq("barrio", filtros.barrio);
-  consulta = consulta.eq("estado", filtros.estado || "activo");
-  if (filtros.q) {
-    const q = filtros.q.replace(/[%,()]/g, " ").trim();
-    if (q) {
-      consulta = consulta.or(
-        `nombre.ilike.%${q}%,raza.ilike.%${q}%,color.ilike.%${q}%,barrio.ilike.%${q}%,ciudad.ilike.%${q}%,descripcion.ilike.%${q}%`,
-      );
-    }
-  }
+  const consulta = aplicarFiltros(
+    supabase()
+      .from("reportes")
+      .select(CAMPOS_PUBLICOS)
+      .order("created_at", { ascending: false })
+      .limit(300),
+    filtros,
+  );
 
   const { data, error } = await consulta;
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as Reporte[];
+}
+
+/** Una página del listado, más el total que hay detrás del mismo filtro. */
+export type PaginaReportes = {
+  reportes: Reporte[];
+  /** Total de reportes que casan con el filtro, no los de esta página. */
+  total: number;
+};
+
+/**
+ * El listado, de a una página.
+ *
+ * Existe aparte de `listarReportes` a propósito: esa la usan la ficha, las
+ * coincidencias y la API, que quieren un array pelado y no un total. Acá lo que
+ * se necesita es lo contrario — cuántas páginas hay que ofrecer.
+ *
+ * Por qué se pagina: el home renderizaba las 125 tarjetas de una sola vez.
+ * Medido en producción: 791 KB de HTML, 2.590 nodos y 125 fotos en un mismo
+ * documento. Con 24 por página el navegador tiene que masticar una fracción de
+ * eso antes de poder mostrar algo.
+ */
+export async function listarPaginaReportes(
+  filtros: FiltrosReporte = {},
+  pagina = 1,
+  porPagina = 24,
+): Promise<PaginaReportes> {
+  const desde = Math.max(0, (Math.max(1, pagina) - 1) * porPagina);
+
+  if (!HAY_SUPABASE) {
+    const todos = await listarReportes(filtros);
+    return { reportes: todos.slice(desde, desde + porPagina), total: todos.length };
+  }
+
+  let consulta = supabase()
+    .from("reportes")
+    // `count: "exact"` y no "planned": con estos volúmenes cuesta microsegundos
+    // y una cifra estimada en «1 de 6 páginas» se nota como un error.
+    .select(CAMPOS_PUBLICOS, { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(desde, desde + porPagina - 1);
+
+  consulta = aplicarFiltros(consulta, filtros);
+
+  const { data, error, count } = await consulta;
+  if (error) throw new Error(error.message);
+  return {
+    reportes: (data ?? []) as unknown as Reporte[],
+    total: count ?? 0,
+  };
 }
 
 export async function obtenerReporte(id: string): Promise<Reporte | null> {
