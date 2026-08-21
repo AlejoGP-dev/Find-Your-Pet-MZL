@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Nunito } from "next/font/google";
+import { Analytics as AnaliticaVercel } from "@vercel/analytics/next";
 import Analytics from "@/components/Analytics";
 import AvisoLegal from "@/components/AvisoLegal";
 import BotonSoporte from "@/components/BotonSoporte";
@@ -67,6 +68,15 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-dvh flex-col font-sans">
         <Analytics />
+        {/* Analítica de Vercel: visitas y páginas vistas, sin cookies y sin
+            pedirle nada a la persona. Convive con Google Analytics a
+            propósito — GA da el detalle (de dónde llega la gente, qué busca) y
+            esta da el número limpio, sin que los bloqueadores se coman la
+            mitad de los datos. Pesa ~1 KB y se carga aparte del render.
+
+            Ojo: en el plan Hobby tiene un tope mensual de eventos. Si se pasa,
+            deja de contar hasta el otro mes; no rompe nada del sitio. */}
+        <AnaliticaVercel />
         <Vitals />
         {/* SEO-007: WebSite + SearchAction en todas las páginas. */}
         <DatosEstructurados datos={sitioWeb()} />
