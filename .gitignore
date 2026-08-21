@@ -42,3 +42,7 @@ next-env.d.ts
 
 # carpeta temporal de trabajo
 _to_delete/
+
+# credenciales y accesos (NUNCA subir)
+_privado/
+*.xlsx

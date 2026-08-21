@@ -63,6 +63,51 @@ tráfico al mes. No pide tarjeta.
 
 ---
 
+## 🔒 Archivos privados — nunca subir al repositorio
+
+La carpeta **`_privado/`** guarda información sensible del proyecto: credenciales de
+acceso, contraseñas y códigos de verificación de reserva (MFA). Vive dentro del repo por
+comodidad, pero **no forma parte del código y nunca debe viajar con él**.
+
+**Contenido actual**
+
+- `_privado/Accesos-FindYourPetCO.xlsx` — centro de accesos del proyecto: Zoho Mail,
+  Vercel, Supabase, GitHub y las cuentas de Google. Incluye una pestaña con los códigos
+  de respaldo del MFA de `admin@find-your-pet.co`.
+
+**Reglas**
+
+- ⛔ **Nunca** se sube a GitHub. Ya está cubierto en el `.gitignore`:
+
+  ```
+  _privado/
+  *.xlsx
+  ```
+
+- ⛔ **No se comparte con nadie.** Ni por correo, ni por WhatsApp, ni por enlace de Drive,
+  ni con colaboradores. Es información privada del propietario del proyecto.
+- ⛔ No se saca del `.gitignore` "un momentico para probar algo".
+- Antes de un `git add .` a ciegas, confirma que sigue ignorada:
+
+  ```bash
+  git check-ignore -v _privado/
+  ```
+
+**Si algún día se filtra**
+
+Borrarlo en un commit nuevo **no basta**: el archivo queda en el historial de Git y
+cualquiera puede recuperarlo. Habría que reescribir la historia del repositorio (`git
+filter-repo`) **y**, sobre todo, rotar todo lo expuesto: contraseña de Zoho, códigos MFA
+(generar un juego nuevo invalida los viejos), `SUPABASE_SERVICE_ROLE_KEY` y accesos de
+Vercel.
+
+> Misma lógica que el `.env.local`: el `.gitignore` es la primera barrera, no la única.
+> La segunda eres tú al revisar qué estás subiendo.
+
+_Carpeta creada el 21 de agosto de 2026._
+
+---
+
 ## 3. Desplegar en Vercel
 
 ```bash

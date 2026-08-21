@@ -105,7 +105,9 @@ export default async function PaginaMascota({ params }: Props) {
       ? await listarReportes({
           tipo: reporte.tipo === "perdida" ? "encontrada" : "perdida",
           especie: reporte.especie,
-          ciudad: reporte.ciudad,
+          // Sin filtro de ciudad a propósito: el cruce ahora acepta municipios
+          // vecinos (RADIO_CRUCE_KM) y filtrar acá dejaría fuera justo los
+          // casos que veníamos perdiendo, como Manizales ↔ Villamaría.
           estado: "activo",
         }).catch(() => [])
       : [];
