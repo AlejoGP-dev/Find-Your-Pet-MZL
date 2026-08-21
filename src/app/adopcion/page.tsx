@@ -1,18 +1,23 @@
 import type { Metadata } from "next";
 import { ogPagina } from "@/lib/seo";
 import ListadoAdopcion from "@/components/ListadoAdopcion";
-import { contarAdopciones } from "@/lib/almacen";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(): Promise<Metadata> {
-  // SEO-005: mientras no haya ni una publicación, esta página no tiene nada
-  // que ofrecerle a Google. Se queda en el sitemap (es una sección real del
-  // sitio) pero con noindex hasta que alguien publique la primera.
-  const total = await contarAdopciones()
-    .then((t) => t.disponibles + t.adoptadas)
-    .catch(() => 1);
-
+/**
+ * Esta página se indexa siempre, tenga o no publicaciones.
+ *
+ * Antes llevaba noindex mientras estuviera vacía (SEO-005): ofrecerle a Google
+ * una página que promete «perros y gatos en adopción» y no muestra ninguno es
+ * contenido vacío. El argumento sigue siendo cierto, pero es decisión del
+ * proyecto indexarla desde ya para que empiece a acumular antigüedad y no
+ * tener que esperar a la primera publicación.
+ *
+ * Si Google la deja en «Rastreada, no indexada» un tiempo, no es un error del
+ * código: es el buscador diciendo justo eso. Se resuelve solo cuando haya
+ * adopciones reales publicadas.
+ */
+export function generateMetadata(): Metadata {
   return {
     title: "Perros y gatos en adopción en Colombia — Find Your Pet CO",
     description:
@@ -24,7 +29,6 @@ export async function generateMetadata(): Promise<Metadata> {
       descripcion:
         "Mascotas que buscan hogar definitivo en Colombia. Adopción gratuita y contacto directo por WhatsApp con quien las está cuidando.",
     }),
-    robots: total > 0 ? undefined : { index: false, follow: true },
   };
 }
 
