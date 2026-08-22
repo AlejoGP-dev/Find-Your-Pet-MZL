@@ -12,6 +12,7 @@ import Isotipo from "@/components/Isotipo";
 import MenuMovil from "@/components/MenuMovil";
 import Vitals from "@/components/Vitals";
 import { WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
+import { REDES } from "@/lib/redes";
 import { sitioWeb } from "@/lib/schema";
 import { SITIO } from "@/lib/seo";
 import "./globals.css";
@@ -143,6 +144,27 @@ export default function RootLayout({
                 Adopción
               </Link>
 
+              {/* GSC-002 — Las redes en el header, solo de xl para arriba.
+                  Debajo de ese ancho el header ya va apretado (logo + dos
+                  enlaces + dos CTA) y meter tres iconos más empujaría el botón
+                  de publicar, que es la acción principal y no se toca. En
+                  móvil y tablet viven en la hamburguesa y en el footer. */}
+              <span className="mr-1 hidden items-center gap-0.5 border-r border-stone-200 pr-2 xl:flex">
+                {REDES.map((red) => (
+                  <a
+                    key={red.nombre}
+                    href={red.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Find Your Pet CO en ${red.nombre}`}
+                    title={red.nombre}
+                    className="grid h-9 w-9 place-items-center rounded-lg text-stone-500 transition hover:bg-stone-100 hover:text-marca-oscuro"
+                  >
+                    <Icono nombre={red.icono} className="h-[18px] w-[18px]" bloque />
+                  </a>
+                ))}
+              </span>
+
               <Link
                 href="/reportar"
                 className="whitespace-nowrap rounded-xl bg-marca px-3.5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-marca-oscuro sm:px-4"
@@ -243,16 +265,42 @@ export default function RootLayout({
               </a>
             </p>
 
-            <p className="mt-6 border-t border-stone-200 pt-5 text-center text-stone-500">
+            {/* GSC-002 — Los perfiles oficiales de la marca. Salen de
+                lib/redes.ts, que es la única fuente: agregar una red es tocar
+                ese archivo y nada más. */}
+            <div className="mt-6 border-t border-stone-200 pt-5">
+              <p className="text-center text-sm font-bold text-stone-600">
+                Síguenos
+              </p>
+              <ul className="mt-3 flex items-center justify-center gap-3">
+                {REDES.map((red) => (
+                  <li key={red.nombre}>
+                    <a
+                      href={red.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      // El nombre va en aria-label y no visible: son tres
+                      // iconos y el texto los volvería una fila apretada. Un
+                      // enlace con solo un icono sin nombre accesible es
+                      // invisible para un lector de pantalla.
+                      aria-label={`Find Your Pet CO en ${red.nombre}`}
+                      title={red.nombre}
+                      className="grid h-11 w-11 place-items-center rounded-xl border border-stone-200 bg-white text-marca transition hover:border-marca/40 hover:bg-marca-suave hover:text-marca-oscuro"
+                    >
+                      <Icono nombre={red.icono} className="h-5 w-5" bloque />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* El crédito se queda como texto. Antes enlazaba al Instagram
+                personal de Alejo, que era el único enlace social del sitio; ese
+                lugar ahora es de las redes de la marca. El JSON-LD sí conserva
+                el perfil personal en su nodo Person — ahí sí corresponde. */}
+            <p className="mt-6 text-center text-stone-500">
               Un granito de arena realizado por{" "}
-              <a
-                href="https://www.instagram.com/ialejog"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-bold text-marca underline underline-offset-2 hover:text-marca-oscuro"
-              >
-                Alejandro Grajales
-              </a>
+              <span className="font-bold text-stone-600">Alejandro Grajales</span>
             </p>
           </div>
         </footer>

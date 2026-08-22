@@ -141,6 +141,10 @@ const TRAZOS = {
     "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
     "m9 12 2 2 4-4",
   ],
+  // facebook: trazo propio, al estilo del resto del set (líneas, sin relleno)
+  facebook: [
+    "M7 10v4h3v7h4v-7h3l1-4h-4V8a1 1 0 0 1 1-1h3V3h-3a5 5 0 0 0-5 5v2H7",
+  ],
   // gato: lucide/cat
   gato: [
     "M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z",
@@ -296,6 +300,11 @@ const TRAZOS = {
     "M20 2v4",
     "M22 4h-4",
     "M2.0 20.0a2.0 2.0 0 1 0 4.0 0a2.0 2.0 0 1 0 -4.0 0",
+  ],
+  // tiktok: trazo propio. La bolita, el tallo y el gancho — es el glifo
+  // reconocible en versión de línea, para que case con el resto del set.
+  tiktok: [
+    "M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5",
   ],
   // transporte: lucide/car
   transporte: [

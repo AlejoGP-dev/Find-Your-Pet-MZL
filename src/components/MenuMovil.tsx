@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Icono, { type NombreIcono } from "@/components/Icono";
+import { REDES } from "@/lib/redes";
 
 const OPCIONES: {
   href: string;
@@ -134,6 +135,29 @@ export default function MenuMovil() {
               );
             })}
           </nav>
+
+          {/* GSC-002 — En el header las redes solo caben de xl para arriba.
+              Acá es donde las encuentra quien entra desde el celular, que es
+              la mayoría del tráfico de este sitio. */}
+          <div className="border-t border-stone-200 px-3 py-3">
+            <p className="text-xs font-bold uppercase tracking-wide text-stone-500">
+              Síguenos
+            </p>
+            <div className="mt-2 flex items-center gap-2">
+              {REDES.map((red) => (
+                <a
+                  key={red.nombre}
+                  href={red.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Find Your Pet CO en ${red.nombre}`}
+                  className="grid h-10 w-10 place-items-center rounded-xl border border-stone-200 text-marca transition hover:bg-marca-suave hover:text-marca-oscuro"
+                >
+                  <Icono nombre={red.icono} className="h-5 w-5" bloque />
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

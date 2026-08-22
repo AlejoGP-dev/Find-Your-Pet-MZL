@@ -3,6 +3,7 @@ import { ogPagina } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import Icono, { type NombreIcono } from "@/components/Icono";
+import { REDES } from "@/lib/redes";
 import {
   CIUDADES_CON_ORGS,
   GRUPOS_DIFUSION,
@@ -226,15 +227,22 @@ export default function PaginaAyudar() {
         <p className="mt-1 text-sm text-stone-600">
           Escríbeme y la agrego a esta lista.
         </p>
-        <a
-          href="https://www.instagram.com/ialejog"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="boton-secundario mt-4"
-        >
-          Escribirme por Instagram
-          <Icono nombre="instagram" />
-        </a>
+        {/* GSC-002 — Antes esto apuntaba al Instagram personal. Ahora manda a
+            las cuentas de la marca, que son las que atienden el proyecto. */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          {REDES.map((red) => (
+            <a
+              key={red.nombre}
+              href={red.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="boton-secundario"
+            >
+              {red.nombre}
+              <Icono nombre={red.icono} />
+            </a>
+          ))}
+        </div>
       </div>
     </div>
   );
