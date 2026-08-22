@@ -8,7 +8,6 @@ import {
 import { GUIAS } from "@/lib/consejos";
 import { ciudadesDesdeConteo } from "@/lib/ciudades";
 import { DIAS_CADUCIDAD, SITIO, UMBRAL } from "@/lib/seo";
-import { CIUDADES } from "@/lib/tipos";
 
 /**
  * El sitemap consulta la base de datos, así que se regenera cada hora en vez
@@ -16,6 +15,45 @@ import { CIUDADES } from "@/lib/tipos";
  * consultas a Supabase.
  */
 export const revalidate = 3600;
+
+/**
+ * Reintenta una consulta antes de darla por perdida.
+ *
+ * GSC-001 · Paso 3. El fallo es intermitente —el sitemap se degradó durante
+ * ~15 minutos el 21 de agosto y se recuperó solo—, y un fallo intermitente es
+ * justo el que se arregla reintentando. Tres intentos con espera creciente
+ * (300 ms, 600 ms) cubren un timeout puntual o un cold start sin alargar de
+ * forma perceptible la regeneración, que corre una vez por hora y no delante
+ * de ningún usuario.
+ *
+ * Cada intento fallido queda registrado: si el sitemap se salva en el segundo
+ * intento queremos enterarnos igual, porque eso es la reincidencia que estamos
+ * cazando en el Paso 2.
+ */
+async function conReintento<T>(
+  nombre: string,
+  consulta: () => Promise<T>,
+  intentos = 3,
+): Promise<T> {
+  let ultimoFallo: unknown;
+  for (let intento = 1; intento <= intentos; intento++) {
+    try {
+      return await consulta();
+    } catch (e) {
+      ultimoFallo = e;
+      console.warn(
+        `[sitemap] GSC-001 · ${nombre} falló (intento ${intento}/${intentos}):`,
+        e instanceof Error ? e.message : String(e),
+      );
+      if (intento < intentos) {
+        await new Promise((listo) => setTimeout(listo, 300 * intento));
+      }
+    }
+  }
+  throw new Error(
+    `${nombre} → ${ultimoFallo instanceof Error ? ultimoFallo.message : String(ultimoFallo)}`,
+  );
+}
 
 function diasDesde(iso: string): number {
   return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
@@ -46,24 +84,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let ciudadesAdopcion: MetadataRoute.Sitemap = [];
 
   try {
-    // GSC-001 · Paso 1 — Saber CUÁL de las dos consultas falla.
+    // GSC-001 · Pasos 1 y 3 — Reintentar, y saber CUÁL consulta falló.
     //
-    // Las otras dos ya traen su propio .catch(), así que solo estas pueden
-    // tumbar el bloque. Cada una re-lanza con su nombre delante: el mensaje de
-    // Supabase se conserva tal cual y el control de flujo no cambia —lo sigue
-    // atrapando el catch de abajo—, pero el log dice quién murió en vez de
-    // dejarnos adivinando entre dos candidatas.
+    // Las de adopciones degradan a vacío a propósito: hoy no hay ni una
+    // publicación, así que perderlas no cambia el sitemap. Aun así se
+    // registran — un catch mudo es exactamente el bug que estamos arreglando.
+    //
+    // Las de reportes NO degradan: si alguna se cae después de tres intentos,
+    // el error sube y la ruta falla. Ver el catch de abajo.
     const [filas, filasAdopcion, porCiudad, adopPorCiudad] = await Promise.all([
-      listarParaSitemap().catch((e) => {
-        throw new Error(`listarParaSitemap → ${e instanceof Error ? e.message : String(e)}`);
-      }),
-      listarAdopcionesParaSitemap().catch(() => []),
-      contarReportesPorCiudad().catch((e) => {
-        throw new Error(
-          `contarReportesPorCiudad → ${e instanceof Error ? e.message : String(e)}`,
+      conReintento("listarParaSitemap", listarParaSitemap),
+      listarAdopcionesParaSitemap().catch((e) => {
+        console.warn(
+          "[sitemap] listarAdopcionesParaSitemap falló, se omiten las adopciones:",
+          e instanceof Error ? e.message : String(e),
         );
+        return [];
       }),
-      contarAdopcionesPorCiudad().catch(() => ({}) as Record<string, number>),
+      conReintento("contarReportesPorCiudad", contarReportesPorCiudad),
+      contarAdopcionesPorCiudad().catch((e) => {
+        console.warn(
+          "[sitemap] contarAdopcionesPorCiudad falló, se omiten sus ciudades:",
+          e instanceof Error ? e.message : String(e),
+        );
+        return {} as Record<string, number>;
+      }),
     ]);
 
     fichas = filas
@@ -114,12 +159,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       }));
   } catch (e) {
-    // GSC-001 · Paso 1 — Dejar de fallar en silencio.
-    //
-    // Este catch lleva días activo en producción y nadie se enteró: el sitemap
-    // servía 19 URLs con estado «Correcto» mientras se perdían las 147 fichas,
-    // que son el 88 % del contenido. Un fallback que miente y además no deja
-    // rastro es la peor combinación posible.
+    // GSC-001 · Pasos 1 y 3 — Registrar y NO mentir.
     //
     // Se registran los campos por separado y no el objeto pelado: en los logs
     // de Vercel un Error serializado se ve como «{}» y no sirve de nada.
@@ -134,18 +174,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     );
 
-    // Sin base de datos servimos al menos el esqueleto: las 8 ciudades que
-    // llevan meses publicadas, que es lo que no puede desaparecer del índice
-    // porque Supabase tuvo un mal minuto.
+    // Antes acá se servían las 8 ciudades del catálogo y se devolvía 200. Ese
+    // fallback hacía tres cosas malas a la vez: escondía la pérdida del 88 %
+    // del sitemap detrás de un «Correcto» en Search Console, le decía a Google
+    // que las 147 fichas dejaron de estar declaradas, y emitía cinco ciudades
+    // por debajo del umbral que se marcan solas como noindex —contradiciendo a
+    // SEO-006 y generando avisos de «URL enviada marcada como noindex»—.
     //
-    // OJO: esta política es justo lo que discute el Paso 2 del handoff — hoy
-    // emite ciudades por debajo del umbral y contradice a SEO-006. No se toca
-    // hasta tener el log de arriba; primero el diagnóstico, después la cura.
-    ciudades = CIUDADES.map((c) => ({
-      url: `${SITIO}/${c.slug}`,
-      changeFrequency: "hourly" as const,
-      priority: 0.9,
-    }));
+    // Ahora el error sube. Dos finales posibles, los dos honestos:
+    //   · Con caché previa (el caso normal en producción), Next sigue sirviendo
+    //     el último sitemap bueno y reintenta después. Google no pierde nada.
+    //   · Sin caché, la ruta responde 5xx y Search Console reporta «No se ha
+    //     podido obtener»: un estado visible y diagnosticable.
+    //
+    // CONSECUENCIA A TENER PRESENTE: esta ruta se prerenderiza en el build, así
+    // que si Supabase falla los tres intentos justo durante un despliegue, el
+    // build falla y Vercel mantiene el anterior en producción. Es ruidoso, pero
+    // es preferible a publicar un sitemap sin el 88 % del contenido.
+    throw error;
   }
 
   // Con ~150 URLs un solo archivo es correcto. Al pasar de ~10.000 habrá que
