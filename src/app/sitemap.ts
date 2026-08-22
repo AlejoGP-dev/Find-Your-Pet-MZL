@@ -10,11 +10,43 @@ import { ciudadesDesdeConteo } from "@/lib/ciudades";
 import { DIAS_CADUCIDAD, SITIO, UMBRAL } from "@/lib/seo";
 
 /**
- * El sitemap consulta la base de datos, así que se regenera cada hora en vez
- * de en cada petición. Sin esto, cada visita de un bot dispararía tres
- * consultas a Supabase.
+ * ARCH-003 — El sitemap se genera en cada petición.
+ *
+ * Acá vivía `export const revalidate = 3600`, y era mentira. La documentación
+ * de Next 16 lo dice en una línea: «sitemap.js es un Route Handler especial
+ * que se cachea POR DEFECTO salvo que use una API de tiempo de petición o una
+ * opción de configuración `dynamic`». `revalidate` no es una de esas dos
+ * cosas, así que la ruta se quedaba prerenderizada en el build y no revalidaba
+ * nunca.
+ *
+ * No es teoría. El 22 de agosto se midió en producción: el documento llevaba
+ * ~10 horas idéntico —byte por byte, `age` creciendo 1:1 con el reloj— desde
+ * el último despliegue. Cero invocaciones en los logs de Vercel frente a 13
+ * peticiones (con una ruta de control que sí aparecía), cero mensajes de la
+ * instrumentación del Paso 1 en 11 horas, sin las cabeceras `x-nextjs-prerender`
+ * ni `x-nextjs-stale-time` que sí lleva una página ISR de verdad, y un `206`
+ * ante una petición de `Range`: se servía como objeto estático del CDN.
+ *
+ * La consecuencia era de producto, no de SEO: una mascota reportada hoy no
+ * entraba al sitemap hasta que alguien desplegara. En un sitio cuyo problema
+ * declarado es que Google no descubre las fichas, el canal de descubrimiento
+ * estaba desconectado del momento de publicar.
+ *
+ * Coste: tres consultas a Supabase por petición. El tráfico a un sitemap es de
+ * bots y es bajo — no se parece al de una ruta de usuario. Si el TTFB se va por
+ * encima de 3 s, el plan es mover esto a `app/sitemap.xml/route.ts` con
+ * `Cache-Control: s-maxage=3600, stale-while-revalidate=86400`, que da el mismo
+ * resultado con una consulta por hora y un comportamiento que se lee en las
+ * cabeceras en vez de adivinarse.
+ *
+ * OJO con lo que este cambio se lleva por delante: al no prerenderizarse en el
+ * build, el escudo del Paso 3 cambia de forma. Antes, si Supabase fallaba los
+ * tres intentos durante un despliegue, el build fallaba y Vercel mantenía el
+ * anterior. Ahora ese mismo fallo sale como 5xx en la petición. Sigue sin
+ * violarse la regla que importa —nunca un `urlset` mutilado con estado 200—,
+ * pero el fallo se ve en otro sitio.
  */
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 /**
  * Reintenta una consulta antes de darla por perdida.
