@@ -73,6 +73,26 @@ export const UMBRAL = {
 export const DIAS_CADUCIDAD = 0;
 
 /**
+ * SEO-033. Mientras no exista ninguna publicación de adopción, el hub
+ * `/adopcion` no se le ofrece a Google: hoy su contenido visible dice «0 En
+ * adopción · 0 Ya tienen hogar · No hay mascotas que coincidan».
+ *
+ * **Para publicarla, poner esto en `true` y desplegar. Es el único paso.**
+ * Manda a la vez sobre la meta `robots` de la página y sobre su entrada en el
+ * sitemap, así que las dos no se pueden desincronizar — que es exactamente lo
+ * que pasó cuando `SEO-030` se cerró al revés y quedó una página vacía dentro
+ * del sitemap y encima indexable.
+ *
+ * OJO — NO convertir esto en una consulta. Antes el `noindex` se decidía
+ * consultando Supabase en cada visita, y esa consulta es una de las tres
+ * implicadas en `SEO-031` (metadata emitida fuera de `<head>`). Quitarla fue
+ * una mejora real y no se deshace: una constante cuesta cero milisegundos y
+ * hace lo mismo. `/adopcion/{ciudad}` sí usa el conteo real, y está bien —
+ * pero eso corre en el sitemap, no en el camino de una petición de usuario.
+ */
+export const ADOPCION_CON_CONTENIDO = false;
+
+/**
  * Recorta en el último espacio antes del límite, para que ninguna meta
  * description termine cortando una palabra por la mitad.
  */

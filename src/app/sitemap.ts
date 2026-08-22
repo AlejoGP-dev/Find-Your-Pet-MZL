@@ -7,7 +7,7 @@ import {
 } from "@/lib/almacen";
 import { GUIAS } from "@/lib/consejos";
 import { ciudadesDesdeConteo } from "@/lib/ciudades";
-import { DIAS_CADUCIDAD, SITIO, UMBRAL } from "@/lib/seo";
+import { ADOPCION_CON_CONTENIDO, DIAS_CADUCIDAD, SITIO, UMBRAL } from "@/lib/seo";
 
 /**
  * ARCH-003 — El sitemap se genera en cada petición.
@@ -97,7 +97,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITIO}/reportar`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITIO}/ayudar`, changeFrequency: "weekly", priority: 0.6 },
     { url: `${SITIO}/consejos`, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${SITIO}/adopcion`, changeFrequency: "daily", priority: 0.9 },
+    // SEO-033 — El hub de adopción entra al sitemap solo cuando tiene algo que
+    // mostrar. Misma constante que decide su meta `robots`, así que no puede
+    // volver a pasar lo de antes: una página vacía, con `noindex`… y enviada a
+    // Google en el sitemap.
+    ...(ADOPCION_CON_CONTENIDO
+      ? [
+          {
+            url: `${SITIO}/adopcion`,
+            changeFrequency: "daily" as const,
+            priority: 0.9,
+          },
+        ]
+      : []),
+    // `/adopcion/publicar` no depende de eso: es un formulario, intención
+    // transaccional, indexable siempre — igual que `/reportar`.
     { url: `${SITIO}/adopcion/publicar`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITIO}/terminos`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITIO}/datos`, changeFrequency: "yearly", priority: 0.3 },
