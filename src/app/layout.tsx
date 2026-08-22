@@ -135,20 +135,15 @@ export default function RootLayout({
                 Ayudar <Icono nombre="corazon" className="h-[1em] w-[1em]" />
               </Link>
 
-              {/* Dos CTA: adopción va en secundario para no restarle fuerza a
-                  publicar, que sigue siendo la acción principal del sitio. */}
-              <Link
-                href="/adopcion"
-                className="hidden whitespace-nowrap rounded-xl border-2 border-marca px-3.5 py-2 text-sm font-bold text-marca transition hover:bg-marca-suave sm:inline-block sm:px-4"
-              >
-                Adopción
-              </Link>
+              {/* GSC-002 — Las redes van ANTES de los dos CTA, no entre ellos:
+                  «Adopción» y «Publicar reporte» son la pareja de acciones y
+                  tienen que leerse juntas. Metidas en medio partían el par y el
+                  header se veía desordenado.
 
-              {/* GSC-002 — Las redes en el header, solo de xl para arriba.
-                  Debajo de ese ancho el header ya va apretado (logo + dos
-                  enlaces + dos CTA) y meter tres iconos más empujaría el botón
-                  de publicar, que es la acción principal y no se toca. En
-                  móvil y tablet viven en la hamburguesa y en el footer. */}
+                  Solo de xl para arriba: por debajo el header ya va apretado
+                  (logo + dos enlaces + dos CTA) y tres iconos más empujarían el
+                  botón de publicar, que es la acción principal. En móvil y
+                  tablet viven en la hamburguesa y en el footer. */}
               <span className="mr-1 hidden items-center gap-0.5 border-r border-stone-200 pr-2 xl:flex">
                 {REDES.map((red) => (
                   <a
@@ -164,6 +159,15 @@ export default function RootLayout({
                   </a>
                 ))}
               </span>
+
+              {/* Dos CTA: adopción va en secundario para no restarle fuerza a
+                  publicar, que sigue siendo la acción principal del sitio. */}
+              <Link
+                href="/adopcion"
+                className="hidden whitespace-nowrap rounded-xl border-2 border-marca px-3.5 py-2 text-sm font-bold text-marca transition hover:bg-marca-suave sm:inline-block sm:px-4"
+              >
+                Adopción
+              </Link>
 
               <Link
                 href="/reportar"
@@ -217,14 +221,18 @@ export default function RootLayout({
                 <Icono nombre="corazon" className="h-[1em] w-[1em]" />
               </Link>
             </p>
+            {/* Antes acá salía «Bomberos Manizales: 119» junto a la 123. Con el
+                sitio ya abierto a todo el país eso dejó de servir: la 119 es de
+                bomberos en algunas ciudades y en otras no marca nada, así que
+                publicarla a nivel nacional era mandar a alguien a un número
+                muerto en plena emergencia.
+                La 123 sí es la línea única nacional y desde ella se activan
+                bomberos, policía y ambulancia — con una basta, y se puede
+                decir en todo el país sin mentir. */}
             <p className="mt-3">
-              Emergencias con animales:{" "}
+              Emergencia con un animal, en cualquier parte de Colombia:{" "}
               <a className="font-semibold text-marca underline" href="tel:123">
-                123
-              </a>{" "}
-              · Bomberos Manizales:{" "}
-              <a className="font-semibold text-marca underline" href="tel:119">
-                119
+                Línea nacional 123
               </a>
             </p>
 
