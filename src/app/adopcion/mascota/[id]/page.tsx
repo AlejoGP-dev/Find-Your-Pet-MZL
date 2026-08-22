@@ -9,6 +9,7 @@ import Icono, { type NombreIcono } from "@/components/Icono";
 import Migas, { type Miga } from "@/components/Migas";
 import { obtenerAdopcion } from "@/lib/almacen";
 import {
+  type Adopcion,
   CONVIVENCIAS,
   EDADES,
   ESPECIES_ADOPCION,
@@ -26,14 +27,27 @@ export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ id: string }> };
 
+/**
+ * SEO-007 · hueco 2, gemelo del de `/mascota/[id]`. Misma razón y misma forma:
+ * el `<head>` y el `WebPage` del JSON-LD salen de acá y de ningún otro sitio.
+ */
+export function metaDeAdopcion(a: Adopcion): {
+  titulo: string;
+  descripcion: string;
+} {
+  const nombre = a.nombre || "Mascota";
+  const titulo = `${nombre} busca hogar en ${a.ciudad} — Find Your Pet CO`;
+  const base = `${nombre} está en adopción en ${a.barrio}, ${a.ciudad}. Adopción gratuita y contacto directo por WhatsApp.`;
+  const descripcion = recortar(a.descripcion ? `${base} ${a.descripcion}` : base);
+  return { titulo, descripcion };
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const a = await obtenerAdopcion(id).catch(() => null);
   if (!a) return { title: "Publicación no encontrada — Find Your Pet CO" };
   const nombre = a.nombre || "Mascota";
-  const titulo = `${nombre} busca hogar en ${a.ciudad} — Find Your Pet CO`;
-  const base = `${nombre} está en adopción en ${a.barrio}, ${a.ciudad}. Adopción gratuita y contacto directo por WhatsApp.`;
-  const descripcion = recortar(a.descripcion ? `${base} ${a.descripcion}` : base);
+  const { titulo, descripcion } = metaDeAdopcion(a);
 
   return {
     title: titulo,
@@ -98,10 +112,10 @@ export default async function FichaAdopcion({ params }: Props) {
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-6">
       <DatosEstructurados datos={schema.migas(ruta)} />
+      {/* SEO-007 · hueco 2 — mismo título y misma descripción que el <head>. */}
       <DatosEstructurados
         datos={schema.ficha({
-          titulo: `${a.nombre || "Mascota"} en adopción en ${a.ciudad}`,
-          descripcion: a.descripcion || `Mascota en adopción en ${a.barrio}, ${a.ciudad}.`,
+          ...metaDeAdopcion(a),
           ruta: `/adopcion/mascota/${a.id}`,
           foto: a.foto_url,
           fotoAlt: a.nombre ? `Foto de ${a.nombre}` : undefined,

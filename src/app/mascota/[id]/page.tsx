@@ -16,6 +16,7 @@ import {
   ESPECIES,
   SEXOS,
   TAMANOS,
+  type Reporte,
   enlaceWhatsapp,
   etiquetaDe,
   diasDesde,
@@ -30,11 +31,28 @@ export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ id: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const reporte = await obtenerReporte(id).catch(() => null);
-  if (!reporte) return { title: "Reporte no encontrado — Find Your Pet CO" };
-
+/**
+ * El título y la descripción de una ficha, en un solo sitio.
+ *
+ * SEO-007 · hueco 2. Antes esto vivía dentro de `generateMetadata`, y el
+ * componente —que necesita lo mismo para el JSON-LD— lo recomponía por su
+ * cuenta con otra fórmula. El resultado era un `WebPage` que describía una
+ * página distinta de la que el visitante tenía delante:
+ *
+ *   <title>       Se perdió: Mascota en Villa verde, Pereira — Find Your Pet CO
+ *   WebPage.name  Mascotas perdidas en Pereira — Mascota
+ *
+ * QA lo midió en 3 de 3 fichas: era patrón, no caso suelto. Y la auditoría
+ * original ya avisaba de que un JSON-LD que se contradice con el HTML visible
+ * es peor que no tenerlo.
+ *
+ * La función es pura y no consulta nada: recibe el reporte que el llamante ya
+ * tiene en la mano. Así los dos consumidores no pueden separarse.
+ */
+export function metaDeReporte(reporte: Reporte): {
+  titulo: string;
+  descripcion: string;
+} {
   const nombre = reporte.nombre || "Mascota";
   const accion = reporte.tipo === "perdida" ? "Se perdió" : "Encontrada";
   const especie = ESPECIES.find((e) => e.valor === reporte.especie)?.etiqueta ?? "Mascota";
@@ -55,6 +73,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const descripcion = recortar(
     reporte.descripcion ? `${base} ${reporte.descripcion}` : base,
   );
+
+  return { titulo, descripcion };
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const reporte = await obtenerReporte(id).catch(() => null);
+  if (!reporte) return { title: "Reporte no encontrado — Find Your Pet CO" };
+
+  const nombre = reporte.nombre || "Mascota";
+  const { titulo, descripcion } = metaDeReporte(reporte);
 
   // Caducidad desactivada por defecto (DIAS_CADUCIDAD = 0). Ver lib/seo.ts.
   const caducado =
@@ -167,10 +196,11 @@ export default async function PaginaMascota({ params }: Props) {
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-6">
       <DatosEstructurados datos={schema.migas(ruta)} />
+      {/* SEO-007 · hueco 2 — mismo título y misma descripción que el <head>,
+          calculados una sola vez en `metaDeReporte`. */}
       <DatosEstructurados
         datos={schema.ficha({
-          titulo: `${etiquetaListado} — ${reporte.nombre || "Mascota"}`,
-          descripcion: reporte.descripcion || etiquetaListado,
+          ...metaDeReporte(reporte),
           ruta: `/mascota/${reporte.id}`,
           foto: reporte.foto_url,
           fotoAlt: reporte.nombre ? `Foto de ${reporte.nombre}` : undefined,

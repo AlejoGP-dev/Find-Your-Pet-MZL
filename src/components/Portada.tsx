@@ -278,9 +278,27 @@ export default async function Portada({
             izquierda, que se lee mejor en columna angosta. */}
         <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-14 md:text-center">
           {ciudad && (
-            <div className="md:flex md:justify-center">
-              <Migas items={migas} />
-            </div>
+            <>
+              {/* SEO-007 · hueco 1 — Las páginas de ciudad pintaban las migas
+                  pero no las declaraban. Google veía «no se ha detectado ningún
+                  elemento» en /manizales mientras la ficha sí salía con rutas
+                  de exploración.
+
+                  Sale del MISMO array que pinta <Migas>, no de una copia: dos
+                  fuentes distintas para lo mismo terminan contradiciéndose, y
+                  un JSON-LD que no coincide con el HTML es peor que ninguno.
+
+                  Va acá y no junto al bloque de `coleccion` a propósito: aquel
+                  vive dentro de `reportes.length > 0`, así que una ciudad sin
+                  resultados pintaría las migas sin declararlas. Acá aparecen y
+                  desaparecen juntas, siempre. Y en la portada nacional no se
+                  emite ninguno de los dos, que es lo correcto: `/` no tiene
+                  migas. */}
+              <DatosEstructurados datos={schema.migas(migas)} />
+              <div className="md:flex md:justify-center">
+                <Migas items={migas} />
+              </div>
+            </>
           )}
           <div className="mb-3 flex flex-wrap items-center gap-2 md:justify-center">
             <p className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-marca-oscuro shadow-sm">
