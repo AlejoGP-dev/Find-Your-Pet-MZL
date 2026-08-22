@@ -46,10 +46,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let ciudadesAdopcion: MetadataRoute.Sitemap = [];
 
   try {
+    // GSC-001 · Paso 1 — Saber CUÁL de las dos consultas falla.
+    //
+    // Las otras dos ya traen su propio .catch(), así que solo estas pueden
+    // tumbar el bloque. Cada una re-lanza con su nombre delante: el mensaje de
+    // Supabase se conserva tal cual y el control de flujo no cambia —lo sigue
+    // atrapando el catch de abajo—, pero el log dice quién murió en vez de
+    // dejarnos adivinando entre dos candidatas.
     const [filas, filasAdopcion, porCiudad, adopPorCiudad] = await Promise.all([
-      listarParaSitemap(),
+      listarParaSitemap().catch((e) => {
+        throw new Error(`listarParaSitemap → ${e instanceof Error ? e.message : String(e)}`);
+      }),
       listarAdopcionesParaSitemap().catch(() => []),
-      contarReportesPorCiudad(),
+      contarReportesPorCiudad().catch((e) => {
+        throw new Error(
+          `contarReportesPorCiudad → ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }),
       contarAdopcionesPorCiudad().catch(() => ({}) as Record<string, number>),
     ]);
 
@@ -100,10 +113,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "daily" as const,
         priority: 0.7,
       }));
-  } catch {
+  } catch (e) {
+    // GSC-001 · Paso 1 — Dejar de fallar en silencio.
+    //
+    // Este catch lleva días activo en producción y nadie se enteró: el sitemap
+    // servía 19 URLs con estado «Correcto» mientras se perdían las 147 fichas,
+    // que son el 88 % del contenido. Un fallback que miente y además no deja
+    // rastro es la peor combinación posible.
+    //
+    // Se registran los campos por separado y no el objeto pelado: en los logs
+    // de Vercel un Error serializado se ve como «{}» y no sirve de nada.
+    const error = e instanceof Error ? e : new Error(String(e));
+    console.error(
+      "[sitemap] GSC-001 · fallo construyendo el sitemap dinámico",
+      JSON.stringify({
+        mensaje: error.message,
+        nombre: error.name,
+        causa: error.cause ? String(error.cause) : undefined,
+        pila: error.stack?.split("\n").slice(0, 4).join(" | "),
+      }),
+    );
+
     // Sin base de datos servimos al menos el esqueleto: las 8 ciudades que
     // llevan meses publicadas, que es lo que no puede desaparecer del índice
     // porque Supabase tuvo un mal minuto.
+    //
+    // OJO: esta política es justo lo que discute el Paso 2 del handoff — hoy
+    // emite ciudades por debajo del umbral y contradice a SEO-006. No se toca
+    // hasta tener el log de arriba; primero el diagnóstico, después la cura.
     ciudades = CIUDADES.map((c) => ({
       url: `${SITIO}/${c.slug}`,
       changeFrequency: "hourly" as const,
