@@ -11,7 +11,7 @@ import Icono from "@/components/Icono";
 import Isotipo from "@/components/Isotipo";
 import MenuMovil from "@/components/MenuMovil";
 import Vitals from "@/components/Vitals";
-import { WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
+import { CORREO_PUBLICO, WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
 import { REDES } from "@/lib/redes";
 import { sitioWeb } from "@/lib/schema";
 import { SITIO } from "@/lib/seo";
@@ -270,6 +270,21 @@ export default function RootLayout({
                 className="font-semibold text-marca underline underline-offset-2"
               >
                 {WHATSAPP_SOPORTE_VISIBLE}
+              </a>
+            </p>
+            {/* MAIL-006 — Hasta acá el único canal visible era WhatsApp. Una
+                fundación que quiere entrar a /ayudar, un periodista o quien
+                simplemente prefiere dejar constancia por escrito no tenía a
+                dónde escribir. Va junto al WhatsApp y no en un bloque aparte:
+                son la misma cosa —cómo contactarnos— y separarlos obligaría a
+                buscar dos veces. */}
+            <p className="mt-1.5">
+              Correo:{" "}
+              <a
+                href={`mailto:${CORREO_PUBLICO}`}
+                className="font-semibold text-marca underline underline-offset-2"
+              >
+                {CORREO_PUBLICO}
               </a>
             </p>
 

@@ -3,6 +3,7 @@ import { ogPagina } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import Icono, { type NombreIcono } from "@/components/Icono";
+import { CORREO_PUBLICO } from "@/lib/legal";
 import { REDES } from "@/lib/redes";
 import {
   CIUDADES_CON_ORGS,
@@ -227,9 +228,24 @@ export default function PaginaAyudar() {
         <p className="mt-1 text-sm text-stone-600">
           Escríbeme y la agrego a esta lista.
         </p>
+        {/* MAIL-006 — El correo va primero y por delante de las redes.
+            Quien escribe acá suele ser una fundación presentándose: manda su
+            nombre, su NIT si lo tiene, fotos y una cuenta de donaciones. Eso no
+            cabe en un mensaje directo de Instagram, y encima los MD de cuentas
+            que no te siguen caen en «solicitudes» y se pierden semanas. */}
+        <p className="mt-4 text-sm text-stone-600">
+          Al correo{" "}
+          <a
+            href={`mailto:${CORREO_PUBLICO}?subject=${encodeURIComponent("Fundación para la lista de Find Your Pet CO")}`}
+            className="font-bold text-marca underline underline-offset-2"
+          >
+            {CORREO_PUBLICO}
+          </a>{" "}
+          o por redes:
+        </p>
         {/* GSC-002 — Antes esto apuntaba al Instagram personal. Ahora manda a
             las cuentas de la marca, que son las que atienden el proyecto. */}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
           {REDES.map((red) => (
             <a
               key={red.nombre}

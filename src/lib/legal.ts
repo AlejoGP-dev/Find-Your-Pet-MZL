@@ -12,6 +12,20 @@ export const WHATSAPP_SOPORTE = "573148148380";
 /** Como se lee en Colombia, para mostrarlo en pantalla. */
 export const WHATSAPP_SOPORTE_VISIBLE = "314 814 8380";
 
+/**
+ * MAIL-006 — El correo público del proyecto.
+ *
+ * Es la cuenta de cara al público, no la administrativa: `admin@` administra
+ * Zoho, el DNS y los usuarios, y por eso no se publica nunca (ver
+ * claude/CORREO-CORPORATIVO.md). Si esta dirección entra a listas de spam, se
+ * cambia el alias y ya — la que controla el dominio no se toca.
+ *
+ * Hasta ahora el único canal visible era WhatsApp, y hay gente que no escribe
+ * por WhatsApp a un desconocido: una fundación que quiere aparecer en /ayudar,
+ * un periodista, alguien que prefiere dejar constancia por escrito.
+ */
+export const CORREO_PUBLICO = "contacto@find-your-pet.co";
+
 /** Fecha de la última actualización de los documentos legales. */
 export const ACTUALIZADO = "17 de agosto de 2026";
 
