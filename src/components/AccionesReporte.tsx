@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Icono from "@/components/Icono";
+import { enlaceCodigoPerdido } from "@/lib/legal";
 import { useTokenGuardado } from "@/lib/misReportes";
 import type { TipoReporte } from "@/lib/tipos";
 
@@ -10,10 +11,17 @@ export default function AccionesReporte({
   id,
   tipo,
   resuelto,
+  nombre,
+  ciudad,
+  url,
 }: {
   id: string;
   tipo: TipoReporte;
   resuelto: boolean;
+  /** FEATURE-003: para que el mensaje de código perdido llegue ya identificado. */
+  nombre: string | null;
+  ciudad: string;
+  url: string;
 }) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
@@ -148,6 +156,27 @@ export default function AccionesReporte({
                   Cancelar
                 </button>
               </div>
+
+              {/* FEATURE-003 — La salida para quien perdió el código.
+                  Va acá dentro y no fuera: este panel es el único momento en
+                  que a alguien le hace falta el código, y es justo cuando
+                  descubre que no lo tiene. Un enlace discreto, no un botón —
+                  no compite con «Confirmar», que es lo que la mayoría va a
+                  usar. Y como todo el bloque vive dentro de `!resuelto`, no
+                  aparece en fichas ya resueltas, donde no hay nada que
+                  gestionar. */}
+              <p className="mt-3 border-t border-stone-200 pt-3 text-sm text-stone-500">
+                <a
+                  href={enlaceCodigoPerdido({ nombre, ciudad, url })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-marca underline underline-offset-2 hover:text-marca-oscuro"
+                >
+                  ¿Perdiste tu código?
+                </a>{" "}
+                Escríbenos desde el mismo WhatsApp con el que publicaste y te lo
+                reenviamos.
+              </p>
             </div>
           ) : (
             <button

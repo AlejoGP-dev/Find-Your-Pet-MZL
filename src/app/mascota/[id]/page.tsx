@@ -334,6 +334,13 @@ export default async function PaginaMascota({ params }: Props) {
             id={reporte.id}
             tipo={reporte.tipo}
             resuelto={reporte.estado === "resuelto"}
+            // FEATURE-003: el mensaje de «perdí mi código» sale con la mascota
+            // ya identificada. `url` es la misma que ya se calcula acá arriba
+            // para compartir, así que no se inventa una segunda forma de armar
+            // la dirección de la ficha.
+            nombre={reporte.nombre}
+            ciudad={reporte.ciudad}
+            url={url}
           />
 
           <p className="rounded-xl bg-amber-50 p-3 text-xs text-amber-900">

@@ -40,6 +40,53 @@ export function enlaceSoporte(mensaje?: string): string {
   return `https://wa.me/${WHATSAPP_SOPORTE}?text=${encodeURIComponent(texto)}`;
 }
 
+/**
+ * FEATURE-003 — «¿Perdiste tu código?»
+ *
+ * El `token_gestion` se muestra una sola vez, al publicar, y no se guarda en
+ * ningún lado. Si se pierde, el dueño no puede marcar su reporte como resuelto:
+ * una mascota que ya volvió a casa se queda publicada como perdida para
+ * siempre, y el sitio sigue pidiéndole a la gente que la busque.
+ *
+ * La salida NO es automática, y es a propósito. Sin correo ni teléfono
+ * verificado, cualquier recuperación automática sería adivinar quién pide — y
+ * entregarle el código a quien no es permite marcar como resuelta una mascota
+ * que sigue perdida, o sea apagar su búsqueda. Con 151 reportes, una persona lo
+ * resuelve en dos minutos y con criterio.
+ *
+ * Por eso esto es solo un enlace que arma el mensaje. No guarda nada, no
+ * registra nada, no manda nada automático.
+ *
+ * **El `{id}` en el enlace es lo que hace que esto funcione**: sin él, quien
+ * atiende tiene que buscar a mano entre todas las fichas.
+ *
+ * Va por WhatsApp y no por correo porque el número del reporte ES la identidad:
+ * ya está en la base de datos, lo puso el dueño al publicar, y si escribe desde
+ * ese mismo número la prueba es inmediata. Un correo no se puede cotejar contra
+ * nada. La última línea del mensaje se la dice a la persona de antemano, para
+ * que escriba desde el número correcto y no haya que pedírselo después.
+ *
+ * Cómo se verifica y qué hacer si escribe desde otro número está en
+ * claude/OPERACION.md, no acá: es criterio de quien atiende, no código.
+ */
+export function enlaceCodigoPerdido(datos: {
+  nombre: string | null;
+  ciudad: string;
+  url: string;
+}): string {
+  return enlaceSoporte(
+    [
+      "Hola, perdí el código de gestión de mi reporte.",
+      "",
+      `Mascota: ${datos.nombre || "Sin nombre"}`,
+      `Ciudad: ${datos.ciudad}`,
+      `Enlace: ${datos.url}`,
+      "",
+      "Estoy escribiendo desde el mismo WhatsApp con el que publiqué el reporte.",
+    ].join("\n"),
+  );
+}
+
 /** Motivos frecuentes, para que el mensaje llegue ya clasificado. */
 export const MOTIVOS_SOPORTE = [
   {
