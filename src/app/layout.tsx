@@ -4,6 +4,7 @@ import { Nunito } from "next/font/google";
 import { Analytics as AnaliticaVercel } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Analytics from "@/components/Analytics";
+import PixelMeta from "@/components/PixelMeta";
 import AvisoLegal from "@/components/AvisoLegal";
 import BotonSoporte from "@/components/BotonSoporte";
 import DatosEstructurados from "@/components/DatosEstructurados";
@@ -70,6 +71,10 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-dvh flex-col font-sans">
         <Analytics />
+        {/* SOC-906-A: píxel de Meta, solo PageView, con la misma regla de
+            carga que GA4 (lazyOnload). Hoy no hace nada — espera a que exista
+            NEXT_PUBLIC_META_PIXEL_ID en Vercel. Ver PixelMeta.tsx. */}
+        <PixelMeta />
         {/* Analítica de Vercel: visitas y páginas vistas, sin cookies y sin
             pedirle nada a la persona. Convive con Google Analytics a
             propósito — GA da el detalle (de dónde llega la gente, qué busca) y
