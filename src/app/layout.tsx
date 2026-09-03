@@ -68,11 +68,14 @@ export default function RootLayout({
               "try{if(localStorage.getItem('fyp-aviso-legal-visto')==='1')document.documentElement.classList.add('aviso-visto')}catch(e){}",
           }}
         />
-        {/* AN-004: el shim de gtag, ~60 bytes en línea y sin red. Tiene que
-            existir ANTES de que nadie llame a gtag() — Vitals.tsx hoy, y los
-            eventos de negocio de SOC-906-B mañana. `gtag/js`, que es el que
-            pesa 170 KB, sigue en lazyOnload dentro de <Analytics />, así que
-            WPO-001 no se toca. Ver el comentario largo en Analytics.tsx. */}
+        {/* AN-004: el arranque de gtag —shim + js + config—, ~120 bytes en
+            línea y sin una sola petición de red. Tiene que correr ANTES de
+            que nadie llame a gtag() Y ANTES de que se encole ningún evento:
+            gtag.js procesa dataLayer en orden y descarta los eventos que ve
+            antes del config. Con el config abajo, TTFB y FCP se perdían.
+            `gtag/js`, que es el que pesa 170 KB, sigue en lazyOnload dentro
+            de <Analytics />, así que WPO-001 no se toca. Ver el comentario
+            largo en Analytics.tsx. */}
         <ShimGtag />
       </head>
       <body className="flex min-h-dvh flex-col font-sans">
