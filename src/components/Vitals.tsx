@@ -15,13 +15,33 @@ import { useReportWebVitals } from "next/web-vitals";
  */
 export default function Vitals() {
   useReportWebVitals((metrica) => {
-    // Empuja directo a dataLayer en vez de llamar a gtag(): GA se carga con
-    // lazyOnload (WPO-001) y una métrica puede dispararse antes. La cola de
-    // dataLayer existe desde el primer momento y GA la procesa al llegar.
     if (typeof window === "undefined") return;
-    const dl = ((window as unknown as { dataLayer?: unknown[] }).dataLayer ??= []);
 
-    dl.push([
+    // AN-004 — FID se descarta a propósito, no se olvidó.
+    //
+    // useReportWebVitals emite SEIS métricas, no cinco: además de las de
+    // abajo sale FID, que Google retiró como Core Web Vital y sustituyó por
+    // INP. En GA4 los nombres de evento NO se borran nunca —el proyecto ya
+    // carga para siempre con `an001_control`—, así que no se añade un evento
+    // que nadie planeó y que nadie va a mirar. INP ya mide lo que FID
+    // intentaba medir, y mejor. Decisión de la mesa en SPEC-TANDA-1 (H-35).
+    if (metrica.name === "FID") return;
+
+    // AN-004 — Se llama a gtag() como cualquier otro consumidor.
+    //
+    // Antes se empujaba un Array a dataLayer a mano, porque con lazyOnload
+    // (WPO-001) `gtag` no existía todavía. Pero gtag.js solo reconoce como
+    // comando un objeto `arguments`: el Array se quedaba en la cola y se
+    // ignoraba en silencio. Ahora el shim vive en el <head> (ver
+    // Analytics.tsx → ShimGtag), así que `gtag` está disponible desde el
+    // principio y este caso especial desaparece.
+    //
+    // Si no hay gtag es que GA está apagado —en desarrollo, o sin
+    // NEXT_PUBLIC_GA_ID—, y entonces no hay nada que medir.
+    const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
+    if (typeof gtag !== "function") return;
+
+    gtag(
       "event",
       metrica.name, // LCP, INP, CLS, FCP, TTFB
       {
@@ -34,7 +54,7 @@ export default function Vitals() {
         metric_ruta: window.location.pathname,
         non_interaction: true, // no ensucia la tasa de rebote
       },
-    ]);
+    );
   });
 
   return null;

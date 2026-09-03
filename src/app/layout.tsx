@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Nunito } from "next/font/google";
 import { Analytics as AnaliticaVercel } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import Analytics from "@/components/Analytics";
+import Analytics, { ShimGtag } from "@/components/Analytics";
 import PixelMeta from "@/components/PixelMeta";
 import AvisoLegal from "@/components/AvisoLegal";
 import BotonSoporte from "@/components/BotonSoporte";
@@ -68,6 +68,12 @@ export default function RootLayout({
               "try{if(localStorage.getItem('fyp-aviso-legal-visto')==='1')document.documentElement.classList.add('aviso-visto')}catch(e){}",
           }}
         />
+        {/* AN-004: el shim de gtag, ~60 bytes en línea y sin red. Tiene que
+            existir ANTES de que nadie llame a gtag() — Vitals.tsx hoy, y los
+            eventos de negocio de SOC-906-B mañana. `gtag/js`, que es el que
+            pesa 170 KB, sigue en lazyOnload dentro de <Analytics />, así que
+            WPO-001 no se toca. Ver el comentario largo en Analytics.tsx. */}
+        <ShimGtag />
       </head>
       <body className="flex min-h-dvh flex-col font-sans">
         <Analytics />
