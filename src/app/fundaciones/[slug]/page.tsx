@@ -55,19 +55,35 @@ export async function generateMetadata({ params }: { params: Ruta }): Promise<Me
   };
 }
 
-/** La onda que separa las franjas de color. Decorativa: fuera del árbol de a11y. */
-function Onda({ arriba = false, color }: { arriba?: boolean; color: string }) {
+/**
+ * La onda que separa las franjas de color. Decorativa: fuera del árbol de a11y.
+ *
+ * El SVG se dibuja 60 px más ancho que su caja y desplazado 30 px a la
+ * izquierda. Es lo que permite que derive de lado a lado sin que asome el
+ * borde por ningún extremo: la animación mueve ±14 px y sobran 16 a cada lado.
+ */
+function Onda({
+  arriba = false,
+  color,
+  lenta = false,
+}: {
+  arriba?: boolean;
+  color: string;
+  lenta?: boolean;
+}) {
   return (
     <div
       aria-hidden="true"
-      className={`pointer-events-none absolute left-0 right-0 z-[2] leading-[0] ${
+      className={`pointer-events-none absolute left-0 right-0 z-[2] overflow-hidden leading-[0] ${
         arriba ? "top-[-1px]" : "bottom-[-1px]"
       }`}
     >
       <svg
         viewBox="0 0 1440 90"
         preserveAspectRatio="none"
-        className={`block h-[46px] w-full sm:h-[70px] ${arriba ? "" : "rotate-180"}`}
+        className={`-ml-[30px] block h-[46px] w-[calc(100%+60px)] sm:h-[70px] ${
+          arriba ? "" : "rotate-180"
+        } ${lenta ? "onda-deriva-lenta" : "onda-deriva"}`}
       >
         <path
           fill={color}
@@ -116,28 +132,32 @@ export default async function PaginaFundacion({ params }: { params: Ruta }) {
         <div className="mx-auto w-full max-w-5xl px-4">
           <Migas items={migas} />
 
-          {/* Co-marca: quién publica y de quién es la historia. Se lee de una,
-              y evita que la página parezca de Find Your Pet. */}
+          {/* El logo de la fundación, solo. Antes iba con un «Find Your Pet
+              junto a» y una raya divisoria; se quitaron porque la cabecera del
+              sitio ya dice de quién es el dominio, y repetirlo acá le robaba
+              protagonismo a la marca que esta página viene a visibilizar.
+              El origen mide 240 px de alto, así que a 96 px sigue nítido en
+              pantallas de doble densidad. */}
           {p.logo && (
-            <div className="mt-5 flex flex-wrap items-center gap-4">
-              <span className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-marca">
-                Find Your Pet junto a
-              </span>
-              <span aria-hidden="true" className="h-9 w-px bg-marca/25" />
-              <Image
-                src={p.logo}
-                alt={`Logo de ${org.nombre}`}
-                width={255}
-                height={240}
-                priority
-                className="h-14 w-auto sm:h-16"
-              />
-            </div>
+            <Image
+              src={p.logo}
+              alt={`Logo de ${org.nombre}`}
+              width={255}
+              height={240}
+              priority
+              className="mt-4 h-20 w-auto sm:h-24"
+            />
           )}
 
           {/* La columna del texto va un poco más ancha que la de la foto: con
-              las dos iguales, el titular partía «Los que nadie / adopta». */}
-          <div className="mt-8 grid items-center gap-10 md:grid-cols-[1.08fr_0.92fr] md:gap-12">
+              las dos iguales, el titular partía «Los que nadie / adopta».
+
+              `items-start` y no `items-center`: la foto es mucho más alta que
+              el texto, así que al centrar verticalmente el bloque de texto se
+              hundía y quedaba un vacío enorme entre el logo y la píldora del
+              nombre. Alineados arriba, la píldora arranca justo debajo del
+              logo, que es como tiene que leerse. */}
+          <div className="mt-4 grid items-start gap-8 md:grid-cols-[1.08fr_0.92fr] md:gap-12">
             <div>
               <p className="inline-block rounded-full bg-white px-4 py-2 text-xs font-extrabold uppercase tracking-[0.13em] text-marca shadow-sm">
                 {p.antetitulo}
@@ -161,8 +181,13 @@ export default async function PaginaFundacion({ params }: { params: Ruta }) {
                 resto de la página abajo. No se recorta — la mujer sale en la
                 parte de arriba y un `object-cover` le cortaría la cabeza. */}
             <div className="relative mx-auto w-full max-w-[288px] sm:max-w-[340px] md:max-w-none">
+              {/* `flota-foto` mueve la forma y el borde en bucle. El
+                  `border-radius` de partida se queda en línea porque es el que
+                  se ve si alguien pidió menos movimiento: la animación está
+                  dentro de `prefers-reduced-motion`, y sin ella este valor es
+                  el único que manda. Ver globals.css. */}
               <div
-                className="overflow-hidden border-[7px] border-white shadow-[0_22px_50px_rgba(10,79,77,0.24)]"
+                className="flota-foto overflow-hidden border-[7px] border-white shadow-[0_22px_50px_rgba(10,79,77,0.24)]"
                 style={{ borderRadius: "58% 42% 46% 54% / 48% 44% 56% 52%" }}
               >
                 <Image
@@ -182,9 +207,9 @@ export default async function PaginaFundacion({ params }: { params: Ruta }) {
                   aria-hidden="true"
                   className={`absolute z-10 hidden overflow-hidden rounded-full border-4 border-white shadow-[0_10px_24px_rgba(10,79,77,0.2)] lg:block ${
                     [
-                      "left-[-30px] top-[14%] h-20 w-20",
-                      "right-[-24px] top-[6%] h-[68px] w-[68px]",
-                      "bottom-[16%] left-[-14px] h-16 w-16",
+                      "left-[-30px] top-[14%] h-20 w-20 flota-1",
+                      "right-[-24px] top-[6%] h-[68px] w-[68px] flota-2",
+                      "bottom-[16%] left-[-14px] h-16 w-16 flota-3",
                     ][i]
                   }`}
                 >
@@ -237,10 +262,10 @@ export default async function PaginaFundacion({ params }: { params: Ruta }) {
           Es lo mejor que tiene la página. Va a pantalla completa, en el color
           de marca, y sin reescribir: solo se le añadió puntuación y párrafos. */}
       <section className="relative overflow-hidden bg-marca py-20 sm:py-28">
-        <Onda arriba color="var(--color-crema)" />
+        <Onda arriba lenta color="var(--color-crema)" />
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute left-[3%] top-2 select-none font-serif text-[200px] leading-none text-white/10 sm:text-[280px]"
+          className="respira pointer-events-none absolute left-[3%] top-2 origin-center select-none font-serif text-[200px] leading-none text-white/10 sm:text-[280px]"
         >
           &ldquo;
         </span>
@@ -288,12 +313,16 @@ export default async function PaginaFundacion({ params }: { params: Ruta }) {
           </h2>
 
           <div className="mt-8 grid gap-5 sm:grid-cols-3">
-            {p.apoyo.bloques.map((b) => (
+            {p.apoyo.bloques.map((b, i) => (
               <article
                 key={b.titulo}
-                className="rounded-3xl bg-marca p-7 text-white shadow-[0_14px_32px_rgba(15,111,108,0.22)]"
+                className="rounded-3xl bg-marca p-7 text-white shadow-[0_14px_32px_rgba(15,111,108,0.22)] transition-transform duration-300 hover:-translate-y-1"
               >
-                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/20">
+                <span
+                  className={`grid h-12 w-12 place-items-center rounded-2xl bg-white/20 ${
+                    ["flota-icono-1", "flota-icono-2", "flota-icono-3"][i] ?? ""
+                  }`}
+                >
                   <Icono nombre={b.icono} className="h-6 w-6" bloque />
                 </span>
                 <h3 className="mt-4 text-xl font-extrabold">{b.titulo}</h3>
@@ -311,7 +340,7 @@ export default async function PaginaFundacion({ params }: { params: Ruta }) {
                 href={e.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 rounded-full bg-white px-6 py-4 text-base font-extrabold text-marca-oscuro shadow-[0_8px_22px_rgba(10,79,77,0.12)] transition hover:bg-white hover:shadow-[0_12px_28px_rgba(10,79,77,0.2)]"
+                className="inline-flex items-center gap-3 rounded-full bg-white px-6 py-4 text-base font-extrabold text-marca-oscuro shadow-[0_8px_22px_rgba(10,79,77,0.12)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(10,79,77,0.22)]"
               >
                 <Icono nombre={e.icono === "facebook" ? "facebook" : "instagram"} />
                 {e.etiqueta}
@@ -325,7 +354,7 @@ export default async function PaginaFundacion({ params }: { params: Ruta }) {
               Find Your Pet de ser un recaudador (D-26). ===== */}
       <section className="mx-auto w-full max-w-3xl px-4 py-14">
         <div className="rounded-3xl bg-white p-8 shadow-[0_14px_40px_rgba(10,79,77,0.10)] sm:p-11">
-          <span className="grid h-14 w-14 place-items-center rounded-full bg-marca-suave text-marca">
+          <span className="late grid h-14 w-14 place-items-center rounded-full bg-marca-suave text-marca">
             <Icono nombre="escudo" className="h-7 w-7" bloque />
           </span>
           <h2 className="mt-4 text-2xl font-extrabold text-marca-oscuro">

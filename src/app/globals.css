@@ -74,3 +74,152 @@ body {
 .aviso-visto .aviso-legal {
   display: none;
 }
+
+/* FEATURE-007 — La portada de la página de fundación flota.
+   ------------------------------------------------------------------
+   La foto principal y los tres recortes se mueven en bucle, cada uno con su
+   duración y su desfase, para que el conjunto no lata al unísono: si todos
+   suben y bajan a la vez se ve mecánico, y lo que se busca es que respire.
+
+   Solo se anima `transform` (y en la foto grande, el `border-radius`): nada
+   que obligue al navegador a recalcular la maquetación. No hay salto de
+   layout porque los elementos no cambian de tamaño ni de sitio en el flujo.
+
+   Todo va dentro de `prefers-reduced-motion: no-preference`. **Sin la guardia
+   no se despliega**: hay gente a la que el movimiento en bucle le produce
+   mareo o migraña, y una página sobre cuidar animales no es sitio para eso.
+   Quien pida menos movimiento ve exactamente el mismo diseño, quieto. */
+@media (prefers-reduced-motion: no-preference) {
+  .flota-foto {
+    animation: flota-foto 9s ease-in-out infinite;
+    will-change: transform;
+  }
+  .flota-1 {
+    animation: flota-corto 5.5s ease-in-out infinite;
+    will-change: transform;
+  }
+  .flota-2 {
+    animation: flota-largo 7s ease-in-out infinite -2.3s;
+    will-change: transform;
+  }
+  .flota-3 {
+    animation: flota-corto 6.2s ease-in-out infinite -3.7s;
+    will-change: transform;
+  }
+}
+
+@keyframes flota-foto {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    border-radius: 58% 42% 46% 54% / 48% 44% 56% 52%;
+  }
+  50% {
+    transform: translate3d(0, -12px, 0) rotate(0.7deg);
+    /* El borde también se mueve: es lo que hace que parezca una forma viva y
+       no una elipse con una animación encima. */
+    border-radius: 46% 54% 56% 44% / 54% 52% 48% 46%;
+  }
+}
+
+@keyframes flota-corto {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@keyframes flota-largo {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, 16px, 0);
+  }
+}
+
+/* FEATURE-007 — Movimiento sutil en el resto de la página de fundación.
+   ------------------------------------------------------------------
+   Regla que se siguió al elegir dónde: **solo se mueve lo decorativo.** Ni el
+   texto, ni los titulares, ni los enlaces. Nada que alguien esté leyendo o a
+   punto de pulsar se mueve debajo de su vista o de su dedo.
+
+   Todos los ciclos son largos (10-22 s) y de amplitud pequeña (4-16 px). Si se
+   nota que «hay una animación», está mal hecha: lo que se busca es que la
+   página respire, no que llame la atención.
+
+   Misma guardia que el resto: con `prefers-reduced-motion` no se mueve nada. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Las ondas que separan las franjas de color derivan muy despacio. Son el
+     fondo, así que pueden moverse sin molestar a nadie. */
+  .onda-deriva {
+    animation: onda-deriva 18s ease-in-out infinite;
+  }
+  .onda-deriva-lenta {
+    animation: onda-deriva 22s ease-in-out infinite -7s;
+  }
+  /* La comilla gigante de la cita: respira, sin desplazarse. */
+  .respira {
+    animation: respira 12s ease-in-out infinite;
+  }
+  /* El sello del bloque de la aclaración. */
+  .late {
+    animation: late 10s ease-in-out infinite;
+  }
+  /* Los iconos de los tres bloques de apoyo, desfasados entre sí. */
+  .flota-icono-1 {
+    animation: flota-icono 6.5s ease-in-out infinite;
+  }
+  .flota-icono-2 {
+    animation: flota-icono 7.5s ease-in-out infinite -2.5s;
+  }
+  .flota-icono-3 {
+    animation: flota-icono 8.5s ease-in-out infinite -4.5s;
+  }
+}
+
+@keyframes onda-deriva {
+  0%,
+  100% {
+    transform: translate3d(-14px, 0, 0);
+  }
+  50% {
+    transform: translate3d(14px, 0, 0);
+  }
+}
+
+@keyframes respira {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.16;
+  }
+}
+
+@keyframes late {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes flota-icono {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -5px, 0);
+  }
+}
