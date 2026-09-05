@@ -192,15 +192,20 @@ body {
   }
 }
 
+/* La comilla de la cita: respira y flota a la vez.
+   OJO con la opacidad: el elemento ya lleva su alfa en el color y una clase
+   `opacity` de base. Si acá se pone un valor bajo, los dos se MULTIPLICAN —
+   así estuvo un rato al 1 % de opacidad real, o sea invisible. Los valores de
+   abajo son la opacidad final del elemento, no un porcentaje de otra cosa. */
 @keyframes respira {
   0%,
   100% {
-    transform: scale(1);
-    opacity: 0.1;
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.22;
   }
   50% {
-    transform: scale(1.06);
-    opacity: 0.16;
+    transform: translate3d(0, -10px, 0) scale(1.05);
+    opacity: 0.34;
   }
 }
 

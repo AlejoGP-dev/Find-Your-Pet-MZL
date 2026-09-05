@@ -265,7 +265,13 @@ export default async function PaginaFundacion({ params }: { params: Ruta }) {
         <Onda arriba lenta color="var(--color-crema)" />
         <span
           aria-hidden="true"
-          className="respira pointer-events-none absolute left-[3%] top-2 origin-center select-none font-serif text-[200px] leading-none text-white/10 sm:text-[280px]"
+          /* `text-white` a secas y la opacidad en una clase aparte: con
+             `text-white/10` el alfa del color se multiplicaba por el de la
+             animación y la comilla quedaba al 1 % — estaba ahí, pero no se
+             veía. La clase `opacity-20` es la que manda si alguien pidió menos
+             movimiento; con movimiento, la animación va de 0,22 a 0,34.
+             `top-16` la baja por debajo de la onda, que antes la recortaba. */
+          className="respira pointer-events-none absolute left-[4%] top-16 origin-center select-none font-serif text-[190px] leading-none text-white opacity-20 sm:top-20 sm:text-[280px]"
         >
           &ldquo;
         </span>
