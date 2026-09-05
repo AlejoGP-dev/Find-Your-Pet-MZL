@@ -147,6 +147,20 @@ export default function PaginaAyudar() {
                     </p>
                   )}
 
+                  {/* FEATURE-007: si la fundación tiene página propia, este
+                      es el único camino hasta ella. Va antes que sus redes y
+                      con el color de marca: es contenido nuestro sobre ellos,
+                      no un enlace externo más. */}
+                  {org.pagina && (
+                    <Link
+                      href={`/fundaciones/${org.pagina.slug}`}
+                      className="mt-4 inline-flex items-center gap-2 rounded-xl bg-marca-suave px-3.5 py-2 text-sm font-bold text-marca-oscuro transition hover:bg-marca hover:text-white"
+                    >
+                      Conoce su historia
+                      <Icono nombre="corazon" className="h-[1em] w-[1em]" />
+                    </Link>
+                  )}
+
                   <div className="mt-4 flex flex-wrap gap-2">
                     {org.enlaces.map((e) => (
                       <a

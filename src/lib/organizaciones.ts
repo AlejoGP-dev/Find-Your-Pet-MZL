@@ -2,6 +2,51 @@ import type { NombreIcono } from "@/components/Icono";
 
 export type Enlace = { etiqueta: string; url: string; icono: string };
 
+/**
+ * FEATURE-007 — Una organización puede tener, además de su tarjeta en
+ * `/ayudar`, una página propia en `/fundaciones/{slug}`.
+ *
+ * Todo el contenido vive acá y la plantilla no sabe de ninguna fundación en
+ * concreto: **la segunda entra añadiendo un objeto, sin tocar la ruta.** Era
+ * un requisito explícito de la spec, y por eso no hay ni un `if` con nombres
+ * propios en `src/app/fundaciones/[slug]/page.tsx`.
+ *
+ * Regla que gobierna estos campos, y no es de estilo: **nada que la fundación
+ * no haya dado por escrito.** Si un dato falta, se omite el campo — no se pone
+ * un texto de relleno ni un `[por confirmar]`. La página es sobre un tercero y
+ * publicada en nuestro dominio: si algo está mal, la confianza que se pierde
+ * es la nuestra.
+ */
+export type BloqueApoyo = {
+  icono: NombreIcono;
+  titulo: string;
+  texto: string;
+};
+
+export type PaginaFundacion = {
+  slug: string;
+  /** `<title>` y meta description. Se escriben aparte del `<h1>` a propósito. */
+  titulo: string;
+  descripcion: string;
+  /** Va sobre el `<h1>`, en la píldora. Suele ser el nombre de la fundación. */
+  antetitulo: string;
+  /** El `<h1>` en dos líneas: la segunda se pinta en el color de marca. */
+  h1: [string, string];
+  /** Párrafos de entrada. Admiten **negrita** con dos asteriscos. */
+  entrada: string[];
+  /** La tira de tres datos bajo la portada. Solo cosas verificadas. */
+  datos: { valor: string; texto: string }[];
+  /** Bloques de texto corrido. Admiten **negrita**. */
+  secciones: { titulo: string; parrafos: string[] }[];
+  /** Cita literal. `firma` es de quien la dice, y va tal cual la autorizaron. */
+  testimonio: { parrafos: string[]; firma: string };
+  apoyo: { titulo: string; bloques: BloqueApoyo[]; pie: string };
+  /** Rutas dentro de /public. Optimizadas antes de commitear (ARCH-005). */
+  fotos: { portada: string; portadaAlt: string; recortes: string[] };
+  /** Logo grande para la cabecera de la página, si lo hay. */
+  logo?: string;
+};
+
 export type Organizacion = {
   nombre: string;
   descripcion: string;
@@ -21,6 +66,8 @@ export type Organizacion = {
   /** Distintivo corto, p. ej. "Ofrece hogar de paso". Va como etiqueta en la tarjeta. */
   etiqueta?: string;
   enlaces: Enlace[];
+  /** FEATURE-007: si existe, la organización tiene página propia. */
+  pagina?: PaginaFundacion;
 };
 
 /** Color estable para el avatar de iniciales, derivado del nombre. */
@@ -63,7 +110,97 @@ export const ORGANIZACIONES: Organizacion[] = [
         url: "https://www.instagram.com/fundacionvecinode4patas",
         icono: "instagram",
       },
+      {
+        etiqueta: "Facebook",
+        url: "https://www.facebook.com/vecinode4patas/",
+        icono: "facebook",
+      },
     ],
+    pagina: {
+      slug: "vecino-de-4-patas",
+      titulo: "Vecino de 4 Patas: un hogar para los perros que nadie adopta",
+      descripcion:
+        "Reciben a los animales que nadie quiere adoptar —por viejos, por enfermos, por su tamaño— y se quedan con ellos hasta el final. Conoce su trabajo y cómo apoyarlos.",
+      antetitulo: "Fundación Vecino de 4 Patas",
+      // El titular NO lleva el nombre de la fundación a propósito: nadie la
+      // busca por su nombre todavía, que es justo el problema que esta página
+      // viene a resolver. El nombre va en el `title` y en la píldora de arriba.
+      h1: ["Los que nadie adopta", "también tienen familia"],
+      entrada: [
+        "En casi todas las páginas de animales se muestran los que buscan hogar: los cachorros, los sanos, los que encuentran familia rápido.",
+        "**Vecino de 4 Patas hace lo contrario. Por eso casi nadie los ve.**",
+      ],
+      // Tres datos, los tres verificables. No hay cifra de animales ni año de
+      // fundación porque la fundación no los ha dado, y no se inventan.
+      datos: [
+        { valor: "Hogar geriátrico", texto: "para los que ya nadie va a adoptar" },
+        { valor: "Para siempre", texto: "no están en tránsito: se quedan" },
+        { valor: "Manizales", texto: "donde cuidan a sus animales" },
+      ],
+      secciones: [
+        {
+          titulo: "Un hogar geriátrico",
+          parrafos: [
+            "Reciben a los animales **que ya nadie va a adoptar**. Perros y gatos viejos, con enfermedades de base, con problemas de comportamiento.",
+            "Algunos llegaron porque estaban enfermos. Otros porque eran muy grandes, o de un color que nadie quería. Y varios, simplemente, porque dejaron de quererlos en su casa.",
+            "No los tienen en tránsito esperando a alguien. **Se quedan con ellos hasta el final de sus días.**",
+          ],
+        },
+        {
+          titulo: "Por qué es tan difícil que los vean",
+          parrafos: [
+            "Todo el mundo de la ayuda animal gira alrededor de la adopción: *adopta, no compres*, las ferias, las fichas de animales disponibles. **Una fundación que no tiene animales adoptables no aparece en ninguna de esas conversaciones.**",
+            "No tienen nada que ofrecerle a quien busca un perro. Y sin embargo cargan con los casos más caros y más largos: medicamentos todos los días, controles veterinarios, animales que van a estar con ellos años.",
+            "**Cuidan a los que nadie quiere, y por eso nadie los ve.**",
+          ],
+        },
+      ],
+      // Literal. Solo se le añadió puntuación y se partió en párrafos: ni una
+      // palabra cambiada, ni una quitada. Firma sin nombre propio porque la
+      // fundación no confirmó si quien habla quiere aparecer nombrada.
+      testimonio: {
+        parrafos: [
+          "Para nosotros esto sería muy importante: visibilizar nuestro trabajo, que se sepa que hay hogares que se dedican a darles una familia hasta el final de sus días.",
+          "Al ser nosotros un hogar geriátrico, o para animales gerontes, es muy importante que las personas sepan que con nosotros están los animalitos que no fueron adoptados por sus enfermedades de base, por su comportamiento, por su color, por su tamaño, o simplemente porque ya no los querían tener.",
+          "Nuestro objetivo es que ellos conozcan el amor verdadero, que sepan que merecen tener una familia, y que nosotros seremos su familia hasta el final de sus días.",
+          "**Nos encanta esta idea, sobre todo para que entiendan que aunque nosotros no tenemos perros o gatos adoptables, también los necesitamos.**",
+        ],
+        firma: "Fundación Vecino de 4 Patas",
+      },
+      apoyo: {
+        titulo: "Cómo apoyarlos",
+        bloques: [
+          {
+            icono: "comida",
+            titulo: "Alimento",
+            texto: "Es su necesidad constante, todos los días del año.",
+          },
+          {
+            icono: "medicina",
+            titulo: "Medicamentos",
+            texto: "Muchos de sus animales están en tratamiento permanente.",
+          },
+          {
+            icono: "megafono",
+            titulo: "Difusión",
+            texto: "No cuesta nada, y es lo que hace que lo demás llegue.",
+          },
+        ],
+        // El único camino hacia ellos son sus redes. Ni un mecanismo de
+        // donación nuestro, ni un intermediario: D-26 y la spec de FEATURE-007.
+        pie: "Escríbeles directamente para saber qué necesitan esta semana y cómo hacerles llegar la ayuda:",
+      },
+      fotos: {
+        portada: "/fundaciones/vecino-de-4-patas/casa.jpg",
+        portadaAlt: "La fundación en su casa, rodeada de los perros que cuida",
+        recortes: [
+          "/fundaciones/vecino-de-4-patas/perro-1.jpg",
+          "/fundaciones/vecino-de-4-patas/perro-2.jpg",
+          "/fundaciones/vecino-de-4-patas/perro-3.jpg",
+        ],
+      },
+      logo: "/fundaciones/vecino-de-4-patas/logo.png",
+    },
   },
   {
     nombre: "Fundación Estoy Contigo",
@@ -348,6 +485,22 @@ export const ORGANIZACIONES: Organizacion[] = [
 export const CIUDADES_CON_ORGS = [
   ...new Set(ORGANIZACIONES.map((o) => o.ciudad)),
 ];
+
+/**
+ * FEATURE-007 — Las organizaciones que tienen página propia.
+ *
+ * De acá salen las rutas estáticas y las entradas del sitemap. Añadir una
+ * fundación nueva es añadirle el campo `pagina`: no hay que tocar la ruta, ni
+ * el sitemap, ni `/ayudar`.
+ */
+export const CON_PAGINA: (Organizacion & { pagina: PaginaFundacion })[] =
+  ORGANIZACIONES.filter(
+    (o): o is Organizacion & { pagina: PaginaFundacion } => Boolean(o.pagina),
+  );
+
+export function organizacionPorSlug(slug: string) {
+  return CON_PAGINA.find((o) => o.pagina.slug === slug) ?? null;
+}
 
 /**
  * Grupos de Facebook donde la comunidad difunde mascotas perdidas y

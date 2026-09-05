@@ -7,6 +7,7 @@ import {
 } from "@/lib/almacen";
 import { GUIAS } from "@/lib/consejos";
 import { ciudadesDesdeConteo } from "@/lib/ciudades";
+import { CON_PAGINA } from "@/lib/organizaciones";
 import { ADOPCION_CON_CONTENIDO, DIAS_CADUCIDAD, SITIO, UMBRAL } from "@/lib/seo";
 
 /**
@@ -113,6 +114,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // `/adopcion/publicar` no depende de eso: es un formulario, intención
     // transaccional, indexable siempre — igual que `/reportar`.
     { url: `${SITIO}/adopcion/publicar`, changeFrequency: "monthly", priority: 0.7 },
+    // FEATURE-007 — Las páginas de fundaciones. Salen de `CON_PAGINA`, así que
+    // una fundación nueva entra al sitemap sola, sin tocar este archivo.
+    // No hay umbral que las bloquee (`D-09` es sobre páginas generadas): son
+    // páginas con contenido propio, escrito y verificado.
+    ...CON_PAGINA.map((o) => ({
+      url: `${SITIO}/fundaciones/${o.pagina.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     { url: `${SITIO}/terminos`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITIO}/datos`, changeFrequency: "yearly", priority: 0.3 },
     ...GUIAS.map((g) => ({
