@@ -133,26 +133,84 @@ export async function listarPaginaReportes(
   const desde = Math.max(0, (Math.max(1, pagina) - 1) * porPagina);
 
   if (!HAY_SUPABASE) {
-    const todos = await listarReportes(filtros);
+    // FEATURE-008 — El modo demo ordena en memoria. `listarReportes` ya devuelve
+    // por fecha descendente, y `sort` en JS es estable desde ES2019: al ordenar
+    // solo por «tiene foto» el orden por fecha de dentro de cada grupo se
+    // conserva sin tener que compararlo otra vez.
+    const todos = [...(await listarReportes(filtros))].sort(
+      (a, b) => Number(Boolean(b.foto_url)) - Number(Boolean(a.foto_url)),
+    );
     return { reportes: todos.slice(desde, desde + porPagina), total: todos.length };
   }
 
-  let consulta = supabase()
+  /**
+   * FEATURE-008 — Las que tienen foto van primero, y dentro de cada grupo se
+   * conserva el orden por fecha.
+   *
+   * Por qué son dos consultas y no un `order` más. Lo que hace falta en SQL es
+   * `ORDER BY (foto_url IS NULL), created_at DESC`, o sea ordenar por una
+   * EXPRESIÓN. PostgREST solo sabe ordenar por columnas: si se le pide
+   * `.order("foto_url", { nullsFirst: false })` ordena por el TEXTO de la URL,
+   * y eso destroza el orden por fecha de dentro del grupo — que es justo la
+   * precisión 1 de la spec.
+   *
+   * Se podría con una columna generada (`tiene_foto`) y un índice compuesto, y
+   * sería una sola consulta y más rápida que la de hoy. **No se hizo a
+   * propósito:** obliga a correr una migración ANTES de desplegar, y si el
+   * despliegue se adelanta a la migración el listado entero revienta. Este
+   * proyecto ya tiene un SQL entregado el 25 de agosto que nunca se corrió.
+   * Cambiar el orden del feed no vale ese riesgo. Queda propuesto para la mesa.
+   *
+   * Cómo funciona: la lista real es [con foto, por fecha] ++ [sin foto, por
+   * fecha]. Para la ventana [desde, desde+porPagina) se pide la parte que cae
+   * en el primer tramo y, solo si falta, la del segundo. La ventana del segundo
+   * arranca en `desde - totalConFoto`, acotada a 0. La paginación sigue siendo
+   * exacta: ningún reporte puede salir en dos páginas.
+   */
+  // Los filtros se aplican sobre el `select` pelado y el resto de la cadena va
+  // después: al revés, la inferencia de tipos de PostgREST se dispara y `tsc`
+  // corta con «Type instantiation is excessively deep». Comprobado.
+  let baseConFoto = supabase()
     .from("reportes")
     // `count: "exact"` y no "planned": con estos volúmenes cuesta microsegundos
     // y una cifra estimada en «1 de 6 páginas» se nota como un error.
-    .select(CAMPOS_PUBLICOS, { count: "exact" })
-    .order("created_at", { ascending: false })
-    .range(desde, desde + porPagina - 1);
+    .select(CAMPOS_PUBLICOS, { count: "exact" });
+  baseConFoto = aplicarFiltros(baseConFoto, filtros);
 
-  consulta = aplicarFiltros(consulta, filtros);
+  // Solo la cifra, sin traer filas: `head: true` no descarga ni un registro.
+  let baseSinFoto = supabase()
+    .from("reportes")
+    .select("id", { count: "exact", head: true });
+  baseSinFoto = aplicarFiltros(baseSinFoto, filtros);
 
-  const { data, error, count } = await consulta;
-  if (error) throw new Error(error.message);
-  return {
-    reportes: (data ?? []) as unknown as Reporte[],
-    total: count ?? 0,
-  };
+  const [resConFoto, resSinFoto] = await Promise.all([
+    baseConFoto
+      .not("foto_url", "is", null)
+      .order("created_at", { ascending: false })
+      .range(desde, desde + porPagina - 1),
+    baseSinFoto.is("foto_url", null),
+  ]);
+  if (resConFoto.error) throw new Error(resConFoto.error.message);
+  if (resSinFoto.error) throw new Error(resSinFoto.error.message);
+
+  const totalConFoto = resConFoto.count ?? 0;
+  const totalSinFoto = resSinFoto.count ?? 0;
+  const reportes = ((resConFoto.data ?? []) as unknown as Reporte[]).slice();
+
+  const faltan = porPagina - reportes.length;
+  if (faltan > 0 && totalSinFoto > 0) {
+    const desdeSinFoto = Math.max(0, desde - totalConFoto);
+    let sinFoto = supabase().from("reportes").select(CAMPOS_PUBLICOS);
+    sinFoto = aplicarFiltros(sinFoto, filtros);
+    const { data, error } = await sinFoto
+      .is("foto_url", null)
+      .order("created_at", { ascending: false })
+      .range(desdeSinFoto, desdeSinFoto + faltan - 1);
+    if (error) throw new Error(error.message);
+    reportes.push(...((data ?? []) as unknown as Reporte[]));
+  }
+
+  return { reportes, total: totalConFoto + totalSinFoto };
 }
 
 export async function obtenerReporte(id: string): Promise<Reporte | null> {
