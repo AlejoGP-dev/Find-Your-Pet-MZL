@@ -6,6 +6,7 @@ import Icono from "@/components/Icono";
 import Migas, { type Miga } from "@/components/Migas";
 import { GUIAS, guiaPorSlug } from "@/lib/consejos";
 import * as schema from "@/lib/schema";
+import { ADOPCION_CON_CONTENIDO } from "@/lib/seo";
 
 type Ruta = Promise<{ tipo: string }>;
 
@@ -65,6 +66,11 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
       </h1>
       <p className="mt-4 text-base text-stone-600 sm:text-lg">{guia.intro}</p>
 
+      {/* FEATURE-006 — En la guía de adoptar, el CTA manda a `/adopcion`. Con la
+          sección oculta no hay a dónde mandar a nadie, así que el botón no se
+          pinta: la guía sigue viva y sigue siendo útil, pero no promete un
+          listado que hoy no existe. Vuelve solo con ADOPCION_CON_CONTENIDO. */}
+      {(!esAdoptar || ADOPCION_CON_CONTENIDO) && (
       <Link
         href={esAdoptar ? "/adopcion" : `/reportar?tipo=${guia.slug}`}
         className="boton-primario mt-6 w-full sm:w-auto"
@@ -86,6 +92,7 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
           </>
         )}
       </Link>
+      )}
 
       {/* Índice: en una guía larga, poder saltar importa */}
       <nav className="mt-8 rounded-2xl border border-stone-200 bg-white p-4">

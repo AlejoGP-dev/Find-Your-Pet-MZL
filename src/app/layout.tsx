@@ -15,7 +15,7 @@ import Vitals from "@/components/Vitals";
 import { CORREO_PUBLICO, WHATSAPP_SOPORTE_VISIBLE, enlaceSoporte } from "@/lib/legal";
 import { REDES } from "@/lib/redes";
 import { sitioWeb } from "@/lib/schema";
-import { SITIO } from "@/lib/seo";
+import { ADOPCION_CON_CONTENIDO, SITIO } from "@/lib/seo";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -174,14 +174,23 @@ export default function RootLayout({
                 ))}
               </span>
 
-              {/* Dos CTA: adopción va en secundario para no restarle fuerza a
-                  publicar, que sigue siendo la acción principal del sitio. */}
-              <Link
-                href="/adopcion"
-                className="hidden whitespace-nowrap rounded-xl border-2 border-marca px-3.5 py-2 text-sm font-bold text-marca transition hover:bg-marca-suave sm:inline-block sm:px-4"
-              >
-                Adopción
-              </Link>
+              {/* FEATURE-006 — El CTA de adopción se oculta mientras la sección
+                  no tenga oferta real (SOC-012: Alejo está hablando con las
+                  fundaciones). Gobernado por ADOPCION_CON_CONTENIDO, la misma
+                  constante que ya decidía el noindex y el sitemap (SEO-033):
+                  volver a encenderlo es cambiar ese booleano y nada más.
+
+                  Cuando estaba visible: dos CTA, adopción en secundario para no
+                  restarle fuerza a publicar, que sigue siendo la acción
+                  principal del sitio. */}
+              {ADOPCION_CON_CONTENIDO && (
+                <Link
+                  href="/adopcion"
+                  className="hidden whitespace-nowrap rounded-xl border-2 border-marca px-3.5 py-2 text-sm font-bold text-marca transition hover:bg-marca-suave sm:inline-block sm:px-4"
+                >
+                  Adopción
+                </Link>
+              )}
 
               <Link
                 href="/reportar"

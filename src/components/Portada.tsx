@@ -17,6 +17,7 @@ import {
 import * as schema from "@/lib/schema";
 import { ciudadesDesdeConteo } from "@/lib/ciudades";
 import { POR_PAGINA, TOPE_VER_TODOS, paginaDe, verTodosDe } from "@/lib/paginacion";
+import { ADOPCION_CON_CONTENIDO } from "@/lib/seo";
 import { type Ciudad, type Reporte } from "@/lib/tipos";
 
 function uno(valor: string | string[] | undefined): string | null {
@@ -334,13 +335,17 @@ export default async function Portada({
               Encontré una mascota
               <Icono nombre="encontrada" />
             </Link>
-            <Link
-              href={`/adopcion${ciudad ? `/${ciudad.slug}` : ""}`}
-              className="boton-secundario border-marca/40 text-marca"
-            >
-              Quiero adoptar
-              <Icono nombre="hogar" />
-            </Link>
+            {/* FEATURE-006 — «Quiero adoptar» se oculta mientras la sección no
+                tenga oferta real. Vuelve con ADOPCION_CON_CONTENIDO. */}
+            {ADOPCION_CON_CONTENIDO && (
+              <Link
+                href={`/adopcion${ciudad ? `/${ciudad.slug}` : ""}`}
+                className="boton-secundario border-marca/40 text-marca"
+              >
+                Quiero adoptar
+                <Icono nombre="hogar" />
+              </Link>
+            )}
           </div>
 
           <div className="mt-8 grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3 md:mx-auto">
@@ -575,27 +580,33 @@ export default async function Portada({
       </section>
 
       <section className="mx-auto w-full max-w-5xl px-4 pb-6">
-        <Link
-          href="/adopcion"
-          className="mb-3 flex flex-col gap-3 rounded-2xl border-2 border-marca/30 bg-white p-6 transition hover:border-marca sm:flex-row sm:items-center sm:justify-between"
-        >
-          <span>
-            <span className="block text-xl font-extrabold text-marca-oscuro">
-              Mascotas que buscan familia{" "}
-              <Icono
-                nombre="hogar"
-                className="h-[1em] w-[1em]"
-              />
+        {/* FEATURE-006 — La tarjeta de adopción se oculta mientras la sección
+            no tenga oferta real (SOC-012). Vuelve con ADOPCION_CON_CONTENIDO.
+            Ojo al `mb-3`: es el que separa esta tarjeta de la de «Ayudar»; si
+            esta no se pinta, la de abajo queda sola y no necesita separación. */}
+        {ADOPCION_CON_CONTENIDO && (
+          <Link
+            href="/adopcion"
+            className="mb-3 flex flex-col gap-3 rounded-2xl border-2 border-marca/30 bg-white p-6 transition hover:border-marca sm:flex-row sm:items-center sm:justify-between"
+          >
+            <span>
+              <span className="block text-xl font-extrabold text-marca-oscuro">
+                Mascotas que buscan familia{" "}
+                <Icono
+                  nombre="hogar"
+                  className="h-[1em] w-[1em]"
+                />
+              </span>
+              <span className="mt-1 block text-stone-700">
+                Perros y gatos en adopción. Gratis y con contacto directo con quien
+                los está cuidando.
+              </span>
             </span>
-            <span className="mt-1 block text-stone-700">
-              Perros y gatos en adopción. Gratis y con contacto directo con quien
-              los está cuidando.
+            <span className="shrink-0 rounded-xl border-2 border-marca px-5 py-3 text-center font-bold text-marca">
+              Ver adopciones
             </span>
-          </span>
-          <span className="shrink-0 rounded-xl border-2 border-marca px-5 py-3 text-center font-bold text-marca">
-            Ver adopciones
-          </span>
-        </Link>
+          </Link>
+        )}
 
         <Link
           href="/ayudar"

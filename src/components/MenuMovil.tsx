@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Icono, { type NombreIcono } from "@/components/Icono";
 import { REDES } from "@/lib/redes";
+import { ADOPCION_CON_CONTENIDO } from "@/lib/seo";
 
 const OPCIONES: {
   href: string;
@@ -13,12 +14,18 @@ const OPCIONES: {
   detalle: string;
 }[] = [
   { href: "/", icono: "casa", texto: "Inicio", detalle: "Todos los reportes" },
-  {
-    href: "/adopcion",
-    icono: "hogar",
-    texto: "Adopción",
-    detalle: "Perros y gatos que buscan familia",
-  },
+  // FEATURE-006 — Adopción sale del menú mientras no haya oferta real.
+  // Se filtra en vez de borrarse: la entrada vuelve sola con la constante.
+  ...(ADOPCION_CON_CONTENIDO
+    ? [
+        {
+          href: "/adopcion",
+          icono: "hogar" as NombreIcono,
+          texto: "Adopción",
+          detalle: "Perros y gatos que buscan familia",
+        },
+      ]
+    : []),
   {
     href: "/consejos",
     icono: "buscar",
