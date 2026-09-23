@@ -30,8 +30,11 @@ export const metadata: Metadata = {
   // significaría dos copias del sitio diciendo cada una "yo soy la buena".
   metadataBase: new URL(SITIO),
   title: "Find Your Pet CO — Mascotas perdidas y encontradas en Colombia",
+  // SEO-038: sin «después del sismo del 10 de agosto». El sitio se queda para
+  // siempre y esa frase lo vendía como emergencia temporal. Es la description
+  // de `/` (la que más clics trae) y de toda página que no declare la suya.
   description:
-    "Plataforma comunitaria para reportar mascotas perdidas y encontradas en Colombia después del sismo del 10 de agosto. Publica en un minuto y contacta por WhatsApp.",
+    "Reporta y busca mascotas perdidas y encontradas en Colombia. Gratis, sin registro y con contacto directo por WhatsApp. Publica en un minuto.",
   openGraph: {
     title: "Find Your Pet CO",
     description:
