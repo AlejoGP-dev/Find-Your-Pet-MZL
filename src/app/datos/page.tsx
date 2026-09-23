@@ -50,8 +50,8 @@ export default function PaginaDatos() {
         </p>
         <p>
           No hay empresa ni NIT detrás: es un proyecto personal, gratuito y sin
-          ánimo de lucro, hecho para ayudar después del sismo. La página la
-          atiende una sola persona.
+          ánimo de lucro, hecho para ayudar a que las mascotas perdidas vuelvan
+          a casa. La página la atiende una sola persona.
         </p>
         <p>
           Canal de contacto para todo lo relacionado con datos personales

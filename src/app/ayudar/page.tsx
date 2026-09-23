@@ -50,10 +50,10 @@ export default function PaginaAyudar() {
         Quienes cuidan a los que nadie reclama
       </h1>
       <p className="mt-4 max-w-2xl text-base text-stone-600 sm:text-lg">
-        Después del sismo, las fundaciones y albergues de las ciudades afectadas
-        recibieron muchos más animales de los que ya tenían — y a varios se les
-        cayó el refugio encima. Casi todos se sostienen con lo que la gente dona.
-        Si puedes aportar algo, por poquito que sea, acá están.
+        Las fundaciones y albergues reciben animales todos los días, y casi
+        todos se sostienen con lo que la gente dona. Los que perdieron parte de
+        su refugio van resaltados. Si puedes aportar algo, por poquito que sea,
+        acá están.
       </p>
 
       <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-5">

@@ -172,7 +172,9 @@ export default async function Portada({
   }
 
   let intro =
-    "Después del sismo del 10 de agosto muchas mascotas salieron corriendo y hoy están lejos de su familia. Publica tu reporte en menos de un minuto: sin registro, gratis y con contacto directo por WhatsApp.";
+    // Sin el sismo: el sitio se queda para siempre y ese arranque lo vendía como
+    // emergencia temporal. Este texto también es la description del JSON-LD.
+    "Si se te perdió una mascota o te encontraste una, publícalo acá en menos de un minuto: gratis, sin registro y con contacto directo por WhatsApp. Entre más rápido esté publicado, más gente está buscando.";
 
   if (ciudad && !hayFiltros) {
     const activos = totales.perdidas + totales.encontradas;

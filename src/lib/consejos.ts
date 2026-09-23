@@ -421,7 +421,7 @@ const ADOPTAR: Guia = {
   descripcion:
     "Qué preguntar antes de adoptar un perro o un gato, qué implica de verdad y cómo hacer una adopción segura para el animal y para ti.",
   intro:
-    "Adoptar es de las cosas más bonitas que se pueden hacer, y también un compromiso de diez o quince años. Después de un sismo hay mucha gente conmovida queriendo ayudar — esto es para que esa decisión aguante cuando pase la emoción del momento.",
+    "Adoptar es de las cosas más bonitas que se pueden hacer, y también un compromiso de diez o quince años. Muchas veces se adopta conmovido por una historia — esto es para que esa decisión aguante cuando pase la emoción del momento.",
   etiquetaCorta: "Quiero adoptar",
   icono: "hogar",
   paleta: {
