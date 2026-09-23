@@ -17,30 +17,6 @@ export const metadata: Metadata = {
   }),
 };
 
-const ESTILO = {
-  perdida: {
-    icono: "perdida",
-    titulo: "Se me perdió una mascota",
-    borde: "border-perdida/30 hover:border-perdida",
-    fondo: "bg-perdida-suave",
-    texto: "text-perdida",
-  },
-  encontrada: {
-    icono: "encontrada",
-    titulo: "Me encontré una mascota",
-    borde: "border-encontrada/30 hover:border-encontrada",
-    fondo: "bg-encontrada-suave",
-    texto: "text-encontrada",
-  },
-  adoptar: {
-    icono: "hogar",
-    titulo: "Quiero adoptar",
-    borde: "border-marca/30 hover:border-marca",
-    fondo: "bg-marca-suave",
-    texto: "text-marca-oscuro",
-  },
-} as const;
-
 export default function IndiceConsejos() {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8">
@@ -62,15 +38,17 @@ export default function IndiceConsejos() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {GUIAS.map((g) => {
-          const e = ESTILO[g.slug];
+          // SEO-036: etiqueta, icono y color salen del dato. Antes vivían en un
+          // mapa por slug y una guía nueva tumbaba esta página.
+          const { borde, fondo, texto } = g.paleta;
           return (
             <Link
               key={g.slug}
               href={`/consejos/${g.slug}`}
-              className={`flex flex-col rounded-2xl border-2 p-6 transition ${e.borde} ${e.fondo}`}
+              className={`flex flex-col rounded-2xl border-2 p-6 transition ${borde} ${fondo}`}
             >
-              <span className={`text-xl font-extrabold ${e.texto}`}>
-                {e.titulo} <Icono nombre={e.icono} className="h-[1em] w-[1em]" />
+              <span className={`text-xl font-extrabold ${texto}`}>
+                {g.etiquetaCorta} <Icono nombre={g.icono} className="h-[1em] w-[1em]" />
               </span>
               <span className="mt-2 flex-1 text-stone-700">{g.intro}</span>
               <span className="mt-4 flex flex-wrap gap-1.5">

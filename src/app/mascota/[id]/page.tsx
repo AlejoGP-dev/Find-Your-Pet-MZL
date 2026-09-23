@@ -321,14 +321,23 @@ export default async function PaginaMascota({ params }: Props) {
             )}
           </Link>
 
-          <a
-            href={`/api/reportes/${reporte.id}/afiche`}
-            className="boton-secundario w-full"
-            download
-          >
-            Descargar afiche para compartir
-            <Icono nombre="imagen" />
-          </a>
+          {/* SEO-036: el afiche y la guía de dónde pegarlo van juntos. */}
+          <div>
+            <a
+              href={`/api/reportes/${reporte.id}/afiche`}
+              className="boton-secundario w-full"
+              download
+            >
+              Descargar afiche para compartir
+              <Icono nombre="imagen" />
+            </a>
+            <Link
+              href="/consejos/afiche"
+              className="mt-2 block text-center text-sm font-bold text-marca-oscuro underline underline-offset-2 hover:text-marca"
+            >
+              ¿Dónde pegarlo para que funcione?
+            </Link>
+          </div>
 
           <AccionesReporte
             id={reporte.id}

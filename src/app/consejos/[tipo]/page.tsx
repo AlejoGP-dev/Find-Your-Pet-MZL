@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Ruta }): Promise<Me
   const guia = guiaPorSlug(tipo);
   if (!guia) return {};
   return {
-    title: `${guia.titulo} — Find Your Pet CO`,
+    title: `${guia.tituloSeo ?? guia.titulo} — Find Your Pet CO`,
     description: guia.descripcion,
     alternates: { canonical: `/consejos/${guia.slug}` },
     openGraph: {
@@ -38,9 +38,13 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
   const guia = guiaPorSlug(tipo);
   if (!guia) notFound();
 
-  const otras = GUIAS.filter((g) => g.slug !== guia.slug);
-  const esPerdida = guia.slug === "perdida";
+  // SEO-036: cada guía dice cuáles dos ofrecer al final. Con cinco guías ya no
+  // caben todas, y «las demás» dejó de ser una lista corta.
+  const otras = guia.relacionadas
+    .map((s) => guiaPorSlug(s))
+    .filter((g): g is NonNullable<typeof g> => g !== null);
   const esAdoptar = guia.slug === "adoptar";
+  const cta = guia.cta;
 
   const ruta: Miga[] = [
     { etiqueta: "Inicio", href: "/" },
@@ -70,27 +74,10 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
           sección oculta no hay a dónde mandar a nadie, así que el botón no se
           pinta: la guía sigue viva y sigue siendo útil, pero no promete un
           listado que hoy no existe. Vuelve solo con ADOPCION_CON_CONTENIDO. */}
-      {(!esAdoptar || ADOPCION_CON_CONTENIDO) && (
-      <Link
-        href={esAdoptar ? "/adopcion" : `/reportar?tipo=${guia.slug}`}
-        className="boton-primario mt-6 w-full sm:w-auto"
-      >
-        {esAdoptar ? (
-          <>
-            Ver mascotas en adopción
-            <Icono nombre="hogar" />
-          </>
-        ) : esPerdida ? (
-          <>
-            Publicar que se perdió
-            <Icono nombre="perdida" />
-          </>
-        ) : (
-          <>
-            Publicar que la encontré
-            <Icono nombre="encontrada" />
-          </>
-        )}
+      {cta && (!esAdoptar || ADOPCION_CON_CONTENIDO) && (
+      <Link href={cta.href} className="boton-primario mt-6 w-full sm:w-auto">
+        {cta.texto}
+        <Icono nombre={cta.icono} />
       </Link>
       )}
 
@@ -149,12 +136,22 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
                     <h3 className="font-extrabold leading-snug text-stone-900">
                       {paso.titulo}
                     </h3>
-                    <p className="mt-1 text-stone-600">{paso.texto}</p>
+                    {paso.texto && (
+                      <p className="mt-1 text-stone-600">{paso.texto}</p>
+                    )}
                     {paso.dato && (
                       <p className="mt-2 rounded-xl bg-stone-50 px-3.5 py-2.5 text-sm font-bold text-stone-800">
                         {paso.dato}{" "}
                         <Icono nombre="chincheta" className="h-[1em] w-[1em]" />
                       </p>
+                    )}
+                    {paso.enlace && (
+                      <Link
+                        href={paso.enlace.href}
+                        className="mt-2 inline-block font-bold text-marca-oscuro underline underline-offset-2"
+                      >
+                        {paso.enlace.texto} →
+                      </Link>
                     )}
                   </div>
                 </li>
@@ -172,21 +169,8 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
             className="rounded-2xl border-2 border-stone-300 p-5 transition hover:border-marca hover:bg-marca-suave"
           >
             <span className="block text-lg font-extrabold text-stone-900">
-              {o.slug === "perdida" ? (
-                <>
-                  Se me perdió una mascota{" "}
-                  <Icono nombre="perdida" className="h-[1em] w-[1em]" />
-                </>
-              ) : o.slug === "encontrada" ? (
-                <>
-                  Me encontré una mascota{" "}
-                  <Icono nombre="encontrada" className="h-[1em] w-[1em]" />
-                </>
-              ) : (
-                <>
-                  Quiero adoptar <Icono nombre="hogar" className="h-[1em] w-[1em]" />
-                </>
-              )}
+              {o.etiquetaCorta}{" "}
+              <Icono nombre={o.icono} className="h-[1em] w-[1em]" />
             </span>
             <span className="mt-1 block text-sm text-stone-600">Ver esa guía</span>
           </Link>
@@ -205,6 +189,9 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
         </Link>
       </div>
 
+      {/* SEO-036: la atribución solo va en las guías que salen de esa
+          investigación. La del afiche no. */}
+      {guia.fuentes === "mar" && (
       <p className="mt-8 text-xs leading-relaxed text-stone-500">
         Esta guía se apoya en la investigación de{" "}
         <a
@@ -219,6 +206,7 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
         Universidad de Queensland sobre distancias recorridas por gatos. No
         reemplaza el criterio de un veterinario ni de un rescatista.
       </p>
+      )}
     </div>
   );
 }

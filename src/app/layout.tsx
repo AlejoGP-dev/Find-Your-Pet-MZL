@@ -234,6 +234,20 @@ export default function RootLayout({
                 Me encontré una mascota{" "}
                 <Icono nombre="mano" className="h-[1em] w-[1em]" />
               </Link>
+              <Link
+                href="/consejos/buscar-de-noche"
+                className="font-bold text-marca underline underline-offset-2"
+              >
+                Si se perdió de noche{" "}
+                <Icono nombre="ojo" className="h-[1em] w-[1em]" />
+              </Link>
+              <Link
+                href="/consejos/afiche"
+                className="font-bold text-marca underline underline-offset-2"
+              >
+                Cómo hacer un afiche{" "}
+                <Icono nombre="imagen" className="h-[1em] w-[1em]" />
+              </Link>
             </p>
             <p className="mt-3">
               <Link

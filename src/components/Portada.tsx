@@ -638,8 +638,8 @@ export default async function Portada({
           </h2>
           <p className="mt-2 text-stone-600 md:mx-auto md:max-w-2xl">
             Buscar un gato no se parece en nada a buscar un perro, y la mayoría de
-            la gente hace justo lo que hace huir al animal. Armamos dos guías con
-            lo que sí funciona.
+            la gente hace justo lo que hace huir al animal. Armamos estas guías
+            con lo que sí funciona.
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             <Link
@@ -672,6 +672,34 @@ export default async function Portada({
               <span className="mt-1 block text-sm text-stone-700">
                 Cómo acercarte sin espantarla, qué darle de comer y cómo
                 verificar a la familia.
+              </span>
+            </Link>
+            {/* SEO-036: las dos guías de la ola 1. Este bloque sale en el home y
+                en las páginas de ciudad, que son las que Google ya rastrea. */}
+            <Link
+              href="/consejos/buscar-de-noche"
+              className="rounded-xl border-2 border-indigo-300/60 bg-indigo-50 p-5 transition hover:border-indigo-500"
+            >
+              <span className="block text-lg font-extrabold text-indigo-900">
+                Se perdió de noche{" "}
+                <Icono nombre="ojo" className="h-[1em] w-[1em]" />
+              </span>
+              <span className="mt-1 block text-sm text-stone-700">
+                Dónde se esconde, cómo usar la linterna y qué hacer al
+                amanecer.
+              </span>
+            </Link>
+            <Link
+              href="/consejos/afiche"
+              className="rounded-xl border-2 border-amber-300/70 bg-amber-50 p-5 transition hover:border-amber-500"
+            >
+              <span className="block text-lg font-extrabold text-amber-900">
+                Cómo hacer un afiche{" "}
+                <Icono nombre="imagen" className="h-[1em] w-[1em]" />
+              </span>
+              <span className="mt-1 block text-sm text-stone-700">
+                Qué foto sirve, qué datos van y dónde pegarlo para que alguien
+                se pare a leerlo.
               </span>
             </Link>
           </div>
