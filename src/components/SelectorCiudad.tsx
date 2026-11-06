@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { MENSAJE_CIUDAD, municipioAlInicio, nombreOficial } from "@/lib/ciudades";
 import { buscarMunicipios, type Municipio } from "@/lib/municipios";
 import { CIUDADES } from "@/lib/tipos";
 
@@ -12,9 +13,11 @@ import { CIUDADES } from "@/lib/tipos";
  * el nombre a mano —y por eso hoy conviven «Bogotá» y «Bogota» en la base— y
  * su ciudad nunca podía tener página propia.
  *
- * Se deja escribir libre a propósito. Si alguien reporta desde un corregimiento
- * que no está en la lista oficial, tiene que poder publicar igual: perder un
- * reporte de una mascota perdida por un problema de catálogo sería absurdo.
+ * BUG-002: se puede escribir, pero solo se publica un municipio reconocido. No
+ * hace falta tocar la lista: escribir «manizales» completo también vale. Quien
+ * reporta desde un corregimiento elige su municipio y lo escribe en el barrio.
+ * La validación es la nativa del navegador y la API la repite, porque el
+ * formulario no es la única forma de llegar a ella.
  */
 export default function SelectorCiudad({
   valor,
@@ -34,7 +37,19 @@ export default function SelectorCiudad({
   const [sugerencias, setSugerencias] = useState<Municipio[]>([]);
   const [resaltado, setResaltado] = useState(0);
   const contenedor = useRef<HTMLDivElement>(null);
+  const campo = useRef<HTMLInputElement>(null);
   const idLista = useId();
+  const idAviso = useId();
+
+  const limpio = texto.trim();
+  const noReconocida = limpio !== "" && nombreOficial(limpio) === null;
+  // Mientras la lista está abierta, la persona sigue escribiendo o eligiendo.
+  const mostrarAviso = noReconocida && !abierto;
+  const sugerida = mostrarAviso ? municipioAlInicio(limpio) : null;
+
+  useEffect(() => {
+    campo.current?.setCustomValidity(noReconocida ? MENSAJE_CIUDAD : "");
+  }, [noReconocida]);
 
   // Si el valor llega de fuera (por ejemplo, del ?ciudad= de la URL), se refleja.
   const [valorPrevio, setValorPrevio] = useState(valor);
@@ -89,6 +104,7 @@ export default function SelectorCiudad({
   return (
     <div ref={contenedor} className="relative">
       <input
+        ref={campo}
         id={id}
         className="campo"
         value={texto}
@@ -103,6 +119,8 @@ export default function SelectorCiudad({
         aria-expanded={abierto}
         aria-controls={idLista}
         aria-autocomplete="list"
+        aria-invalid={noReconocida}
+        aria-describedby={mostrarAviso ? idAviso : undefined}
       />
       {/* El valor que viaja al servidor es el mismo que se ve: si la persona
           eligió de la lista, es el nombre oficial del municipio. */}
@@ -136,6 +154,24 @@ export default function SelectorCiudad({
             </li>
           ))}
         </ul>
+      )}
+
+      {mostrarAviso && (
+        <div id={idAviso} className="mt-2 text-sm text-amber-900">
+          <p>{MENSAJE_CIUDAD}</p>
+          {sugerida && (
+            <button
+              type="button"
+              onClick={() => {
+                setTexto(sugerida);
+                alCambiar(sugerida);
+              }}
+              className="mt-1.5 min-h-11 rounded-xl bg-amber-50 px-3.5 py-2 font-bold text-amber-900 ring-1 ring-amber-300 transition hover:bg-amber-100"
+            >
+              ¿Es {sugerida}? Usar esta
+            </button>
+          )}
+        </div>
       )}
 
       {/* Atajos a las ciudades del sismo: siguen siendo el grueso de los

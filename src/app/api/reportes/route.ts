@@ -5,7 +5,7 @@ import {
   listarReportes,
   subirFoto,
 } from "@/lib/almacen";
-import { canonicalizarCiudadNacional } from "@/lib/ciudades";
+import { canonicalizarCiudadNacional, MENSAJE_CIUDAD } from "@/lib/ciudades";
 import { leerMedidas } from "@/lib/medidasImagen";
 import { ubicacionParaGuardar } from "@/lib/ubicacionReporte";
 import {
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     const contacto_nombre = texto(form, "contacto_nombre");
     const contacto_whatsapp = texto(form, "contacto_whatsapp");
 
-    if (!ciudad) return NextResponse.json({ error: "Falta la ciudad." }, { status: 400 });
+    if (!ciudad) return NextResponse.json({ error: MENSAJE_CIUDAD }, { status: 400 });
     if (!barrio) return NextResponse.json({ error: "Falta el barrio o la zona." }, { status: 400 });
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha))
       return NextResponse.json({ error: "Falta la fecha." }, { status: 400 });

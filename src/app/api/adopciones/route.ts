@@ -8,7 +8,7 @@ import {
 import { leerMedidas } from "@/lib/medidasImagen";
 import type { Convivencia, NuevaAdopcion } from "@/lib/adopciones";
 import { buscarPosiblesDuenos } from "@/lib/coincidencias";
-import { canonicalizarCiudadNacional } from "@/lib/ciudades";
+import { canonicalizarCiudadNacional, MENSAJE_CIUDAD } from "@/lib/ciudades";
 import { canonicalizarBarrio } from "@/lib/tipos";
 
 export const runtime = "nodejs";
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     const contacto_nombre = texto(form, "contacto_nombre");
     const contacto_whatsapp = texto(form, "contacto_whatsapp");
 
-    if (!ciudad) return NextResponse.json({ error: "Falta la ciudad." }, { status: 400 });
+    if (!ciudad) return NextResponse.json({ error: MENSAJE_CIUDAD }, { status: 400 });
     if (!barrio) return NextResponse.json({ error: "Falta el barrio o la zona." }, { status: 400 });
     if (contacto_nombre.length < 2)
       return NextResponse.json({ error: "Falta tu nombre." }, { status: 400 });

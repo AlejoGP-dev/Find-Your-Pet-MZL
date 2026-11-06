@@ -13,6 +13,56 @@ import { CIUDADES, type Ciudad } from "./tipos";
  * barrios propia y sus URLs llevan meses publicadas.
  */
 
+/**
+ * BUG-002 — Lo que ve quien escribe algo que no es un municipio. Es el mismo en
+ * el formulario y en la API, para que nadie reciba dos explicaciones distintas.
+ */
+export const MENSAJE_CIUDAD =
+  "Elige tu municipio de la lista. El barrio, la vereda o el corregimiento van en el campo de abajo.";
+
+/**
+ * Formas de escribir un municipio que no coinciden con su nombre en el catálogo
+ * y que la gente usa de verdad. Se rechazarían desde BUG-002, así que hay que
+ * reconocerlas: nadie escribe «San José de Cúcuta». Quien pone el departamento
+ * detrás lo cubre `nombreOficial`, y si no lleva separador, la sugerencia de
+ * `municipioAlInicio`.
+ */
+const VARIANTES: Record<string, string> = {
+  "villa maria": "Villamaría",
+  "dos quebradas": "Dosquebradas",
+  "santiago de cali": "Cali",
+  "bogota dc": "Bogotá",
+  "bogota d c": "Bogotá",
+  "santa fe de bogota": "Bogotá",
+  "santafe de bogota": "Bogotá",
+  cartagena: "Cartagena de Indias",
+  cucuta: "San José de Cúcuta",
+  buga: "Guadalajara de Buga",
+  tumaco: "San Andrés de Tumaco",
+  mariquita: "San Sebastián de Mariquita",
+  mompox: "Santa Cruz de Mompox",
+  mompos: "Santa Cruz de Mompox",
+  tolu: "Santiago de Tolú",
+  ubate: "Villa de San Diego de Ubaté",
+  since: "San Luis de Sincé",
+  guican: "Güicán de la Sierra",
+  piendamo: "Piendamó – Tunía",
+  "piendamo tunia": "Piendamó – Tunía",
+  sotara: "Sotará Paispamba",
+  miriti: "Mirití – Paraná",
+  "miriti parana": "Mirití – Paraná",
+};
+
+function claveVariante(texto: string): string {
+  return texto
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z ]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /** Ciudad del catálogo (con barrios) o municipio del país (sin barrios). */
 export function resolverPorSlug(slug: string): Ciudad | null {
   const delCatalogo = CIUDADES.find((c) => c.slug === slug);
@@ -61,8 +111,23 @@ export function nombreOficial(texto: string): string | null {
   ) as string[];
 
   for (const c of candidatos) {
-    const encontrado = resolverPorNombre(c);
+    const encontrado = resolverPorNombre(VARIANTES[claveVariante(c)] ?? c);
     if (encontrado) return encontrado.nombre;
+  }
+  return null;
+}
+
+/**
+ * El municipio con el que arranca un texto que, completo, no es un municipio.
+ * Es solo para sugerirlo: de los primeros reportes mal diligenciados, 3 de 5
+ * empezaban por un municipio real y seguían con el barrio o el departamento.
+ * Nunca se guarda sin que la persona lo confirme.
+ */
+export function municipioAlInicio(texto: string): string | null {
+  const palabras = texto.replace(/\s+/g, " ").trim().split(" ");
+  for (let n = Math.min(palabras.length, 6); n >= 1; n--) {
+    const encontrado = nombreOficial(palabras.slice(0, n).join(" "));
+    if (encontrado) return encontrado;
   }
   return null;
 }
@@ -85,14 +150,15 @@ export const TOTAL_MUNICIPIOS = MUNICIPIOS.length;
  * hoy conviven «Bogotá» y «Bogota» como si fueran ciudades distintas. Ahora se
  * compara contra los 1.121 municipios oficiales.
  *
- * Si no se reconoce, se respeta lo que escribió la persona (con la inicial en
- * mayúscula): es preferible un reporte con la ciudad rara a un reporte
- * rechazado. Esas ciudades no salen en los filtros ni tienen landing.
+ * Si no se reconoce devuelve vacío y la API rechaza el reporte (BUG-002). Antes
+ * se guardaba lo que hubiera escrito la persona, y este texto sale en el
+ * `<title>` y en el JSON-LD de una ficha indexable: un campo libre ahí terminó
+ * publicando direcciones. Además, sin municipio el reporte no tiene coordenadas,
+ * así que tampoco salía en los filtros ni entraba al cruce de coincidencias.
+ * Decisión de Alejo: un reporte sin municipio no sirve para buscar a nadie.
  */
 export function canonicalizarCiudadNacional(texto: string): string {
-  const limpio = texto.replace(/\s+/g, " ").trim();
-  if (!limpio) return "";
-  return nombreOficial(limpio) ?? limpio.charAt(0).toUpperCase() + limpio.slice(1);
+  return nombreOficial(texto) ?? "";
 }
 
 /** Ciudad con su conteo, para los filtros y los chips de navegación. */
