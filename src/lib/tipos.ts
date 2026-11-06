@@ -290,21 +290,6 @@ export function haceCuanto(iso: string): string {
   return `hace ${meses} ${meses === 1 ? "mes" : "meses"}`;
 }
 
-/** Variantes que la gente escribe a mano y su forma unificada. */
-const ALIAS_CIUDAD: Record<string, string> = {
-  "villamaria": "Villamaría",
-  "villa maria": "Villamaría",
-  "villamaria caldas": "Villamaría",
-  "manizales caldas": "Manizales",
-  "quibdo choco": "Quibdó",
-  "santiago de cali": "Cali",
-  "cali valle": "Cali",
-  "pereira risaralda": "Pereira",
-  "armenia quindio": "Armenia",
-  "popayan cauca": "Popayán",
-  "dos quebradas": "Dosquebradas",
-};
-
 const ALIAS_BARRIO: Record<string, string> = {
   "n/a": "Sin especificar",
   "na": "Sin especificar",
@@ -319,23 +304,6 @@ function sinTildes(texto: string): string {
     .toLowerCase()
     .replace(/\s+/g, " ")
     .trim();
-}
-
-/** Deja la ciudad con el nombre oficial del catálogo cuando la reconoce. */
-export function canonicalizarCiudad(texto: string): string {
-  const limpio = texto.replace(/\s+/g, " ").trim();
-  if (!limpio) return "";
-
-  const clave = sinTildes(limpio);
-  if (ALIAS_CIUDAD[clave]) return ALIAS_CIUDAD[clave];
-
-  const porSlug = CIUDADES.find((c) => c.slug === clave);
-  if (porSlug) return porSlug.nombre;
-
-  const porNombre = ciudadPorNombre(limpio);
-  if (porNombre) return porNombre.nombre;
-
-  return limpio.charAt(0).toUpperCase() + limpio.slice(1);
 }
 
 /**
