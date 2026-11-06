@@ -8,6 +8,7 @@ import CampoUbicacion from "@/components/CampoUbicacion";
 import Icono from "@/components/Icono";
 import SelectorCiudad from "@/components/SelectorCiudad";
 import { resolverPorNombre, resolverPorSlug } from "@/lib/ciudades";
+import { medirReportePublicado } from "@/lib/analitica";
 import { agregarMedidas } from "@/lib/medidasImagen";
 import {
   ESPECIES,
@@ -470,6 +471,14 @@ export default function FormularioReporte() {
         }
         throw new Error(cuerpo.error || "No pudimos guardar el reporte. Intenta de nuevo.");
       }
+
+      // AN-012: el reporte ya está guardado. Es la conversión del sitio y lo
+      // que permite saber qué fuente trae reportes, no solo visitas.
+      medirReportePublicado({
+        tipo: String(datos.get("tipo") ?? ""),
+        especie: String(datos.get("especie") ?? ""),
+        ciudad: String(datos.get("ciudad") ?? ""),
+      });
 
       try {
         const guardados = JSON.parse(localStorage.getItem("fyp-mis-reportes") || "[]");
