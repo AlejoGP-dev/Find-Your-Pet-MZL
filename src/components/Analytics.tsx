@@ -15,9 +15,12 @@ import Script from "next/script";
  * el sitio lo abre gente con mala señal buscando a su mascota, y medir no
  * puede costarle a nadie encontrarla.
  *
- * El ID se puede cambiar sin tocar código con NEXT_PUBLIC_GA_ID.
+ * ARCH-007 — El ID vive solo en NEXT_PUBLIC_GA_ID, definida en Vercel Production.
+ * Sin la variable no se carga nada. Antes el ID real venía por defecto en el
+ * código, y cualquier `next start` local medía en la propiedad de producción,
+ * incluso en modo demo y sin `.env`.
  */
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-KFW6L02SZZ";
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 /**
  * AN-004 — El arranque de gtag, fuera del script que carga tarde.

@@ -36,8 +36,8 @@ import Script from "next/script";
  * pinta nada, no pide nada — y se enciende poniendo `NEXT_PUBLIC_META_PIXEL_ID`
  * en Vercel. Ni un cambio de código más.
  *
- * A diferencia de `NEXT_PUBLIC_GA_ID`, acá NO hay valor por defecto: inventar
- * un ID de píxel manda eventos al Dataset de otro. Sin variable, silencio.
+ * Sin valor por defecto, igual que `NEXT_PUBLIC_GA_ID`: inventar un ID de píxel
+ * manda eventos al Dataset de otro. Sin variable, silencio.
  *
  * LO QUE NO SE MANDA, NUNCA:
  * nombre de mascota, teléfono, ni nada derivado de `contacto_whatsapp` — ni
