@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { EnlacesCiudades } from "@/components/Canales";
 import DatosEstructurados from "@/components/DatosEstructurados";
 import Icono from "@/components/Icono";
 import Migas, { type Miga } from "@/components/Migas";
@@ -79,6 +80,12 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
         {cta.texto}
         <Icono nombre={cta.icono} />
       </Link>
+      )}
+
+      {guia.conCanales && (
+        <p className="mt-4 text-sm text-stone-600">
+          Avisa también a los canales oficiales de tu ciudad: <EnlacesCiudades />.
+        </p>
       )}
 
       {/* Índice: en una guía larga, poder saltar importa */}

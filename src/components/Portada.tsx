@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import {
+  BloqueCanales,
+  BloqueCanalesNacional,
+  LineaCanales,
+  RespuestaCanales,
+} from "@/components/Canales";
 import CercaDeMi, { type UbicacionReporte } from "@/components/CercaDeMi";
 import Contador from "@/components/Contador";
 import DatosEstructurados from "@/components/DatosEstructurados";
@@ -15,6 +21,7 @@ import {
   listarPaginaReportes,
 } from "@/lib/almacen";
 import * as schema from "@/lib/schema";
+import { canalesDe } from "@/lib/canales";
 import { ciudadesDesdeConteo } from "@/lib/ciudades";
 import { POR_PAGINA, TOPE_VER_TODOS, paginaDe, verTodosDe } from "@/lib/paginacion";
 import { ADOPCION_CON_CONTENIDO } from "@/lib/seo";
@@ -152,6 +159,26 @@ export default async function Portada({
   const hayFiltros = Boolean(
     uno(p.tipo) || uno(p.especie) || uno(p.barrio) || uno(p.q) || viendoReunidas,
   );
+
+  // GEO-002: los canales son para la entrada de la página, no para quien ya está
+  // navegando el listado. Se miran los filtros uno por uno y no «sin parámetros»,
+  // porque ChatGPT trae a la gente con `?utm_source=` y esa es la visita que
+  // importa. En el home, `tipo` sí se admite: `/?tipo=encontrada` es una entrada
+  // real de ChatGPT.
+  const sinFiltrosNiPagina =
+    paginaPedida === 1 &&
+    !verTodos &&
+    !viendoReunidas &&
+    !uno(p.especie) &&
+    !uno(p.barrio) &&
+    !uno(p.q);
+  const canales =
+    ciudad && sinFiltrosNiPagina && !uno(p.tipo) ? canalesDe(ciudad.slug) : null;
+  const canalesNacional =
+    !ciudad &&
+    sinFiltrosNiPagina &&
+    !ciudadFiltro &&
+    (!uno(p.tipo) || uno(p.tipo) === "perdida" || uno(p.tipo) === "encontrada");
 
   function barriosFrecuentes(lista: Reporte[], cuantos = 3): string[] {
     const cuenta = new Map<string, number>();
@@ -350,6 +377,8 @@ export default async function Portada({
             )}
           </div>
 
+          {canales && <RespuestaCanales canales={canales} />}
+
           <div className="mt-8 grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3 md:mx-auto">
             {cajas.map((dato) => (
               <Link
@@ -424,6 +453,7 @@ export default async function Portada({
               </span>
             )}
           </div>
+          {canalesNacional && <LineaCanales />}
         </div>
       </section>
 
@@ -580,6 +610,9 @@ export default async function Portada({
           </>
         )}
       </section>
+
+      {canales && <BloqueCanales canales={canales} />}
+      {canalesNacional && <BloqueCanalesNacional />}
 
       <section className="mx-auto w-full max-w-5xl px-4 pb-6">
         {/* FEATURE-006 — La tarjeta de adopción se oculta mientras la sección

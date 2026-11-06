@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ogPagina } from "@/lib/seo";
 import Link from "next/link";
+import { EnlacesCiudades } from "@/components/Canales";
 import Icono from "@/components/Icono";
 import { GUIAS } from "@/lib/consejos";
 
@@ -81,6 +82,9 @@ export default function IndiceConsejos() {
         <Link href="/reportar" className="boton-primario mt-5">
           Publicar un reporte
         </Link>
+        <p className="mt-4 text-sm text-stone-600">
+          Avisa también a los canales oficiales de tu ciudad: <EnlacesCiudades />.
+        </p>
       </div>
     </div>
   );

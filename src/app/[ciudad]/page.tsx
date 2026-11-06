@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Portada from "@/components/Portada";
 import { contarReportesPorCiudad } from "@/lib/almacen";
 import { UMBRAL } from "@/lib/seo";
+import { canalesDe } from "@/lib/canales";
 import { resolverPorSlug } from "@/lib/ciudades";
 import { canonicalPaginado, paginaDe } from "@/lib/paginacion";
 
@@ -29,7 +30,9 @@ export async function generateMetadata({
   const pagina = paginaDe(await searchParams);
 
   const titulo = `Mascotas perdidas y encontradas en ${ciudad.nombre} — Find Your Pet CO`;
-  const descripcion = `Reporta y busca mascotas perdidas o encontradas en ${ciudad.nombre}, ${ciudad.departamento}. Gratis, sin registro y con contacto directo por WhatsApp.`;
+  const descripcion =
+    canalesDe(ciudad.slug)?.descripcion ??
+    `Reporta y busca mascotas perdidas o encontradas en ${ciudad.nombre}, ${ciudad.departamento}. Gratis, sin registro y con contacto directo por WhatsApp.`;
 
   // SEO-006: la página existe siempre para el usuario, pero solo se le ofrece
   // a Google cuando tiene algo que mostrar. `follow: true` es deliberado: aunque

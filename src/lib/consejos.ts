@@ -62,6 +62,8 @@ export type Guia = {
    * estudio de Queensland. `null` = la guía no sale de esa investigación.
    */
   fuentes: "mar" | null;
+  /** GEO-002: la guía enlaza a los canales oficiales de cada ciudad. */
+  conCanales?: boolean;
   bloques: Bloque[];
 };
 
@@ -83,6 +85,7 @@ const PERDIDA: Guia = {
   // SEO-036: las dos guías nuevas cuelgan de las que ya tienen impresiones.
   relacionadas: ["buscar-de-noche", "afiche"],
   fuentes: "mar",
+  conCanales: true,
   bloques: [
     {
       id: "primeras-horas",
