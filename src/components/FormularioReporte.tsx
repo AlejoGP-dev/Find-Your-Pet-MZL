@@ -871,7 +871,7 @@ export default function FormularioReporte() {
             name="referencia"
             className="campo"
             maxLength={140}
-            placeholder="Ej: cerca al parque principal, frente a la panadería"
+            placeholder="Ej: frente al parque principal"
             aria-describedby="aviso-ubicacion"
           />
           {/* BUG-004 (D-51): barrio y referencia salen en la ficha pública. */}
