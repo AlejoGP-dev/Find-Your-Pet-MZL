@@ -871,8 +871,13 @@ export default function FormularioReporte() {
             name="referencia"
             className="campo"
             maxLength={140}
-            placeholder="Ej: cerca al parque, calle 65 con carrera 23"
+            placeholder="Ej: cerca al parque principal, frente a la panadería"
+            aria-describedby="aviso-ubicacion"
           />
+          {/* BUG-004 (D-51): barrio y referencia salen en la ficha pública. */}
+          <p id="aviso-ubicacion" className="mt-2 text-sm font-semibold text-amber-900">
+            Esto lo ve cualquiera. No pongas la dirección de tu casa.
+          </p>
         </div>
         <CampoUbicacion />
       </section>
