@@ -46,3 +46,7 @@ _to_delete/
 # credenciales y accesos (NUNCA subir)
 _privado/
 *.xlsx
+
+# herramientas y entregas de agentes: pueden traer datos internos (H-69)
+.claude/
+Claude outputs/
