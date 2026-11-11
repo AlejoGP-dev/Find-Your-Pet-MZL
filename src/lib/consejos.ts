@@ -62,9 +62,30 @@ export type Guia = {
    * estudio de Queensland. `null` = la guía no sale de esa investigación.
    */
   fuentes: "mar" | null;
+  /**
+   * SEO-938: estudios citados en los bloques, con su DOI. Se pintan en la
+   * misma nota al pie, después del texto fijo. Solo las guías que los citan.
+   */
+  fuentesExtra?: { texto: string; href: string }[];
+  /**
+   * SEO-938: fecha de la última revisión del contenido, en ISO (AAAA-MM-DD).
+   * Se muestra en la página y alimenta `dateModified` y el `lastModified` del
+   * sitemap. Solo cambia cuando cambia el contenido, nunca para «refrescar».
+   */
+  revisado?: string;
   /** GEO-002: la guía enlaza a los canales oficiales de cada ciudad. */
   conCanales?: boolean;
   bloques: Bloque[];
+};
+
+// SEO-938: los dos estudios que citan los bloques de perdida y encontrada.
+const FUENTE_HUANG = {
+  texto: "Huang y otros (2018), Animals",
+  href: "https://doi.org/10.3390/ani8010005",
+};
+const FUENTE_WEISS = {
+  texto: "Weiss, Slater y Lord (2012), Animals",
+  href: "https://doi.org/10.3390/ani2020301",
 };
 
 const PERDIDA: Guia = {
@@ -85,20 +106,51 @@ const PERDIDA: Guia = {
   // SEO-036: las dos guías nuevas cuelgan de las que ya tienen impresiones.
   relacionadas: ["buscar-de-noche", "afiche"],
   fuentes: "mar",
+  fuentesExtra: [FUENTE_HUANG, FUENTE_WEISS],
+  revisado: "2026-11-11",
   conCanales: true,
   bloques: [
+    {
+      id: "primeros-minutos",
+      icono: "check",
+      titulo: "Se acaba de perder: por dónde empezar",
+      entradilla: "Cuatro cosas antes de salir a la calle. No toman nada.",
+      pasos: [
+        {
+          titulo: "Revisa primero adentro de la casa",
+          texto:
+            "Sobre todo si es gato. En un estudio con 1.210 gatos perdidos, 4 % de los que aparecieron vivos estaba dentro de su propia casa: detrás o debajo de un mueble, en un cuarto, en el sótano.",
+        },
+        {
+          titulo: "Si están dos, repártanse: uno sale y otro publica",
+          texto:
+            "Si estás solo, publica primero. Toma un minuto y después ya tienes las manos libres para buscar.",
+          enlace: { href: "/reportar?tipo=perdida", texto: "Publicar el reporte" },
+        },
+        {
+          titulo: "Deja listo el regreso",
+          texto:
+            "Muchos vuelven solos. Que alguien se quede en la casa o, si no, deja agua, comida y una prenda tuya en la entrada, sin dejar la casa abierta.",
+        },
+        {
+          titulo: "Ten el celular a la mano y contesta números desconocidos",
+          texto:
+            "Quien la vea no te tiene guardado. Y si alguien te pide plata antes de mostrártela, no se la mandes.",
+          enlace: { href: "/consejos/perdida#estafas", texto: "Cómo evitar las estafas" },
+        },
+      ],
+    },
     {
       id: "primeras-horas",
       icono: "reloj",
       titulo: "Las primeras horas",
-      entradilla:
-        "El error más común es quedarse en casa esperando a que alguien llame.",
+      entradilla: "Quedarse en casa esperando a que alguien llame no alcanza.",
       pasos: [
         {
           titulo: "Sal a buscar a pie, ya",
           texto:
-            "De todos los métodos estudiados, la búsqueda física del área es el que más mascotas ha recuperado. Publicar y esperar no reemplaza salir a caminar la zona.",
-          dato: "Buscar a pie es el método más efectivo, por encima de carteles y redes",
+            "En una encuesta nacional en Estados Unidos, salir a buscar en el barrio fue la forma más común de recuperar a un perro, y la segunda en gatos. Publicar y esperar no reemplaza salir a caminar la zona.",
+          dato: "Perros recuperados: 49 % buscando en el barrio · Gatos: 30 %",
         },
         {
           titulo: "Empieza por donde se perdió, no por donde crees que fue",
@@ -128,17 +180,29 @@ const PERDIDA: Guia = {
           titulo: "Está más cerca de lo que crees",
           texto:
             "Un estudio de la Universidad de Queensland midió qué tan lejos llegan. Si tu gato era de puertas adentro, probablemente está a menos de media cuadra, escondido y sin hacer ruido.",
-          dato: "Gato casero: 50 m de mediana · Gato que salía a la calle: 315 m",
+          dato: "Gato que nunca sale: 39 m de mediana · Gato que sale a la calle: 300 m",
         },
         {
           titulo: "Busca en escondites, no a campo abierto",
           texto:
             "Un gato asustado busca espacios cerrados y apretados: debajo de la casa, entre tejas, en un altillo, tras un lavadero, en arbustos densos, dentro de un carro parqueado. Necesitas linterna y agacharte, aunque sea de día.",
+          dato: "Dónde aparecieron los que estaban afuera: patio 20 % · esperando en la entrada 19 % · entre arbustos 16 % · bajo un corredor o terraza 10 %",
         },
         {
           titulo: "Pide permiso para revisar patios vecinos",
           texto:
             "Muchísimos gatos aparecen encerrados en la casa del lado, en un garaje o en un depósito que alguien cerró sin darse cuenta. Tienes que entrar a mirar tú: el vecino que 'ya revisó' casi nunca revisó debajo de las cosas.",
+        },
+        {
+          titulo: "Llámalo bajito y quédate escuchando",
+          texto:
+            "Hay gatos que responden y no salen. Entre quienes dijeron que llamarlo fue lo que más ayudó, en más de la mitad de los casos el gato maulló sin acercarse. Llama con tu voz normal, para y escucha.",
+        },
+        {
+          titulo: "Si ya lo viste y no se deja coger, no lo persigas",
+          texto:
+            "Existen trampas humanas que lo encierran sin hacerle daño. Pregúntale a una fundación o a un rescatista cómo se usan, y revísala seguido.",
+          enlace: { href: "/ayudar", texto: "Ver fundaciones y albergues" },
         },
         {
           titulo: "Ten paciencia: pueden tardar días en salir",
@@ -184,6 +248,59 @@ const PERDIDA: Guia = {
       ],
     },
     {
+      id: "que-tan-lejos",
+      icono: "ubicacion",
+      titulo: "¿Qué tan lejos puede estar?",
+      entradilla:
+        "Depende de si es gato o perro, y de cómo se fue. Son datos de otros países: no conocemos un estudio igual en Colombia.",
+      pasos: [
+        {
+          titulo: "Gato que nunca sale: empieza por la misma cuadra",
+          texto:
+            "La mitad apareció a menos de 39 metros del punto por donde se escapó. Los autores del estudio sugieren buscar en un radio de unos 200 metros.",
+          dato: "Gato que nunca sale: 3 de cada 4 a menos de 137 m",
+        },
+        {
+          titulo: "Gato que sale a la calle: abre hasta un par de kilómetros",
+          texto:
+            "La mitad apareció a menos de 300 metros, pero aquí la búsqueda es mucho más amplia: el mismo estudio sugiere llegar a 2 kilómetros o más.",
+          dato: "Gato que sale a la calle: 3 de cada 4 a menos de 1,6 km",
+        },
+        {
+          titulo: "Perro: depende de su carácter y de cómo salió",
+          texto:
+            "No encontramos un estudio de distancias como el de los gatos, así que esto es lo que ve quien se dedica a rastrearlos: el sociable suele aparecer cerca, y el muy miedoso tiende a llegar más lejos. El que salió siguiendo un olor suele quedarse a poca distancia; el que arrancó en pánico puede correr varios kilómetros.",
+          enlace: { href: "/?tipo=encontrada#reportes", texto: "Ver las mascotas encontradas" },
+        },
+      ],
+    },
+    {
+      id: "vuelven-solos",
+      icono: "casa",
+      titulo: "¿Vuelven solos? ¿Hasta cuándo seguir buscando?",
+      entradilla: "Las dos preguntas que llegan cuando pasan los días.",
+      pasos: [
+        {
+          titulo: "Muchos vuelven, pero no todos",
+          texto:
+            "En una encuesta nacional en Estados Unidos, la mayoría de los perros y gatos perdidos fue recuperada, y entre los gatos lo más común fue que regresaran por su cuenta. Cada dueño decidió qué contaba como «perdido», así que incluye pérdidas cortas.",
+          dato: "Recuperados: 93 % de los perros y 75 % de los gatos. Volvieron solos: 20 % de esos perros y 59 % de esos gatos",
+        },
+        {
+          titulo: "Una semana sin noticias no es el final",
+          texto:
+            "En el estudio de 1.210 gatos, la mediana fue de 6 días, y muchos tardaron bastante más. Casi todos los que aparecieron vivos lo hicieron en los primeros dos meses, y después de 90 días fueron pocos.",
+          dato: "Gatos encontrados vivos: 34 % a los 7 días · 50 % a los 30 · 61 % al año",
+        },
+        {
+          titulo: "Si pasan los días, cambia lo que estás haciendo",
+          texto:
+            "Vuelve al punto donde se perdió, pregúntale otra vez a quien ya le preguntaste, revisa las encontradas de tu ciudad y actualiza el reporte si tienes una mejor foto. Y si aparece, márcalo como «ya apareció» y baja los afiches.",
+          enlace: { href: "/?tipo=encontrada#reportes", texto: "Ver las mascotas encontradas" },
+        },
+      ],
+    },
+    {
       id: "difusion",
       icono: "megafono",
       titulo: "Que lo vea la mayor cantidad de gente",
@@ -211,21 +328,27 @@ const PERDIDA: Guia = {
       ],
     },
     {
-      id: "sismo",
-      icono: "sismo",
-      titulo: "Después del sismo",
+      // SEO-938 · H-58-b: reemplaza al bloque del sismo con uno general.
+      id: "susto",
+      icono: "sirena",
+      titulo: "Si huyó por pólvora, tormenta o temblor",
       entradilla:
-        "Un temblor cambia el patrón normal de búsqueda y vale la pena tenerlo en cuenta.",
+        "Un ruido fuerte cambia la búsqueda: el animal no se fue caminando, salió corriendo.",
       pasos: [
         {
-          titulo: "Muchas salieron corriendo mucho más lejos de lo normal",
+          titulo: "Abre la búsqueda antes de lo normal",
           texto:
-            "El ruido y la vibración disparan una huida de pánico. Amplía el radio más de lo que ampliarías en una pérdida común y revisa barrios vecinos.",
+            "Un perro que arranca en pánico por pólvora o truenos puede correr varios kilómetros. Revisa también los barrios vecinos y avisa en los grupos de esas zonas.",
         },
         {
-          titulo: "Revisa escombros y estructuras con cuidado",
+          titulo: "Un gato asustado suele hacer lo contrario",
           texto:
-            "Es un escondite típico después de un sismo, pero no entres a una edificación averiada por tu cuenta. Si crees que está ahí, llama a Bomberos (119) o a la línea 123.",
+            "El gato miedoso tiende a quedarse cerca, escondido y en silencio. Revisa su cuadra a fondo antes de irte lejos.",
+        },
+        {
+          titulo: "Si hubo daños, no entres",
+          texto:
+            "Después de un temblor o una emergencia, no entres a una edificación averiada ni a escombros, así creas que está ahí. Llama a la línea de emergencias 123.",
         },
       ],
     },
@@ -277,6 +400,8 @@ const ENCONTRADA: Guia = {
   // SEO-036: las dos guías nuevas cuelgan de las que ya tienen impresiones.
   relacionadas: ["buscar-de-noche", "afiche"],
   fuentes: "mar",
+  fuentesExtra: [FUENTE_HUANG, FUENTE_WEISS],
+  revisado: "2026-11-11",
   bloques: [
     {
       id: "acercarse",
@@ -304,6 +429,41 @@ const ENCONTRADA: Guia = {
           titulo: "Ojo con morder",
           texto:
             "Un animal adolorido o aterrado puede morder sin ser agresivo. Si gruñe, se encoge o te enseña los dientes, no insistas: publica el reporte con la ubicación y pide ayuda de alguien con experiencia.",
+        },
+      ],
+    },
+    {
+      id: "esta-perdido",
+      icono: "pensar",
+      titulo: "Antes de llevártelo: ¿de verdad está perdido?",
+      entradilla:
+        "Un animal suelto no siempre es un animal sin casa, y llevártelo lejos le puede borrar la pista a su familia.",
+      pasos: [
+        {
+          titulo: "Sin collar no quiere decir sin familia",
+          texto:
+            "En una encuesta nacional en Estados Unidos, muchos animales perdidos no llevaban placa ni chip la última vez que se perdieron, sobre todo los gatos.",
+          dato: "Sin ninguna identificación: 56 % de los gatos y 11 % de los perros",
+        },
+        {
+          titulo: "Asustado no quiere decir maltratado",
+          texto:
+            "Un perro desconfiado se encoge y se aleja aunque en su casa lo traten bien. Esa reacción no te dice nada sobre su familia.",
+        },
+        {
+          titulo: "Un gato en la calle puede vivir muy cerca",
+          texto:
+            "En un estudio con gatos perdidos, la mitad apareció a menos de 50 metros de donde se había escapado. Si está sano y tranquilo, pregunta en la cuadra antes de llevártelo.",
+        },
+        {
+          titulo: "Antes de moverlo, anota dónde estaba",
+          texto:
+            "La hora, la cuadra, un punto de referencia y una foto. La familia va a buscar desde ahí.",
+        },
+        {
+          titulo: "Si está herido o en peligro, primero sácalo de ahí",
+          texto:
+            "Eso va antes que todo lo demás, con cuidado de que no te muerda. Después lo llevas a una veterinaria y haces lo otro.",
         },
       ],
     },
@@ -383,6 +543,70 @@ const ENCONTRADA: Guia = {
           titulo: "Si no puedes tenerlo, dilo en el reporte",
           texto:
             "Escribe que necesitas hogar de paso. En la página de ayuda hay fundaciones y personas que a veces pueden recibirlo, pero contáctalas antes de llevarles nada.",
+        },
+      ],
+    },
+    {
+      id: "cuanto-esperar",
+      icono: "reloj",
+      titulo: "¿Cuánto hay que esperar a la familia?",
+      entradilla:
+        "No hay una respuesta única y esto no es asesoría legal. Lo que sí se sabe es que una familia puede tardar en aparecer.",
+      pasos: [
+        {
+          titulo: "Pasada una semana, todavía lo pueden estar buscando",
+          texto:
+            "En un estudio con gatos perdidos, solo una parte apareció en la primera semana. La familia puede seguir buscando cuando tú ya creas que nadie va a escribir.",
+          dato: "Gatos encontrados vivos: 34 % a los 7 días · 50 % a los 30",
+        },
+        {
+          titulo: "Deja el reporte publicado",
+          texto:
+            "Acá no se vence. Y vuelve a mirar cada tanto las perdidas de tu ciudad: la familia puede publicar días después.",
+          enlace: { href: "/?tipo=perdida#reportes", texto: "Ver las mascotas perdidas" },
+        },
+        {
+          titulo: "No lo des en adopción a la primera",
+          texto:
+            "Quien lo vaya a adoptar debería preguntarte cuánto buscaste a la familia. Ten esa respuesta lista, y que sea cierta.",
+          enlace: { href: "/consejos/adoptar", texto: "Qué preguntar antes de adoptar" },
+        },
+      ],
+    },
+    {
+      id: "a-quien-llamar",
+      icono: "institucion",
+      titulo: "¿A quién llamar si no puedes quedártelo?",
+      entradilla:
+        "Cada municipio lo maneja distinto y no te vamos a dar un número que no hayamos comprobado.",
+      pasos: [
+        {
+          titulo: "Si hay peligro para alguien, es una emergencia",
+          texto:
+            "Un animal mordiendo, o en mitad de una vía con carros encima: llama a la línea 123.",
+        },
+        {
+          titulo: "Pregunta en tu alcaldía quién atiende animales",
+          texto:
+            "La oficina cambia de una ciudad a otra. Pregunta si reciben animales o cómo proceden, y no des por hecho que van a venir a recogerlo. En Bogotá existe el Instituto Distrital de Protección y Bienestar Animal.",
+          enlace: { href: "/bogota", texto: "Ver los canales de Bogotá" },
+        },
+        {
+          titulo: "Escríbele a una fundación antes de llegar",
+          texto:
+            "En la página de ayuda están las que tenemos registradas. Escríbeles antes: llegar sin avisar le complica todo a quien lo recibe.",
+          enlace: { href: "/ayudar", texto: "Ver fundaciones y albergues" },
+        },
+        {
+          titulo: "Publica el reporte aunque se lo lleve otra persona",
+          texto:
+            "Que esté bajo techo no significa que la familia lo sepa. Di dónde apareció y con quién quedó.",
+          enlace: { href: "/reportar?tipo=encontrada", texto: "Publicar que la encontré" },
+        },
+        {
+          titulo: "No lo sueltes en otro lado",
+          texto:
+            "Soltarlo lejos de donde apareció lo deja otra vez en la calle y le quita a la familia la única pista que tenía.",
         },
       ],
     },

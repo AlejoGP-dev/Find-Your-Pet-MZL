@@ -129,6 +129,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${SITIO}/consejos/${g.slug}`,
       changeFrequency: "monthly" as const,
       priority: 0.7,
+      // SEO-938: solo las guías con fecha de revisión declaran lastModified.
+      ...(g.revisado ? { lastModified: new Date(g.revisado) } : {}),
     })),
   ];
 

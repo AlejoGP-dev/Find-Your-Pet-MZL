@@ -135,10 +135,17 @@ export function articulo({
   titulo,
   descripcion,
   ruta,
+  modificado,
 }: {
   titulo: string;
   descripcion: string;
   ruta: string;
+  /**
+   * SEO-938: fecha ISO de la última revisión del contenido. Sin ella no se
+   * emite `dateModified`. Tampoco hay `datePublished`: la fecha real de
+   * publicación no se conoce y no se inventa (`D-38`).
+   */
+  modificado?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -147,6 +154,7 @@ export function articulo({
     description: descripcion,
     url: urlAbsoluta(ruta),
     inLanguage: "es-CO",
+    ...(modificado ? { dateModified: modificado } : {}),
     author: { "@type": "Person", name: RESPONSABLE },
     publisher: { "@type": "Person", name: RESPONSABLE },
     isPartOf: { "@type": "WebSite", name: NOMBRE, url: `${SITIO}/` },

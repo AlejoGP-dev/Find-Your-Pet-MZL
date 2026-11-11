@@ -8,6 +8,7 @@ import Migas, { type Miga } from "@/components/Migas";
 import { GUIAS, guiaPorSlug } from "@/lib/consejos";
 import * as schema from "@/lib/schema";
 import { ADOPCION_CON_CONTENIDO } from "@/lib/seo";
+import { formatearFecha } from "@/lib/tipos";
 
 type Ruta = Promise<{ tipo: string }>;
 
@@ -46,6 +47,7 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
     .filter((g): g is NonNullable<typeof g> => g !== null);
   const esAdoptar = guia.slug === "adoptar";
   const cta = guia.cta;
+  const extra = guia.fuentesExtra ?? [];
 
   const ruta: Miga[] = [
     { etiqueta: "Inicio", href: "/" },
@@ -61,6 +63,7 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
           titulo: guia.titulo,
           descripcion: guia.descripcion,
           ruta: `/consejos/${guia.slug}`,
+          modificado: guia.revisado,
         })}
       />
 
@@ -196,10 +199,19 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
         </Link>
       </div>
 
+      {/* SEO-938: fecha de revisión visible, la misma que va en dateModified. */}
+      {guia.revisado && (
+        <p className="mt-8 text-xs text-stone-500">
+          Revisado el {formatearFecha(guia.revisado)}
+        </p>
+      )}
+
       {/* SEO-036: la atribución solo va en las guías que salen de esa
           investigación. La del afiche no. */}
       {guia.fuentes === "mar" && (
-      <p className="mt-8 text-xs leading-relaxed text-stone-500">
+      <p
+        className={`${guia.revisado ? "mt-2" : "mt-8"} text-xs leading-relaxed text-stone-500`}
+      >
         Esta guía se apoya en la investigación de{" "}
         <a
           href="https://www.missinganimalresponse.com/"
@@ -212,6 +224,27 @@ export default async function PaginaConsejos({ params }: { params: Ruta }) {
         sobre comportamiento de mascotas perdidas, y en el estudio de la
         Universidad de Queensland sobre distancias recorridas por gatos. No
         reemplaza el criterio de un veterinario ni de un rescatista.
+        {/* SEO-938: los estudios que citan los bloques, con su DOI. */}
+        {extra.length > 0 && (
+          <>
+            <br />
+            Datos de:{" "}
+            {extra.map((f, i) => (
+              <span key={f.href}>
+                {i > 0 && (i === extra.length - 1 ? " y " : ", ")}
+                <a
+                  href={f.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold underline"
+                >
+                  {f.texto}
+                </a>
+              </span>
+            ))}
+            .
+          </>
+        )}
       </p>
       )}
     </div>
