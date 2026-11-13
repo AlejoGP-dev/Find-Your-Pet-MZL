@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import {
   crearReporte,
   hayReporteReciente,
@@ -6,6 +6,7 @@ import {
   subirFoto,
 } from "@/lib/almacen";
 import { canonicalizarCiudadNacional, MENSAJE_CIUDAD } from "@/lib/ciudades";
+import { avisarReporteNuevo } from "@/lib/indexnow";
 import { leerMedidas } from "@/lib/medidasImagen";
 import { ubicacionParaGuardar } from "@/lib/ubicacionReporte";
 import {
@@ -142,6 +143,8 @@ export async function POST(request: NextRequest) {
     };
 
     const { id, token } = await crearReporte(datos);
+    // GEO-004: después de responder, para no retrasar el 201.
+    after(() => avisarReporteNuevo(id, ciudad));
     return NextResponse.json({ id, token }, { status: 201 });
   } catch (error) {
     return NextResponse.json(

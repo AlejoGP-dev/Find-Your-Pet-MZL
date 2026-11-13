@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { marcarResuelto } from "@/lib/almacen";
+import { avisarIndexNow } from "@/lib/indexnow";
 
 export const runtime = "nodejs";
 
@@ -17,6 +18,8 @@ export async function POST(
     if (!ok) {
       return NextResponse.json({ error: "El código no coincide con este reporte." }, { status: 403 });
     }
+    // GEO-004: la ficha cambió de estado; se avisa después de responder.
+    after(() => avisarIndexNow([`/mascota/${id}`]));
     return NextResponse.json({ ok: true });
   } catch (error) {
     return NextResponse.json(

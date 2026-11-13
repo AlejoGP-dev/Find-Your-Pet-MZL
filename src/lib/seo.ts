@@ -108,3 +108,10 @@ export function recortar(texto: string, max = 155): string {
 export function urlAbsoluta(ruta: string): string {
   return ruta.startsWith("http") ? ruta : `${SITIO}${ruta.startsWith("/") ? "" : "/"}${ruta}`;
 }
+
+/**
+ * GEO-004: clave de IndexNow. Es pública por diseño del protocolo: el buscador
+ * comprueba que `/<clave>.txt` existe en el dominio y contiene esto mismo. Si
+ * se cambia, hay que cambiar también el archivo de `public/`.
+ */
+export const INDEXNOW_KEY = "a4a3074ead666cf9a5be503e79a795c0";
