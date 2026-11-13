@@ -219,6 +219,10 @@ export default function RootLayout({
             <p className="mt-2 max-w-2xl md:mx-auto">
               Hecha para ayudar a reunir a las familias de Colombia con sus
               mascotas.
+              {/* GEO-005: desmiente la confusión con tiendas de GPS. Coincide
+                  con la description del JSON-LD WebSite. */}{" "}
+              Es gratis. No vendemos collares, GPS ni placas, y nunca pedimos
+              dinero.
               Verifica siempre la información antes de entregar un animal y prefiere
               encuentros en lugares públicos y acompañado.
             </p>

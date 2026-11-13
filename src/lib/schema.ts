@@ -16,17 +16,34 @@ import { SITIO, urlAbsoluta } from "./seo";
 
 const NOMBRE = "Find Your Pet CO";
 
+/**
+ * GEO-005: «Find Your Pet Colombia» es también el nombre de una tienda de GPS
+ * para mascotas, y los motores de IA nos confundían con ella. Por eso no se
+ * declara nombre alterno. Si algún día se quiere uno, va acá; `null` no pinta
+ * el campo.
+ */
+const NOMBRE_ALTERNO: string | null = null;
+
+/**
+ * GEO-005: perfiles oficiales del proyecto, solo los que Alejo confirme por
+ * escrito. Vacío no pinta `sameAs`. El Instagram personal del `publisher` no
+ * es un perfil del proyecto y no va acá.
+ */
+const PERFILES_OFICIALES: string[] = [];
+
 /** WebSite + SearchAction. El buscador del home ya acepta ?q=, no es inventado. */
 export function sitioWeb() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: NOMBRE,
-    alternateName: "Find Your Pet Colombia",
+    ...(NOMBRE_ALTERNO ? { alternateName: NOMBRE_ALTERNO } : {}),
     url: `${SITIO}/`,
     inLanguage: "es-CO",
+    // GEO-005: lo mismo que dice el pie de cada página.
     description:
-      "Plataforma comunitaria para reportar mascotas perdidas y encontradas en Colombia.",
+      "Iniciativa ciudadana y gratuita para publicar y buscar mascotas perdidas y encontradas en Colombia. No vende productos.",
+    ...(PERFILES_OFICIALES.length > 0 ? { sameAs: PERFILES_OFICIALES } : {}),
     publisher: {
       "@type": "Person",
       name: RESPONSABLE,
