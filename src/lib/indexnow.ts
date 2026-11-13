@@ -24,21 +24,17 @@ export function indexNowActivo(): boolean {
 export async function avisarIndexNow(rutas: string[]): Promise<void> {
   if (!indexNowActivo() || rutas.length === 0) return;
   try {
-    const respuesta = await fetch(
-      // Solo para probar el fallo en local; en Vercel no existe.
-      process.env.INDEXNOW_ENDPOINT_PRUEBA || ENDPOINT,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json; charset=utf-8" },
-        body: JSON.stringify({
-          host: new URL(SITIO).host,
-          key: INDEXNOW_KEY,
-          keyLocation: `${SITIO}/${INDEXNOW_KEY}.txt`,
-          urlList: rutas.map(urlAbsoluta),
-        }),
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-      },
-    );
+    const respuesta = await fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        host: new URL(SITIO).host,
+        key: INDEXNOW_KEY,
+        keyLocation: `${SITIO}/${INDEXNOW_KEY}.txt`,
+        urlList: rutas.map(urlAbsoluta),
+      }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
     // 200 y 202 son éxito; cualquier otro código solo se anota.
     if (!respuesta.ok) console.warn(`IndexNow respondió ${respuesta.status}`);
   } catch (error) {
