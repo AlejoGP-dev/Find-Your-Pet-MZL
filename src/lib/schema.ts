@@ -1,5 +1,6 @@
 import type { Miga } from "@/components/Migas";
 import { RESPONSABLE } from "./legal";
+import { REDES } from "./redes";
 import { SITIO, urlAbsoluta } from "./seo";
 
 /**
@@ -25,11 +26,12 @@ const NOMBRE = "Find Your Pet CO";
 const NOMBRE_ALTERNO: string | null = null;
 
 /**
- * GEO-005: perfiles oficiales del proyecto, solo los que Alejo confirme por
- * escrito. Vacío no pinta `sameAs`. El Instagram personal del `publisher` no
- * es un perfil del proyecto y no va acá.
+ * GEO-005: perfiles oficiales del proyecto, los mismos que enlaza el pie.
+ * Alejo los confirmó el 13 nov. Salen de `redes.ts` para que haya una sola
+ * fuente. El Instagram personal del `publisher` no es un perfil del proyecto
+ * y no va acá.
  */
-const PERFILES_OFICIALES: string[] = [];
+const PERFILES_OFICIALES: string[] = REDES.map((r) => r.url);
 
 /** WebSite + SearchAction. El buscador del home ya acepta ?q=, no es inventado. */
 export function sitioWeb() {

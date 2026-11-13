@@ -13,11 +13,10 @@ import type { NombreIcono } from "@/components/Icono";
  * un solo archivo. El handle `findyourpetco` es el mismo en las tres redes a
  * propósito (ver SOCIAL-HANDOFF-REDES).
  *
- * OJO — no colgar estas URL del JSON-LD como `sameAs` en esta iteración. El
- * sitio declara un nodo `Person`, no `Organization`, porque `/terminos` afirma
- * que el proyecto no es empresa ni fundación; colgar los perfiles de la marca
- * de una persona sería marcado impreciso. Se revisa el día que el proyecto se
- * formalice como entidad.
+ * GEO-005 (13 nov): estas URL van como `sameAs` del nodo `WebSite` en
+ * `schema.ts`, confirmadas por Alejo. No se cuelgan del `publisher`: ese es un
+ * `Person`, no `Organization`, porque `/terminos` afirma que el proyecto no es
+ * empresa ni fundación, y los perfiles de la marca no son los de una persona.
  */
 export type Red = {
   nombre: string;
